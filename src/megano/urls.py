@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
 
 
@@ -25,7 +25,7 @@ urlpatterns = [
     re_path(r'^favicon\.ico$', favicon_view),
     path("admin/", admin.site.urls),
     path('adminsettings/', include('adminsettings.urls')),
-    path('access/', include('access.urls')),
-    path('pay/', include('payments.urls')),
+    # path('access/', include('access.urls')),
+    # path('pay/', include('payments.urls')),
     path('products/', include('products.urls')),
 ]
