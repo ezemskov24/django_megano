@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db.models import QuerySet
 from django.http import HttpRequest
 
-from . import models
+from . import admin_filters, models
 
 
 @admin.action(description="Archive")
@@ -34,7 +34,6 @@ class ProductAdmin(admin.ModelAdmin):
         mark_archived,
         mark_unarchived
     ]
-    # exclude = ['count_sells']
     inlines = [PictureInline]
     list_display = [
         'name',
@@ -44,14 +43,18 @@ class ProductAdmin(admin.ModelAdmin):
         'avg_price',
         'archived',
     ]
-    list_filter = ['category', 'archived']
+    list_filter = [
+        'category',
+        'archived',
+        admin_filters.MinPriceListFilter,
+        admin_filters.AvgPriceListFilter,
+    ]
     readonly_fields = ['count_sells']
     search_fields = ['name']
 
     @admin.display(description='Sellers')
     def sellers_amount(self, obj: models.Product) -> int:
-        return 0
-        # return len(obj.sellers) if obj.sellers else 0
+        return obj.sellers.count()
 
     @admin.display(description='Min price', empty_value=0)
     def min_price(self, obj: models.Product) -> int:
@@ -63,6 +66,11 @@ class ProductAdmin(admin.ModelAdmin):
 
     def delete_queryset(self, request: HttpRequest, queryset: QuerySet):
         queryset.update(archived=True)
+
+
+@admin.register(models.SellerProduct)
+class SellerProductAdminModel(admin.ModelAdmin):
+    pass
 
 
 @admin.register(models.Category)
