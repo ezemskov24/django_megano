@@ -21,7 +21,7 @@ class Banner:
             for category in self.fixed:
                 category.sample = category.products.annotate(
                     min=Min('sellerproduct__price'),
-                ).order_by('min').prefetch_related('images').get()
+                ).order_by('min').prefetch_related('images').all()[0]
             cache.set(FIXED_KEY, self.fixed)
 
         self.slider = cache.get(SLIDER_KEY)

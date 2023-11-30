@@ -30,7 +30,7 @@ class MinPriceListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         qs = queryset.annotate(
-                min=Min('sellers__sellerproduct__price')
+                min=Min('sellerproduct__price')
             )
 
         if self.value() == str(Prices.FIFTY):
