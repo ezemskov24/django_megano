@@ -27,7 +27,8 @@
                                 </div>
                                 <div class="row-block">
                                     <div class="Slider-img">
-                                        <img src="{{ banner.images.get().image.url }}" alt="slider.png"/>
+                                        <img
+                                                src="{{ banner.images.get().image.url }}" alt="Product image"/>
                                     </div>
                                 </div>
                             </div>
@@ -47,30 +48,30 @@
 {% block content %}
     <div class="Middle">
         {% if banners and banners.fixed %}
-        <div class="wrap">
-            <div class="BannersHome">
-                {% for banner in banners.fixed %}
-                    <a class="BannersHomeBlock" href="#">
-                        <div class="BannersHomeBlock-row">
-                            <div class="BannersHomeBlock-block">
-                                <strong class="BannersHomeBlock-title">
-                                    {{ banner.title }}
-                                </strong>
-                                <div class="BannersHomeBlock-content">
-                                    from&#32;<span class="BannersHomeBlock-price">${{ banner.sample.min_price() }}</span>
+            <div class="wrap">
+                <div class="BannersHome">
+                    {% for banner in banners.fixed %}
+                        <a class="BannersHomeBlock" href="#">
+                            <div class="BannersHomeBlock-row">
+                                <div class="BannersHomeBlock-block">
+                                    <strong class="BannersHomeBlock-title">
+                                        {{ banner.title }}
+                                    </strong>
+                                    <div class="BannersHomeBlock-content">
+                                        from&#32;<span class="BannersHomeBlock-price">${{ banner.sample.min_price() }}</span>
+                                    </div>
+                                </div>
+                                <div class="BannersHomeBlock-block">
+                                    <div class="BannersHomeBlock-img">
+                                        <img src="{{ banner.sample.images.get().image.url }}"
+                                         alt="Product image" />
+                                    </div>
                                 </div>
                             </div>
-                            <div class="BannersHomeBlock-block">
-                                <div class="BannersHomeBlock-img">
-                                    <img src="{{ banner.sample.images.get().image.url }}"
-                                     alt="videoca.png" />
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                {% endfor %}
+                        </a>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
         {% endif %}
 
     </div>
