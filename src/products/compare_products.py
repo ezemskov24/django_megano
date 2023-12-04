@@ -1,14 +1,14 @@
-def add_product_to_compare_list():
+def add_product_to_compare_list(request):
     '''добавляет товар в список сравнения'''
     pass
 
 
-def delete_product_to_compare_list():
+def delete_product_to_compare_list(request):
     '''убирает товар из списка сравнения'''
     pass
 
 
-def get_compare_list():
+def get_compare_list(request):
     '''
     Возвращает список товаров из списка сравнения
     (по умолчанию первые 3 товара)
@@ -16,6 +16,6 @@ def get_compare_list():
     pass
 
 
-def get_compare_list_amt():
+def get_compare_list_amt(request):
     '''возвращает количество товаров в списке сравнения'''
     pass
