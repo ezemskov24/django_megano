@@ -1,0 +1,15 @@
+{% extends 'base.jinja2' %}
+
+<body>
+    <h2>Login Page</h2>
+
+    <form action="{{ request.path }}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+
+    {% if next %}
+        <input type="hidden" name="next" value="{{ next }}" />
+    {% endif %}
+</body>

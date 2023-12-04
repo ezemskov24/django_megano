@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+AUTH_USER_MODEL = 'account.Profile'
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'adminsettings.apps.AdminsettingsConfig',
     'payments.apps.PaymentsConfig',
     'products.apps.ProductsConfig',
+    'account.apps.AccountConfig',
 ]
 
 MIDDLEWARE = [
