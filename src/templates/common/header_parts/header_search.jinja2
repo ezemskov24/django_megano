@@ -27,15 +27,16 @@
                                         <a class="CategoriesButton-arrow" href="#"></a>
                                         <div class="CategoriesButton-submenu">
                                             {% for subcategory in subcategories %}
-                                                <a href="{{ subcategory.get_absolute_url() }}">
-                                                    <div class="CategoriesButton-icon">
-                                                        {% if subcategory.icon %}
-                                                            <img src="{{ subcategory.icon.url }}" />
-                                                        {% endif %}
-                                                    </div>
-                                                    <span
-                                                            class="CategoriesButton-text">{{ subcategory.name }}</span>
-                                                </a>
+                                                {% if subcategory.is_active %}
+                                                    <a href="{{ subcategory.get_absolute_url() }}">
+                                                        <div class="CategoriesButton-icon">
+                                                            {% if subcategory.icon %}
+                                                                <img src="{{ subcategory.icon.url }}" />
+                                                            {% endif %}
+                                                        </div>
+                                                        <span class="CategoriesButton-text">{{ subcategory.name }}</span>
+                                                    </a>
+                                                {% endif %}
                                             {% endfor %}
                                         </div>
                                     {% endif %}

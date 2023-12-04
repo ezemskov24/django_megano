@@ -1,7 +1,7 @@
 import random
 
 from django.core.cache import cache
-from django.db.models import Min
+from django.db.models import Count, Min, Q
 
 from .models import Category, Product
 
@@ -15,11 +15,16 @@ class Banner:
         self.fixed = cache.get(FIXED_KEY)
         if not self.fixed:
             self.fixed = random.choices(
-                Category.objects.all(),
+                Category.objects.annotate(
+                    num_products=Count('products', filter=Q(
+                        products__archived=False))
+                ).filter(is_active=True, num_products__gt=0).all(),
                 k=fixed_amount,
             )
             for category in self.fixed:
-                category.sample = category.products.annotate(
+                category.sample = category.products.filter(
+                    archived=False,
+                ).annotate(
                     min=Min('sellerproduct__price'),
                 ).order_by('min').prefetch_related('images').all()[0]
             cache.set(FIXED_KEY, self.fixed)
@@ -27,7 +32,10 @@ class Banner:
         self.slider = cache.get(SLIDER_KEY)
         if not self.slider:
             self.slider = random.choices(
-                Product.objects.all(),
+                Product.objects.filter(
+                    archived=False,
+                    category__is_active=True,
+                ).all(),
                 k=slider_amount,
             )
             cache.set(SLIDER_KEY, self.slider)
