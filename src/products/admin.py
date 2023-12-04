@@ -86,7 +86,13 @@ class SubcategoryInline(admin.TabularInline):
 
 @admin.register(models.Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug', 'is_active', 'sort_index']
+    list_display = [
+        'name',
+        'slug',
+        'parent_category',
+        'is_active',
+        'sort_index',
+    ]
     prepopulated_fields = {
         'slug': ('name',),
     }

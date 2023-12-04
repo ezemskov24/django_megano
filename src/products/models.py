@@ -2,6 +2,9 @@ from django.db import models
 from django.db.models import Avg, Min
 
 
+from .validators import validate_not_subcategory
+
+
 class Product(models.Model):
     """Модель продукта"""
     category = models.ForeignKey(
@@ -130,6 +133,8 @@ class Category(models.Model):
         related_name='subcategories',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
+        validators=[validate_not_subcategory],
     )
     image = models.ImageField(
         upload_to=category_images_directory_path,
