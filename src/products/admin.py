@@ -49,6 +49,9 @@ class ProductAdmin(admin.ModelAdmin):
         admin_filters.MinPriceListFilter,
         admin_filters.AvgPriceListFilter,
     ]
+    prepopulated_fields = {
+        'slug': ('name',),
+    }
     readonly_fields = ['count_sells']
     search_fields = ['name']
 
@@ -73,15 +76,24 @@ class SellerProductAdminModel(admin.ModelAdmin):
     pass
 
 
+class SubcategoryInline(admin.TabularInline):
+    model = models.Category
+    extra = 0
+    prepopulated_fields = {
+        'slug': ('name',),
+    }
+
+
 @admin.register(models.Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'is_active', 'sort_index']
     prepopulated_fields = {
-        'slug': ('name',)
+        'slug': ('name',),
     }
     search_fields = ['name']
     list_filter = ['is_active']
     list_editable = ['is_active', 'sort_index']
+    inlines = [SubcategoryInline]
 
 
 @admin.register(models.Seller)

@@ -16,13 +16,14 @@
                             <div class="row">
                                 <div class="row-block">
                                     <strong class="Slider-title">
-                                        {{ banner.name }}
+                                        {{ banner.name_short(30) }}
                                     </strong>
                                     <div class="Slider-text">
-                                        {{ banner.description }}
+                                        {{ banner.description_short(300) }}
                                     </div>
                                     <div class="Slider-footer">
-                                        <a class="btn btn_primary" href="#">Get Started</a>
+                                        <a class="btn btn_primary"
+                                           href="{{ banner.get_absolute_url() }}">Get Started</a>
                                     </div>
                                 </div>
                                 <div class="row-block">
@@ -51,11 +52,12 @@
             <div class="wrap">
                 <div class="BannersHome">
                     {% for banner in banners.fixed %}
-                        <a class="BannersHomeBlock" href="#">
+                        <a class="BannersHomeBlock"
+                           href="{{ banner.get_absolute_url() }}">
                             <div class="BannersHomeBlock-row">
                                 <div class="BannersHomeBlock-block">
                                     <strong class="BannersHomeBlock-title">
-                                        {{ banner.title }}
+                                        {{ banner.name }}
                                     </strong>
                                     <div class="BannersHomeBlock-content">
                                         from&#32;<span class="BannersHomeBlock-price">${{ banner.sample.min_price() }}</span>
@@ -63,8 +65,8 @@
                                 </div>
                                 <div class="BannersHomeBlock-block">
                                     <div class="BannersHomeBlock-img">
-                                        <img src="{{ banner.sample.images.get().image.url }}"
-                                         alt="Product image" />
+                                        <img src="{{ banner.sample.images.all()[0].image.url }}"
+                                            alt="Product image" />
                                     </div>
                                 </div>
                             </div>
