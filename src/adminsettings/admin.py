@@ -1,5 +1,7 @@
 from django.contrib import admin, messages
 from django.core.cache import cache
+from django.shortcuts import redirect
+from django.urls import path
 
 from .models import SiteSettings
 
@@ -15,11 +17,16 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         'products_images',
         'amount_products_from_the_seller'
     ]
+    change_list_template = 'admin/cache-reset.html'
 
-    actions = ['reset_cache_action']
-
-    def reset_cache_action(self, request, queryset):
+    def reset_cache_action(self, request):
         cache.clear()
-        self.message_user(request, ("Кеш успешно сброшен."), messages.SUCCESS)
+        self.message_user(request, "Кеш успешно сброшен.", messages.SUCCESS)
+        return redirect("..")
 
-    reset_cache_action.short_description = ("Сбросить кеш")
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('reset_cache/', self.reset_cache_action, name='reset_cache'),
+        ]
+        return custom_urls + urls
