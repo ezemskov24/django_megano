@@ -13,7 +13,6 @@ def validate_not_subcategory(value):
             )
     except models.Category.DoesNotExist:
         raise ValidationError(
-            '%Category (value)s does not exist',
+            '%Category %(value)s does not exist',
             params={'value': value},
         )
-

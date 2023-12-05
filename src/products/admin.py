@@ -101,6 +101,13 @@ class CategoryAdmin(admin.ModelAdmin):
     list_editable = ['is_active', 'sort_index']
     inlines = [SubcategoryInline]
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "parent_category":
+            kwargs["queryset"] = models.Category.objects.filter(
+                parent_category=None,
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 @admin.register(models.Seller)
 class SellerAdmin(admin.ModelAdmin):

@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Avg, Min
 
@@ -162,6 +163,18 @@ class Category(models.Model):
     def get_absolute_url(self) -> str:
         'Получение абсолютной ссылки на категорию'
         return '#'
+
+    def clean(self):
+        if self.parent_category:
+            if self.parent_category.pk == self.pk:
+                raise ValidationError(
+                    "Can't be a subcategory of itself",
+                )
+            if self.parent_category.parent_category:
+                raise ValidationError(
+                    "%(parent)s is a subcategory and can't be a parent",
+                    params={'parent': self.parent_category},
+                )
 
 
 class Seller(models.Model):
