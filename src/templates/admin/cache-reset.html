@@ -3,7 +3,7 @@
 {% block object-tools %}
   <form action="{% url 'admin:reset_cache' %}" method="post">
     {% csrf_token %}
-    <input type="submit" value="Reset cache" class="grp-button" />
+    <input type="submit" value="Reset cache">
   </form>
   {{ block.super }}
 {% endblock %}
