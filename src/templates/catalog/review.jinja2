@@ -1,0 +1,50 @@
+{% block content %}
+    <header class="Section-header Section-header_product">
+        <h3 class="Section-title">
+            Добавить отзыв
+        </h3>
+    </header>
+    <div class="Tabs-addComment">
+        <form class="form" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <textarea class="form-textarea" name="text" id="id_text" placeholder="Отзыв"></textarea>
+            </div>
+            <div class="form-group">
+                <button class="btn btn_muted" type="submit">
+                    Отправить отзыв
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+
+
+
+{#    <div class="Tabs-block" id="reviews" style="">#}
+{#        <header class="Section-header">#}
+{#            <h3 class="Section-title">#}
+{#                {{ count_review }}#}
+{#            </h3>#}
+{#        </header>#}
+{#        <div class="Comments">#}
+{#            <div class="Comment">#}
+{#                <div class="Comment-column Comment-column_pict">#}
+{#                    <div class="Comment-avatar">#}
+{#                    </div>#}
+{#                </div>#}
+{#                <div class="Comment-column">#}
+{#                    <header class="Comment-header">#}
+{#                        <div>#}
+{#                            <strong class="Comment-title">Александра Бровина#}
+{#                            </strong><span class="Comment-date">Декабрь 25  /  2017  /  22:50</span>#}
+{#                        </div>#}
+{#                    </header>#}
+{#                    <div class="Comment-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor. Aenean massa. Cumtipsu sociis natoque penatibus et magnis dis parturient montesti, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eutu, pretiumem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justotuio, rhoncus ut loret, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus element semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae.#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#        #}
+{#    </div>#}

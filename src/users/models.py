@@ -7,10 +7,13 @@ class Seller(models.Model):
     """
     Модель для описания продавцов.
 
+    name - название продавца;
     description - описание продавца;
     products - список продавакмых товаров;
+    profile - связь с моделью профиля пользователя;
     archived - архивирование страницы продавца для мягкого удаления.
     """
+    name = models.CharField(max_length=30)
     description = models.TextField()
     products = models.ManyToManyField(Product, through='CountProduct')
     profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
@@ -20,7 +23,8 @@ class Seller(models.Model):
         return f"{self.profile.name}"
 
 class Profile(models.Model):
-    pass
+    name = models.CharField(max_length=20)
+    avatar = models.ImageField(null=True, blank=True, upload_to='avatars/')
 
 
 class CountProduct(models.Model):

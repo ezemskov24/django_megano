@@ -1,0 +1,123 @@
+{% extends 'base.jinja2' %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{{ static('assets/css/basic.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static('assets/css/fonts.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static('assets/css/extra.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static('assets/css/seller.css') }}">
+{% endblock %}
+
+{% block header %}
+    {% include 'common/header_parts/header_middle_full.jinja2' %}
+    {% include 'common/header_parts/header_search.jinja2' %}
+{% endblock %}
+
+{% block title %}
+    Название продавца
+{% endblock %}
+
+
+{% block content %}
+    <div>
+        <div class="Middle Middle_top">
+            <div class="Middle-top">
+                <div class="wrap">
+                    <div class="Middle-header">
+                        <h1 class="Middle-title">*Название продавца</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="Section">
+                <div class="wrap">
+                    <div class="Section-content">
+                        <div class="Seller">
+                            <div class="Seller-infoBlock">
+                                <div class="Seller-personal">
+                                    <div class="row">
+                                        {% if seller.description %}
+                                            <div class="row-block">
+                                                <div class="Seller-description">
+                                                    {{ seller.description }}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        {% if seller.profile.avatar %}
+                                            <div class="row-block">
+                                                <div class="Seller-avatar">
+                                                    <img src="{{ seller.profile.avatar }}" alt="аватар продавца">
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="row">
+                                        <div class="row-block">
+                                            <div class="Seller-info">
+                                                <div class="Seller-infoType">
+                                                    Телефон:
+                                                </div>
+                                                <div class="Seller-infoContent">
+                                                    {{ seller.profile.phone }}
+                                                </div>
+                                            </div>
+                                            <div class="Seller-info">
+                                                <div class="Seller-infoType">
+                                                    E-mail:
+                                                </div>
+                                                <div class="Seller-infoContent">
+                                                    {{ seller.profile.email}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row-block">
+                                            <div class="Seller-info">
+                                                <div class="Seller-infoType">
+                                                    Адрес:
+                                                </div>
+                                                <div class="Seller-infoContent">
+                                                    {{ seller.profile.address }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="Cart Cart_seller">
+{#                                    #}
+{#                                    <div class="Cart-product">#}
+{#                                        <div class="Cart-block Cart-block_row">#}
+{#                                            <div class="Cart-block Cart-block_pict">#}
+{#                                                <a class="Cart-pict" href="#">#}
+{#                                                    <img class="Cart-img" src="assets/img/content/home/card.jpg" alt="card.jpg">#}
+{#                                                </a>#}
+{#                                            </div>#}
+{#                                            <div class="Cart-block Cart-block_info"><a class="Cart-title" href="#">Ноутбук</a>#}
+{#                                                <div class="Cart-desc">#}
+{#                                                    Это супер ноутбук, 3 гб. 4 ядра#}
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                            <div class="Cart-block Cart-block_price">#}
+{#                                                <div class="Cart-price">#}
+{#                                                    80.00$#}
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                        <div class="Cart-block Cart-block_row">#}
+{#                                            <div class="Cart-block Cart-block_amount">#}
+{#                                                1 шт.#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                    #}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+

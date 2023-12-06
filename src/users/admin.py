@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.http import HttpRequest
 from django.db.models import QuerySet
 
-from .models import Seller
+from .models import Seller, Profile
 
 
 class SellerInLine(admin.TabularInline):
@@ -38,3 +38,8 @@ class SellerAdmin(admin.ModelAdmin):
 
     def user_verbose(self, obj: Seller) -> str:
         return obj.profile.name
+
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = 'name',
