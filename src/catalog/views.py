@@ -13,5 +13,4 @@ def show_review(request: HttpRequest):
     Пример view-функции для внедрения кода страницы для добавленя отзыва к товару.
     """
     context = add_review(request)
-    print(context)
     return render(request, 'catalog/review_pass.jinja2', context=context)
