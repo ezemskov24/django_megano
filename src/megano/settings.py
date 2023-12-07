@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'adminsettings.apps.AdminsettingsConfig',
     'payments.apps.PaymentsConfig',
     'products.apps.ProductsConfig',
-    'account.apps.AccountConfig',
+    'users.apps.UsersConfig',
+    'catalog.apps.CatalogConfig',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,56 @@
+{% block content %}
+    <div class="Tabs-block" id="reviews" style="">
+        <header class="Section-header">
+            <h3 class="Section-title">
+                count_review
+            </h3>
+        </header>
+        <div class="Comments">
+            {% for review in reviews_list %}
+                <div class="Comment">
+                    <div class="Comment-column Comment-column_pict">
+                        <img class="Comment-avatar" src="{{ review.author.avatar }}" alt="аватар автора">
+                    </div>
+                    <div class="Comment-column">
+                        <header class="Comment-header">
+                            <div>
+                                <strong class="Comment-title">
+                                    {{ review.author.name }}
+                                </strong>
+                                <span class="Comment-date">
+                                    {{ review.created_at }}
+                                </span>
+                            </div>
+                        </header>
+                        <div class="Comment-content">
+                            {{ review.text }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <header class="Section-header Section-header_product">
+            <h3 class="Section-title">
+                Добавить отзыв
+            </h3>
+        </header>
+        <div class="Tabs-addComment">
+            <form class="form" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <textarea class="form-textarea" name="text" id="id_text" placeholder="Отзыв"></textarea>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn_muted" type="submit">
+                        Отправить отзыв
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+
