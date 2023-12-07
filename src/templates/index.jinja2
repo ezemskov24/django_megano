@@ -1,0 +1,80 @@
+{% extends 'base.jinja2' %}
+
+{% block title %}
+    Megano
+{% endblock %}
+
+{% block header %}
+    {% include 'common/header_full.jinja2' %}
+    {% if banners and banners.slider %}
+    <div class="Header-slider">
+        <div class="Slider Slider_main">
+            <div class="Slider-box">
+                {% for banner in banners.slider %}
+                    <div class="Slider-item">
+                        <div class="Slider-content">
+                            <div class="row">
+                                <div class="row-block">
+                                    <strong class="Slider-title">
+                                        {{ banner.name_short(30) }}
+                                    </strong>
+                                    <div class="Slider-text">
+                                        {{ banner.description_short(300) }}
+                                    </div>
+                                    <div class="Slider-footer">
+                                        <a class="btn btn_primary"
+                                           href="{{ banner.get_absolute_url() }}">Get Started</a>
+                                    </div>
+                                </div>
+                                <div class="row-block">
+                                    <div class="Slider-img">
+                                        <img
+                                                src="{{ banner.images.get().image.url }}" alt="Product image"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="Slider-navigateWrap">
+                <div class="Slider-navigate">
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="Middle">
+        {% if banners and banners.fixed %}
+            <div class="wrap">
+                <div class="BannersHome">
+                    {% for banner in banners.fixed %}
+                        <a class="BannersHomeBlock"
+                           href="{{ banner.get_absolute_url() }}">
+                            <div class="BannersHomeBlock-row">
+                                <div class="BannersHomeBlock-block">
+                                    <strong class="BannersHomeBlock-title">
+                                        {{ banner.name }}
+                                    </strong>
+                                    <div class="BannersHomeBlock-content">
+                                        from&#32;<span class="BannersHomeBlock-price">${{ banner.sample.min_price() }}</span>
+                                    </div>
+                                </div>
+                                <div class="BannersHomeBlock-block">
+                                    <div class="BannersHomeBlock-img">
+                                        <img src="{{ banner.sample.images.all()[0].image.url }}"
+                                            alt="Product image" />
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock %}

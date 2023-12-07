@@ -2267,6 +2267,11 @@ a.Cart-title {
     align-items: center;
 }
 
+.CategoriesButton-icon img {
+    min-width: 26px;
+    max-width: 26px;
+}
+
 .CategoriesButton-content {
     position: absolute;
     top: 100%;
