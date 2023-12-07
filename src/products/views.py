@@ -1,6 +1,16 @@
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-# Create your views here.
+from .banner import Banner
+
+
+def index_view(request: HttpRequest) -> HttpResponse:
+    context = {
+        'banners': Banner(),
+    }
+    return render(request, 'index.jinja2', context)
+
+
 def ProductCreateView():
     pass
 
