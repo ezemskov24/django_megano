@@ -1,13 +1,18 @@
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
-from django.urls import reverse_lazy
-from django.views.generic import CreateView
+
+from .banner import Banner
 
 
-# Create your views here.
-class ProductCreateView(CreateView):
-    model = Product
-    fields = "name", "price", "description", "discount", "preview"
-    success_url = reverse_lazy("shopapp:products_list")
+def index_view(request: HttpRequest) -> HttpResponse:
+    context = {
+        'banners': Banner(),
+    }
+    return render(request, 'index.jinja2', context)
+
+
+def ProductCreateView():
+    pass
 
 
 def ProductDetailsView(DetailView):
@@ -17,8 +22,8 @@ def ProductDetailsView(DetailView):
 
 
 def ProductsListView():
-    return None
+    pass
 
 
 def ProductUpdateView():
-    return None
+    pass
