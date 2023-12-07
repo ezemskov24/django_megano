@@ -6,27 +6,28 @@
             </h3>
         </header>
         <div class="Comments">
-            <div class="Comment">
-                <div class="Comment-column Comment-column_pict">
-                    <img class="Comment-avatar" src="" alt="аватар автора">
-                        author.avatar
-                </div>
-                <div class="Comment-column">
-                    <header class="Comment-header">
-                        <div>
-                            <strong class="Comment-title">
-                                author.name
-                            </strong>
-                            <span class="Comment-date">
-                                review.created_at
-                            </span>
+            {% for review in reviews_list %}
+                <div class="Comment">
+                    <div class="Comment-column Comment-column_pict">
+                        <img class="Comment-avatar" src="{{ review.author.avatar }}" alt="аватар автора">
+                    </div>
+                    <div class="Comment-column">
+                        <header class="Comment-header">
+                            <div>
+                                <strong class="Comment-title">
+                                    {{ review.author.name }}
+                                </strong>
+                                <span class="Comment-date">
+                                    {{ review.created_at }}
+                                </span>
+                            </div>
+                        </header>
+                        <div class="Comment-content">
+                            {{ review.text }}
                         </div>
-                    </header>
-                    <div class="Comment-content">
-                        review.text
                     </div>
                 </div>
-            </div>
+            {% endfor %}
         </div>
         <header class="Section-header Section-header_product">
             <h3 class="Section-title">

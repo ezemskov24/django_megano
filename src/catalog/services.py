@@ -8,10 +8,10 @@ from products.models import Product
 
 
 def get_reviews_list(pk: int):
-    return Product.objects.get(pk=pk).values('reviews')['reviews']
+    return Product.objects.get(pk=pk).reviews.all()
 
 
-def add_review(request: HttpRequest):
+def add_review(request: HttpRequest, *args, **kwargs):
     """
     Сервис добавления отзывов к товару.
 
@@ -20,13 +20,16 @@ def add_review(request: HttpRequest):
             review_template: название шаблона добавления отзыва к товару для имрорта в шаблон страницы товара;
             form: форма для добавления отзыва.
     """
+    product = Product.objects.get(pk=kwargs['pk'])
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
-            Review.objects.create(
+            review = Review.objects.create(
                 text=form.cleaned_data['text'],
                 author=Profile.objects.get(pk=request.user.id),
             )
+            product.review.add(review)
+            product.save()
     else:
         form = ReviewForm()
 
@@ -58,6 +61,3 @@ def get_count_review(pk: int) -> str:
         result = f'{count_review} отзывов'
 
     return result
-
-
-
