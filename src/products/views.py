@@ -15,8 +15,10 @@ def ProductCreateView():
     pass
 
 
-def ProductDetailsView():
-    pass
+def ProductDetailsView(DetailView):
+    template_name = "shopapp/products-details.html"
+    queryset = Product.objects.prefetch_related("images")
+    context_object_name = "product"
 
 
 def ProductsListView():

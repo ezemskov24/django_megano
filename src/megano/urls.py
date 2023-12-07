@@ -28,6 +28,7 @@ urlpatterns = [
     # path('access/', include('access.urls')),
     # path('pay/', include('payments.urls')),
     path('products/', include('products.urls')),
+    path('account/', include('account.urls')),
     path('', index_view)
 ]
 

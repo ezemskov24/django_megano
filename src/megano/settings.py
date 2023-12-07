@@ -29,6 +29,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+AUTH_USER_MODEL = 'account.Profile'
 # Application definition
 
 INSTALLED_APPS = [
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'adminsettings.apps.AdminsettingsConfig',
     'payments.apps.PaymentsConfig',
     'products.apps.ProductsConfig',
+    'account.apps.AccountConfig',
 ]
 
 MIDDLEWARE = [
@@ -155,6 +157,8 @@ else:
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+OGIN_REDIRECT_URL = "/account/profile/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
