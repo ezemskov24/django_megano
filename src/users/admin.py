@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.http import HttpRequest
 from django.db.models import QuerySet
 
-from .models import Seller, Profile
+from .models import Seller
+from account.models import  Profile
 
 
 class SellerInLine(admin.TabularInline):
@@ -10,12 +11,12 @@ class SellerInLine(admin.TabularInline):
 
 
 @admin.action(description="Archive seller")
-def mark_archived(modeladmin:admin.ModelAdmin, request: HttpRequest, queryset: QuerySet):
+def mark_archived(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet):
     queryset.update(archived=True)
 
 
 @admin.action(description="Unarchive seller")
-def mark_unarchived(modeladmin:admin.ModelAdmin, request: HttpRequest, queryset: QuerySet):
+def mark_unarchived(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet):
     queryset.update(archived=False)
 
 
@@ -38,8 +39,3 @@ class SellerAdmin(admin.ModelAdmin):
 
     def user_verbose(self, obj: Seller) -> str:
         return obj.profile.name
-
-
-@admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = 'name',

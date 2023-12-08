@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-import os
+
 import sys
 from pathlib import Path
 
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_jinja',
     'django_cleanup.apps.CleanupConfig',
 
+    'account.apps.AccountConfig',
     'adminsettings.apps.AdminsettingsConfig',
     'payments.apps.PaymentsConfig',
     'products.apps.ProductsConfig',
@@ -155,11 +156,10 @@ else:
     STATICFILES_DIRS = [BASE_DIR / 'static']
 
 
-
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-OGIN_REDIRECT_URL = "/account/profile/"
+LOGIN_REDIRECT_URL = "/account/profile/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

@@ -5,7 +5,7 @@ from django.http import HttpRequest
 from . import admin_filters, models
 
 
-@admin.action(description="Archive")
+@admin.action(description="Archive selected products")
 def mark_archived(
         modeladmin: admin.ModelAdmin,
         request: HttpRequest,
@@ -14,7 +14,7 @@ def mark_archived(
     queryset.update(archived=True)
 
 
-@admin.action(description="Un-archive")
+@admin.action(description="Un-archive selected products")
 def mark_unarchived(
         modeladmin: admin.ModelAdmin,
         request: HttpRequest,
@@ -107,8 +107,3 @@ class CategoryAdmin(admin.ModelAdmin):
                 parent_category=None,
             )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-
-@admin.register(models.Seller)
-class SellerAdmin(admin.ModelAdmin):
-    """SellerAdmin placeholder"""
