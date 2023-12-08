@@ -73,17 +73,91 @@ def product_images_directory_path(
     )
 
 
+def category_images_directory_path(
+        instance: "Category",
+        filename: str
+) -> str:
+    'Сгенерировать путь для сохранения изображения'
+    return "categories/images/category_{pk}/{filename}".format(
+        pk=instance.pk,
+        filename=filename,
+    )
+
+
+def category_icons_directory_path(
+        instance: "Category",
+        filename: str
+) -> str:
+    'Сгенерировать путь для сохранения иконки'
+    return "categories/icons/category_{pk}/{filename}".format(
+        pk=instance.pk,
+        filename=filename,
+    )
+
+
+class Picture(models.Model):
+    """Модель изображения продукта"""
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='images',
+    )
+    image = models.ImageField(upload_to=product_images_directory_path)
+
+
+class SellerProduct(models.Model):
+    """
+    Модель для описпания связи между товарами и продавцами,
+    а также количества товаров и цены у каждого продавца в наличии.
+
+    product - связь с продуктами;
+    seller - связь с продавцами;
+    count - количество товаров в наличии;
+    price - цена товара у данного продавца.
+    """
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+    )
+    seller = models.ForeignKey(
+        'users.Seller',
+        on_delete=models.CASCADE,
+    )
+    count = models.PositiveIntegerField(default=0)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        ordering = ['seller', 'product']
+
+    def __str__(self):
+        return f'{self.product} by {self.seller}'
+
+
 class Category(models.Model):
     """
     Класс категорий товаров
     """
     name = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, null=True)
     is_active = models.BooleanField(default=True)
-    parent_category = models.ForeignKey('self', null=True, blank=True, related_name='children',
-                                        on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='category_images/', null=True, blank=True)
-    icon = models.ImageField(upload_to='category_icons/', null=True, blank=True)
+    parent_category = models.ForeignKey(
+        'self',
+        related_name='subcategories',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        validators=[validate_not_subcategory],
+    )
+    image = models.ImageField(
+        upload_to=category_images_directory_path,
+        null=True,
+        blank=True,
+    )
+    icon = models.ImageField(
+        upload_to=category_icons_directory_path,
+        null=True,
+        blank=True,
+    )
     sort_index = models.IntegerField(default=0)
 
     class Meta:
@@ -97,3 +171,18 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self) -> str:
+        'Получение абсолютной ссылки на категорию'
+        return '#'
+
+    def clean(self):
+        if self.parent_category:
+            if self.parent_category.pk == self.pk:
+                raise ValidationError(
+                    "Can't be a subcategory of itself",
+                )
+            if self.parent_category.parent_category:
+                raise ValidationError(
+                    "%(parent)s is a subcategory and can't be a parent",
+                    params={'parent': self.parent_category},
+                )

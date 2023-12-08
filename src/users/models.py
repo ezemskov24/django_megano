@@ -1,6 +1,7 @@
 from django.db import models
 
-from products.models import Product
+from account.models import Profile
+from products.models import Product, SellerProduct
 
 
 class Seller(models.Model):
@@ -15,30 +16,14 @@ class Seller(models.Model):
     """
     name = models.CharField(max_length=30)
     description = models.TextField()
-    products = models.ManyToManyField(Product, through='CountProduct')
-    profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
+    products = models.ManyToManyField(
+        Product,
+        through=SellerProduct,
+        through_fields=('seller', 'product'),
+        related_name='sellers',
+    )
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     archived = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"{self.profile.name}"
-
-class Profile(models.Model):
-    name = models.CharField(max_length=20)
-    avatar = models.ImageField(null=True, blank=True, upload_to='avatars/')
-
-
-class CountProduct(models.Model):
-    """
-    Модель для описпания связи между товарами и продавцами,
-    а также количества товаров у каждого продавца в наличии.
-
-    product - связь с продуктами;
-    seller - связь с продавцами;
-    count - количество товаров в наличии.
-    """
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
-    count = models.PositiveIntegerField()
-
-    class Meta:
-        ordering = ['seller', 'product']
