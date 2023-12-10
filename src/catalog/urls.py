@@ -7,5 +7,5 @@ from .views import (
 app_name = "catalog"
 
 urlpatterns = [
-    path("add/", show_review, name="show_review"),
+    path("reviews/<int:pk>/", show_review, name="show_review"),
 ]

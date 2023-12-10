@@ -1,8 +1,12 @@
+{% block extra_css %}
+    <link href="{{ static('assets/css/review.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
     <div class="Tabs-block" id="reviews" style="">
         <header class="Section-header">
             <h3 class="Section-title">
-                count_review
+                {{ count_review }}
             </h3>
         </header>
         <div class="Comments">
@@ -15,10 +19,10 @@
                         <header class="Comment-header">
                             <div>
                                 <strong class="Comment-title">
-                                    {{ review.author.name }}
+                                    {{ review.author.username }}
                                 </strong>
                                 <span class="Comment-date">
-                                    {{ review.created_at }}
+                                    {{ review.created_at.strftime('%d %B %Y / %H:%M') }}
                                 </span>
                             </div>
                         </header>
@@ -28,6 +32,9 @@
                     </div>
                 </div>
             {% endfor %}
+            <div class="Comment-more">
+                <button class="btn-more btn btn_muted" id="btn-more">Показать еще</button>
+            </div>
         </div>
         <header class="Section-header Section-header_product">
             <h3 class="Section-title">
@@ -48,6 +55,9 @@
             </form>
         </div>
     </div>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="{{ static('assets/js/review.js') }}"></script>
+
 {% endblock %}
 
 

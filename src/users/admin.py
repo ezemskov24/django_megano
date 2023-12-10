@@ -29,13 +29,11 @@ class SellerAdmin(admin.ModelAdmin):
     inlines = [
         SellerInLine,
     ]
-    list_display = 'id', 'user_verbose', 'description'
-    list_display_links = 'id', 'user_verbose'
+    list_display = 'id', 'name', 'description'
+    list_display_links = 'id', 'name'
     ordering = 'pk',
-    search_fields = 'user_verbose',
+    search_fields = 'name',
 
     def get_queryset(self, request):
         return Seller.objects.select_related("profile")
 
-    def user_verbose(self, obj: Seller) -> str:
-        return obj.profile.name
