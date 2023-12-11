@@ -10,6 +10,7 @@ from .models import Category, Product
 FIXED_KEY = 'index_banners_fixed'
 SLIDER_KEY = 'index_banners_slider'
 TOP_SELLERS_KEY = 'index_top_sellers'
+LIMITED_OFFERS_KEY = 'index_limited_offer'
 
 
 class CacheableContextProduct:
@@ -18,6 +19,13 @@ class CacheableContextProduct:
         self.absolute_url = product.get_absolute_url()
         image = product.images.all()[0].image
         self.image_url = settings.MEDIA_URL + str(image) if image else ''
+
+
+class ProductPreviewCard(CacheableContextProduct):
+    def __init__(self, product: Product):
+        super().__init__(product)
+        self.category = product.category.full_name
+        self.price = product.min_price
 
 
 class CacheableContextCategory:
@@ -84,11 +92,9 @@ class Banner:
                 cache.set(SLIDER_KEY, self.slider)
 
 
-class TopSellerProduct(CacheableContextProduct):
+class TopSellerProduct(ProductPreviewCard):
     def __init__(self, product: Product):
         super().__init__(product)
-        self.category = product.category.full_name
-        self.price = product.min_price
 
     @staticmethod
     def get_top_sellers(amount=8):
@@ -111,3 +117,28 @@ class TopSellerProduct(CacheableContextProduct):
             cache.set(TOP_SELLERS_KEY, top_sellers)
 
         return top_sellers
+
+
+class LimitedProduct(ProductPreviewCard):
+    def __init__(self, product: Product):
+        super().__init__(product)
+
+    @staticmethod
+    def get_limited_offers(amount=16):
+        limited_offers = cache.get(LIMITED_OFFERS_KEY)
+        if not limited_offers:
+            products = Product.objects.annotate(
+                seller_count=Count('sellerproduct')
+            ).filter(
+                archived=False,
+                category__is_active=True,
+                seller_count__gt=0,
+                limited=True,
+            ).select_related(
+                'category',
+            ).prefetch_related('images').all()[:amount]
+            limited_offers = [LimitedProduct(product)
+                              for product in products]
+            cache.set(LIMITED_OFFERS_KEY, limited_offers)
+
+        return limited_offers

@@ -6,7 +6,8 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from .models import Product
-from .utils import Banner, TopSellerProduct
+from .utils import Banner, LimitedProduct, TopSellerProduct
+
 
 class IndexView(TemplateView):
     template_name = 'index.jinja2'
@@ -15,6 +16,7 @@ class IndexView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['banners'] = Banner()
         context['top_sellers'] = TopSellerProduct.get_top_sellers()
+        context['limited_offers'] = LimitedProduct.get_limited_offers()
 
         return context
 
