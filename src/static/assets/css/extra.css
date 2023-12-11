@@ -5567,6 +5567,8 @@ input[type="submit"] {
 
 .Slider_main .Slider-content {
     margin-left: 20%;
+    height: 100%;
+    max-height: 100%;
 }
 
 @media screen and (min-width: 1200px) {

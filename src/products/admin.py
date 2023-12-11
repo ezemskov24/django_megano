@@ -41,10 +41,13 @@ class ProductAdmin(admin.ModelAdmin):
         'sellers_amount',
         'min_price',
         'avg_price',
+        'sort_index',
+        'limited',
         'archived',
     ]
     list_filter = [
         'category',
+        'limited',
         'archived',
         admin_filters.MinPriceListFilter,
         admin_filters.AvgPriceListFilter,
@@ -61,11 +64,11 @@ class ProductAdmin(admin.ModelAdmin):
 
     @admin.display(description='Min price', empty_value=0)
     def min_price(self, obj: models.Product) -> int:
-        return obj.min_price()
+        return obj.min_price
 
     @admin.display(description='Avg price', empty_value=0)
     def avg_price(self, obj: models.Product) -> int:
-        return obj.average_price()
+        return obj.average_price
 
     def delete_queryset(self, request: HttpRequest, queryset: QuerySet):
         queryset.update(archived=True)

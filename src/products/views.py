@@ -1,14 +1,22 @@
+import random
+from typing import Any, Dict
+
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
+from django.views.generic import TemplateView
 
-from .banner import Banner
+from .models import Product
+from .utils import Banner, TopSellerProduct
 
+class IndexView(TemplateView):
+    template_name = 'index.jinja2'
 
-def index_view(request: HttpRequest) -> HttpResponse:
-    context = {
-        'banners': Banner(),
-    }
-    return render(request, 'index.jinja2', context)
+    def get_context_data(self, **kwargs) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['banners'] = Banner()
+        context['top_sellers'] = TopSellerProduct.get_top_sellers()
+
+        return context
 
 
 def ProductCreateView():
