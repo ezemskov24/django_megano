@@ -27,6 +27,7 @@ urlpatterns = [
     path('adminsettings/', include('adminsettings.urls')),
     path('products/', include('products.urls')),
     path('account/', include('account.urls')),
+    path('users/', include('users.urls')),
     path('', index_view)
 ]
 

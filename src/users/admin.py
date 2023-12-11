@@ -38,4 +38,4 @@ class SellerAdmin(admin.ModelAdmin):
         return Seller.objects.select_related("profile")
 
     def user_verbose(self, obj: Seller) -> str:
-        return obj.profile.name
+        return obj.profile.username

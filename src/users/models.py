@@ -26,4 +26,4 @@ class Seller(models.Model):
     archived = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return f"{self.profile.name}"
+        return f"{self.name}"
