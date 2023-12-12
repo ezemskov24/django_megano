@@ -13,16 +13,9 @@ class SellerDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['products'] = Product.objects.filter(sellers=kwargs['object']).values(
-            'name',
-            'description',
-            'count_sells',
-            'images__image',
-            'sellerproduct__price',
-            'sellerproduct__count',
-        ).order_by('-count_sells')
-        print('time=', SiteSettings.objects.values('top_product_cache_time')[0]['top_product_cache_time'])
+        context['products'] = Product.objects.filter(sellers=kwargs['object']).order_by('-count_sells')
         context['top_products_cache_time'] = (
             SiteSettings.objects.values('top_product_cache_time')[0]['top_product_cache_time']
         )
+
         return context
