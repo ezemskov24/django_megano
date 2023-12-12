@@ -13,7 +13,9 @@ def show_review(request: HttpRequest, *args, **kwargs):
     """
     Пример view-функции для внедрения кода страницы для добавленя отзыва к товару.
     """
-    context = add_review(request, *args, **kwargs)
+
+    context = add_review(post=request.POST, user_id=request.user.id, **kwargs)
+
     context['count'], context['count_review'] = get_count_review(kwargs['pk'])
     context['reviews_list'] = get_reviews_list(kwargs['pk'])
 
