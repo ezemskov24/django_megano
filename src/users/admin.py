@@ -29,7 +29,7 @@ class SellerAdmin(admin.ModelAdmin):
     inlines = [
         SellerInLine,
     ]
-    list_display = 'id', 'user_verbose', 'description'
+    list_display = 'id', 'name', 'user_verbose', 'description'
     list_display_links = 'id', 'user_verbose'
     ordering = 'pk',
     search_fields = 'user_verbose',
