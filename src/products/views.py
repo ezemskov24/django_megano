@@ -1,9 +1,8 @@
-import random
 from typing import Any, Dict
 
+from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.views.generic import ListView, TemplateView
 
 from .models import Product
 from .utils import Banner, LimitedProduct, TopSellerProduct
@@ -19,6 +18,25 @@ class IndexView(TemplateView):
         context['limited_offers'] = LimitedProduct.get_limited_offers()
 
         return context
+
+
+class CatalogView(ListView):
+    template_name = 'catalog/catalog.jinja2'
+    model = Product
+    context_object_name = 'products'
+
+    def get_queryset(self):
+        products_list = Product.active.all()
+        paginator = Paginator(products_list, 8)
+        page_number = self.request.GET.get('p', 1)
+        try:
+            products = paginator.page(page_number)
+        except PageNotAnInteger:
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
+
+        return products
 
 
 def ProductCreateView():

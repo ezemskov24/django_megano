@@ -6,6 +6,11 @@ from django.db.models import Avg, Min
 from .validators import validate_not_subcategory
 
 
+class ActiveProductsManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(archived=False)
+
+
 class Product(models.Model):
     """Модель продукта"""
     category = models.ForeignKey(
@@ -22,6 +27,9 @@ class Product(models.Model):
     archived = models.BooleanField(default=False)
     sort_index = models.IntegerField(default=0)
     limited = models.BooleanField(default=False)
+
+    objects = models.Manager()
+    active = ActiveProductsManager()
 
     class Meta:
         ordering = ['sort_index', 'name']
