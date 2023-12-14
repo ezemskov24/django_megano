@@ -1,17 +1,27 @@
+import random
+from typing import Any, Dict
+
 from django.core.cache import cache
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render
+from django.views.generic import TemplateView, DetailView
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import DetailView
 
+from .utils import Banner, LimitedProduct, TopSellerProduct
 from .banner import Banner
 from .models import Product, SellerProduct, Picture
 
 
-def index_view(request: HttpRequest) -> HttpResponse:
-    context = {
-        'banners': Banner(),
-    }
-    return render(request, 'index.jinja2', context)
+class IndexView(TemplateView):
+    template_name = 'index.jinja2'
+
+    def get_context_data(self, **kwargs) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['banners'] = Banner()
+        context['top_sellers'] = TopSellerProduct.get_top_sellers()
+        context['limited_offers'] = LimitedProduct.get_limited_offers()
+
+        return context
 
 
 def ProductCreateView():

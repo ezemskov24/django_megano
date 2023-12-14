@@ -22,9 +22,11 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     count_sells = models.IntegerField(default=0)
     archived = models.BooleanField(default=False)
+    sort_index = models.IntegerField(default=0)
+    limited = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['name']
+        ordering = ['sort_index', 'name']
         indexes = [
             models.Index(fields=['name']),
         ]
@@ -33,6 +35,7 @@ class Product(models.Model):
         'Получение абсолютной ссылки на продукт'
         return '#'
 
+    @property
     def average_price(self) -> int:
         'Получение средней цены'
         avg_price = self.sellers.aggregate(
@@ -40,9 +43,11 @@ class Product(models.Model):
         ).get('avg')
         return round(avg_price, 2) if avg_price else 0.00
 
+    @property
     def average_discounted_price(self) -> int:
         'Получение средней цены со скидкой'
 
+    @property
     def min_price(self) -> int:
         'Получение минимальной цены'
         min_price = self.sellers.aggregate(
@@ -131,7 +136,7 @@ class SellerProduct(models.Model):
         on_delete=models.CASCADE,
     )
     seller = models.ForeignKey(
-        'users.Seller',
+        'account.Seller',
         on_delete=models.CASCADE,
     )
     count = models.PositiveIntegerField(default=0)
@@ -181,6 +186,13 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def full_name(self):
+        if not self.parent_category:
+            return self.name
+
+        return f'{self.parent_category.name} / {self.name}'
 
     def get_absolute_url(self) -> str:
         'Получение абсолютной ссылки на категорию'
