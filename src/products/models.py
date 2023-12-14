@@ -124,7 +124,7 @@ class SellerProduct(models.Model):
         on_delete=models.CASCADE,
     )
     seller = models.ForeignKey(
-        'users.Seller',
+        'account.Seller',
         on_delete=models.CASCADE,
     )
     count = models.PositiveIntegerField(default=0)
