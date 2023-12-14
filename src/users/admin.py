@@ -37,3 +37,5 @@ class SellerAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return Seller.objects.select_related("profile")
 
+    def user_verbose(self, obj: Seller) -> str:
+        return obj.profile.username
