@@ -8,30 +8,31 @@ from products.models import Product
 
 
 def get_reviews_list(pk: int):
-    return Product.objects.get(pk=pk).reviews.all()
+    """
+    Сервис получения списка отзывов на товар.
+
+    Args:
+        pk (int): уникальный код товара.
+    """
+    return Review.objects.filter(product=pk)
 
 
-def add_review(request: HttpRequest, *args, **kwargs):
+def add_review(*args, **kwargs):
     """
     Сервис добавления отзывов к товару.
 
     Returns:
         context: параметны для отрисовки шаблона, содержит:
-            review_template: название шаблона добавления отзыва к товару для имрорта в шаблон страницы товара;
-            form: форма для добавления отзыва.
+            - review_template: название шаблона добавления отзыва к товару для имрорта в шаблон страницы товара;
+            - form: форма для добавления отзыва.
     """
-    product = Product.objects.get(pk=kwargs['pk'])
-    if request.method == 'POST':
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = Review.objects.create(
-                text=form.cleaned_data['text'],
-                author=Profile.objects.get(pk=request.user.id),
-            )
-            product.review.add(review)
-            product.save()
-    else:
-        form = ReviewForm()
+    form = ReviewForm(kwargs['post'])
+    if form.is_valid():
+        review = Review.objects.create(
+            text=form.cleaned_data['text'],
+            author=Profile.objects.get(pk=kwargs['user_id']),
+            product=Product.objects.get(pk=kwargs['pk']),
+        )
 
     context = {
         'form': form,
@@ -40,7 +41,7 @@ def add_review(request: HttpRequest, *args, **kwargs):
     return context
 
 
-def get_count_review(pk: int) -> str:
+def get_count_review(pk: int) -> tuple:
     """
     Функция для определения количества отзывов на товар.
 
@@ -48,16 +49,14 @@ def get_count_review(pk: int) -> str:
         pk (int): уникальный код товара.
 
     return:
-        result (str) - количество отзывов на товар.
+        result (tuple) - количество отзывов на товар.
     """
-    count_review = len(Product.objects.get(pk=pk).values('reviews')['reviews'])
+    count_review = len(Review.objects.filter(product=pk))
     if (count_review % 10 == 1) and (count_review % 100 != 11):
-        result = f'{count_review} отзыв'
+        return count_review, f'{count_review} отзыв'
     elif ((count_review % 10 >= 2)
           and (count_review % 10 <= 4)
           and ((count_review % 100 < 10) or (count_review % 100 >= 20))):
-        result = f'{count_review} отзыва'
+        return count_review, f'{count_review} отзыва'
     else:
-        result = f'{count_review} отзывов'
-
-    return result
+        return count_review, f'{count_review} отзывов'

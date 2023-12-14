@@ -2,7 +2,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Avg, Min
 
-
 from .validators import validate_not_subcategory
 
 
