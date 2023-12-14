@@ -7,7 +7,8 @@ from products.models import Product, SellerProduct
 class Profile(AbstractUser):
     registered_at = models.DateTimeField(auto_now_add=True)
     agreement_accept = models.BooleanField(default=False)
-    phone = models.CharField(max_length=14, unique=True)
+    name = models.CharField(max_length=20)
+    phone = models.CharField(max_length=14)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     address = models.CharField(max_length=255, blank=True)
     cart = models.IntegerField(null=True, blank=True)
