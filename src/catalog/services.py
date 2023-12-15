@@ -1,10 +1,10 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from users.models import Profile
+from ..users.models import Profile
 from .forms import ReviewForm
 from .models import Review
-from products.models import Product
+from ..products.models import Product
 
 
 def get_reviews_list(pk: int):

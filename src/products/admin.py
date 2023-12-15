@@ -3,6 +3,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 
 from . import admin_filters, models
+# from .forms import PropertyAdminForm, PropertyValueAdminForm
 
 
 @admin.action(description="Archive selected products")
@@ -26,6 +27,33 @@ def mark_unarchived(
 class PictureInline(admin.StackedInline):
     model = models.Picture
     extra = 1
+
+
+@admin.register(models.Value)
+class PropertyValueAdmin(admin.ModelAdmin):
+
+    actions = [
+        mark_archived,
+        mark_unarchived
+    ]
+    list_display = [
+        'product',
+        'property',
+        'value',
+    ]
+
+
+@admin.register(models.Property)
+class PropertyAdmin(admin.ModelAdmin):
+
+    actions = [
+        mark_archived,
+        mark_unarchived
+    ]
+    list_display = [
+        'category',
+        'name',
+    ]
 
 
 @admin.register(models.Product)
@@ -107,3 +135,4 @@ class CategoryAdmin(admin.ModelAdmin):
                 parent_category=None,
             )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
