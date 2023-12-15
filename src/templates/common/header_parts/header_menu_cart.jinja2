@@ -2,13 +2,13 @@
     <div class="menuModal" id="navigate">
         <ul class="menu menu_main">
             <li class="menu-item">
-                <a class="menu-link" href="index.html">Главная</a>
+                <a class="menu-link" href="{{ url('index') }}">Главная</a>
             </li>
             <li class="menu-item">
                 {% if active_discounts %}
                     <span class="menu-label menu-label_success">Скидки</span>
                 {% endif %}
-                <a class="menu-link" href="#">Каталог</a>
+                <a class="menu-link" href="{{ url('products:catalog') }}">Каталог</a>
             </li>
             <li class="menu-item">
                 <a class="menu-link" href="#">Сравнение</a>

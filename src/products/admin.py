@@ -28,6 +28,11 @@ class PictureInline(admin.StackedInline):
     extra = 1
 
 
+# class TagInline(admin.StackedInline):
+#     model = models.Tag
+#     extra = 1
+
+
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     actions = [
@@ -110,3 +115,14 @@ class CategoryAdmin(admin.ModelAdmin):
                 parent_category=None,
             )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+@admin.register(models.Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = [
+        'name',
+        'slug',
+    ]
+    prepopulated_fields = {
+        'slug': ('name',),
+    }

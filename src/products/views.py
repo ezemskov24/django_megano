@@ -2,12 +2,13 @@ from enum import Enum
 from typing import Any, Dict
 
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
-from django.db.models import Min, Max, Count
+from django.db.models import Count, Min
 from django.http import HttpRequest, HttpResponse
 from django.views.generic import ListView, TemplateView
 
-from .models import Product
+from .models import Category, Product, Tag
 from .utils import Banner, LimitedProduct, TopSellerProduct
+
 
 
 class IndexView(TemplateView):
@@ -26,6 +27,9 @@ class CatalogView(ListView):
     template_name = 'catalog/catalog.jinja2'
     model = Product
     context_object_name = 'products'
+
+    tag = None
+    category = None
 
     class SortEnum(Enum):
         POP_ASC = '-pop'
@@ -48,7 +52,18 @@ class CatalogView(ListView):
                 self.request.session['sort'] = sort
         sort = self.request.session.get('sort')
 
-        products_list = Product.active.all()
+        filter_params = {}
+        if self.tag:
+            filter_params['tags'] = self.tag
+        if self.category:
+            categories = [self.category]
+            categories.extend([cat for cat in self.category.subcategories.all()])
+            filter_params['category__in'] = categories
+        if filter_params:
+            products_list = Product.active.filter(**filter_params).all()
+        else:
+            products_list = Product.active.all()
+
         if sort:
             products_list = self.get_sorted_queryset(products_list, sort)
         paginator = Paginator(products_list, 8)
@@ -99,7 +114,19 @@ class CatalogView(ListView):
         curr_sort = self.request.session.get('sort')
         if curr_sort:
             context['curr_sort'] = curr_sort
+        context['tags'] = Tag.objects.annotate(
+            prod_count=Count('products')
+        ).order_by('-prod_count').all()[:10]
         return context
+
+    def get(self, request, *args, **kwargs):
+        tag_slug = kwargs.get('tag')
+        if tag_slug:
+            self.tag = Tag.objects.filter(slug=tag_slug).first()
+        category_slug = kwargs.get('category')
+        if category_slug:
+            self.category = Category.objects.filter(slug=category_slug).first()
+        return super().get(request, *args, **kwargs)
 
 
 def ProductCreateView():

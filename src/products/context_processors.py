@@ -36,6 +36,9 @@ def categories(request):
 
         cache.set(CATEGORIES_KEY, menu_categories)
 
+    for cat in menu_categories:
+        print(cat.absolute_url)
+
     return {
         'categories': menu_categories,
     }

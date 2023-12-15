@@ -1,9 +1,21 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Avg, Min
-
+from django.urls import reverse
 
 from .validators import validate_not_subcategory
+
+
+class Tag(models.Model):
+    """Модель тега продуктов"""
+    name = models.CharField(max_length=50, null=False, blank=False)
+    slug = models.SlugField(max_length=50, unique=True, null=False, blank=False)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('products:products-by-tag', args=[self.slug])
 
 
 class ActiveProductsManager(models.Manager):
@@ -19,7 +31,7 @@ class Product(models.Model):
         on_delete=models.CASCADE,
     )
     name = models.CharField(max_length=200, null=False, blank=False)
-    slug = models.SlugField(max_length=200, unique=True, null=True)
+    slug = models.SlugField(max_length=200, unique=True, null=False)
     description = models.TextField(blank=True)
     manufacturer = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -27,6 +39,12 @@ class Product(models.Model):
     archived = models.BooleanField(default=False)
     sort_index = models.IntegerField(default=0)
     limited = models.BooleanField(default=False)
+
+    tags = models.ManyToManyField(
+        'Tag',
+        related_name='products',
+        blank=True
+    )
 
     objects = models.Manager()
     active = ActiveProductsManager()
@@ -193,7 +211,7 @@ class Category(models.Model):
 
     def get_absolute_url(self) -> str:
         'Получение абсолютной ссылки на категорию'
-        return '#'
+        return reverse('products:products-by-category', args=[self.slug])
 
     def clean(self):
         if self.parent_category:
