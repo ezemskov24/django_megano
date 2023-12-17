@@ -40,14 +40,11 @@
                                 </div>
                             </div>
                             <div class="ProductCard-text">
+                                {% for paragraph in product.description.split('\n')[:3] %}
                                 <ul>
-                                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, eiusmod
-                                    </li>
-                                    <li>tempor incididunt ut labore et dolore magna aliqua. Lorem
-                                    </li>
-                                    <li>ipsum dolor sit ameabore et dolore magna aliqua. Lorem ipsum
-                                    </li>
+                                    <li>{{ paragraph[:100] + '...' }}</li>
                                 </ul>
+                                {% endfor %}
                             </div>
                             <div class="ProductCard-cart">
                                 <div class="ProductCard-cartElement ProductCard-cartElement_amount">
@@ -99,7 +96,7 @@
                                 <span>Характеристика</span>
                             </a>
                             <a class="Tabs-link" href="#reviews">
-                                <span>Отзывы (3)</span>
+                                <span>Отзывы ({{ reviews|length }})</span>
                             </a>
                         </div>
                         <div class="Tabs-wrap">
@@ -205,26 +202,44 @@
                             </div>
                             <div class="Tabs-block" id="reviews">
                                 <header class="Section-header">
-                                    <h3 class="Section-title">1 отзыв
+                                    <h3 class="Section-title">
+                                    {{ reviews|length }} отзыв{{
+                                        '' if reviews|length % 10 == 1 and reviews|length % 100 != 11
+                                        else 'а' if reviews|length % 10 in [2, 3, 4] and reviews|length % 100 not in [12, 13, 14]
+                                        else 'ов'
+                                    }}
                                     </h3>
                                 </header>
                                 <div class="Comments">
-                                    <div class="Comment">
-                                        <div class="Comment-column Comment-column_pict">
-                                            <div class="Comment-avatar">
-                                            </div>
-                                        </div>
-                                        <div class="Comment-column">
-                                            <header class="Comment-header">
-                                                <div>
-                                                    <strong class="Comment-title">Александра Бровина
-                                                    </strong><span class="Comment-date">Декабрь 25&#32;&#32;/&#32;&#32;2017&#32;&#32;/&#32;&#32;22:50</span>
+                                    {% for review in reviews %}
+                                        <div class="Comment">
+                                            <div class="Comment-column Comment-column_pict">
+                                                {% if review.author.avatar %}
+                                                    <img src="{{ review.author.avatar.url }}" alt="Avatar" class="Comment-avatar-image">
+                                                {% else %}
+                                                <div class="Comment-avatar">
                                                 </div>
-                                            </header>
-                                            <div class="Comment-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor. Aenean massa. Cumtipsu sociis natoque penatibus et magnis dis parturient montesti, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eutu, pretiumem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justotuio, rhoncus ut loret, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus element semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae.
+                                                {% endif %}
+                                            </div>
+                                            <div class="Comment-column">
+                                                <header class="Comment-header">
+                                                    <div>
+                                                        <strong class="Comment-title">{{ review.author.first_name + ' ' + review.author.last_name }}
+                                                        </strong><span class="Comment-date">
+                                                            {% set russian_months = {
+                                                                1: 'ЯНВАРЬ', 2: 'ФЕВРАЛЬ', 3: 'МАРТ', 4: 'АПРЕЛЬ',
+                                                                5: 'МАЙ', 6: 'ИЮНЬ', 7: 'ИЮЛЬ', 8: 'АВГУСТ',
+                                                                9: 'СЕНТЯБРЬ', 10: 'ОКТЯБРЬ', 11: 'НОЯБРЬ', 12: 'ДЕКАБРЬ'
+                                                            } %}
+                                                            {{ russian_months[review.created_at.month] }} {{ review.created_at.day }} / {{ review.created_at.year }} / {{ review.created_at.hour }}:{{ review.created_at.minute }}
+                                                        </span>
+                                                    </div>
+                                                </header>
+                                                <div class="Comment-content">{{ review.text }}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    {% endfor %}
                                 </div>
                                 <header class="Section-header Section-header_product">
                                     <h3 class="Section-title">Добавить отзыв
