@@ -13,7 +13,42 @@
     <div class="Section Section_column Section_columnLeft">
         <div class="wrap">
             <div class="Section-column">
-
+                <div class="Section-columnSection">
+                    <header class="Section-header">
+                        <strong class="Section-title">Фильтр
+                        </strong>
+                    </header>
+                    <div class="Section-columnContent">
+                        {% if filter_form %}
+                            <form class="form" action="#" method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <div class="range Section-columnRange">
+                                        {{ filter_form.price }}
+                                        <div class="range-price">Цена:&#32;
+                                            <div class="rangePrice">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        {{ filter_form.title }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="toggle">
+                                            {{ filter_form.in_stock }}
+                                            <span class="toggle-box"></span><span class="toggle-text">Только товары в наличии</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="buttons">
+                                            <input class="btn btn_square btn_dark btn_narrow" type="submit" value="Фильтр">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
                 <div class="Section-columnSection">
                         <header class="Section-header">
                             <strong class="Section-title">Популярные тэги
@@ -103,7 +138,7 @@ Sort-sortBy_dec
                                 </strong>
                                 <div class="Card-description">
                                     <div class="Card-cost">
-                                        <span class="Card-price">${{ product.min_price }}</span>
+                                        <span class="Card-price">${{ product.average_price }}</span>
                                     </div>
                                     <div class="Card-category">
                                         {{ product.category.full_name }}
