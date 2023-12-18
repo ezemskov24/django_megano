@@ -81,7 +81,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'products.context_processors.categories',
+                'products.context_processors.header_menu',
             ],
         },
     },
@@ -95,7 +95,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'products.context_processors.categories',
+                'products.context_processors.header_menu',
             ],
         },
     },
@@ -173,20 +173,3 @@ CACHES = {
         "TIMEOUT": 600,
     }
 }
-
-# LOGGING = {
-#     'version': 1,
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#         },
-#     },
-#     'loggers': {
-#         'django.db.backends': {
-#             'level': 'DEBUG',
-#         },
-#     },
-#     'root': {
-#         'handlers': ['console'],
-#     }
-# }

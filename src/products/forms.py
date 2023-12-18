@@ -36,3 +36,17 @@ class FilterForm(forms.Form):
         ),
         required=False,
     )
+
+
+class SearchForm(forms.Form):
+    query = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'search-input',
+                'id': 'query',
+                'name': 'query',
+                'type': 'text',
+                'placeholder': 'NVIDIA GeForce RTX 3060',
+            },
+        ),
+    )

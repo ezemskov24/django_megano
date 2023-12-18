@@ -6,7 +6,7 @@ from django.db.models import Count, Max, Min, Sum
 from django.http import HttpRequest, HttpResponse
 from django.views.generic import ListView, TemplateView
 
-from .forms import FilterForm
+from .forms import FilterForm, SearchForm
 from .models import Category, Product, Tag
 from .utils import Banner, LimitedProduct, TopSellerProduct
 
@@ -39,6 +39,7 @@ class CatalogView(ListView):
         self.filter_prices = {}
         self.filter_name = None
         self.filter_in_stock = None
+        self.search_query = None
 
     class SortEnum(Enum):
         POP_ASC = '-pop'
@@ -68,12 +69,15 @@ class CatalogView(ListView):
         return products
 
     def _get_base_queryset(self):
-        if self.tag or self.categories:
+        search_query = self.request.session.get('search_query')
+        if self.tag or self.categories or search_query:
             base_filter = {}
             if self.tag:
                 base_filter['tags'] = self.tag
             if self.categories:
                 base_filter['category__in'] = self.categories
+            if search_query:
+                base_filter['name__icontains'] = search_query
 
             products_list = Product.active.filter(**base_filter)
         else:
@@ -83,13 +87,19 @@ class CatalogView(ListView):
             min=Min('sellerproduct__price'),
             max=Max('sellerproduct__price'),
         )
-        self.filter_prices['min'] = str(prices['min'])
-        self.filter_prices['max'] = str(prices['max'])
-        if not self.filter_prices.get('selected_min'):
-            self.filter_prices['selected_min'] = str(prices['min'])
-        if not self.filter_prices.get('selected_max'):
-            self.filter_prices['selected_max'] = str(prices['max'])
+        min_pr = prices['min']
+        if not min_pr:
+            min_pr = 0
+        max_pr = prices['max']
+        if not max_pr:
+            max_pr = 0
 
+        self.filter_prices['min'] = str(min_pr)
+        self.filter_prices['max'] = str(max_pr)
+        if not self.filter_prices.get('selected_min'):
+            self.filter_prices['selected_min'] = str(min_pr)
+        if not self.filter_prices.get('selected_max'):
+            self.filter_prices['selected_max'] = str(max_pr)
         return products_list
 
     def _get_filtered_queryset(self, queryset):
@@ -177,12 +187,21 @@ class CatalogView(ListView):
 
     def get(self, request, *args, **kwargs):
         self._get_path_params(**kwargs)
+        if self.search_query:
+            request.session['search_query'] = self.search_query
+        elif (
+            request.session.get('search_query')
+            and not request.GET.get('p')
+            and not self.filter_params
+        ):
+            del request.session['search_query']
 
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self._get_path_params(**kwargs)
         filter_form = FilterForm(request.POST)
+        search_form = SearchForm(request.POST)
         if filter_form.is_valid():
             cd = filter_form.cleaned_data
             if cd['price']:
@@ -197,6 +216,9 @@ class CatalogView(ListView):
             if cd['in_stock']:
                 self.filter_params['amount__gt'] = 0
                 self.filter_in_stock = True
+
+        if search_form.is_valid():
+            self.search_query = search_form.cleaned_data['query']
 
         return self.get(request, args, kwargs)
 
