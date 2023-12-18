@@ -146,3 +146,8 @@ data/
 /category_cache/
 /uploads/
 cache/
+/src/account/migrations/
+/src/catalog/migrations/
+/src/adminsettings/migrations/
+/src/payments/migrations/
+/src/products/migrations/

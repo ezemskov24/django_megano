@@ -2,7 +2,7 @@
 # from django.http import HttpRequest
 # from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DetailView
 from django.urls import reverse_lazy
 # from django.contrib.auth.forms import UserCreationForm
 # from django.views.generic.edit import CreateView
@@ -38,6 +38,11 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 
+from account.models import Seller
+from adminsettings.models import SiteSettings
+from products.models import Product
+
+
 def UserLoginView(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         if request.user.is_authenticated:
@@ -67,3 +72,18 @@ class UserLogoutView(LogoutView):
 
 class UserProfileView(TemplateView):
     template_name = 'registration/profile.jinja2'
+
+
+class SellerDetailView(DetailView):
+    template_name = 'users/seller_details.jinja2'
+    model = Seller
+    context_object_name = 'seller'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['products'] = Product.objects.filter(sellers=kwargs['object']).order_by('-count_sells')
+        context['top_products_cache_time'] = (
+            SiteSettings.objects.values('top_product_cache_time')[0]['top_product_cache_time']
+        )
+
+        return context

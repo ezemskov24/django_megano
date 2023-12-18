@@ -12,37 +12,35 @@
                 </div>
                 <div class="CategoriesButton-content">
                     {% for category in categories %}
-                        {% if not category.parent_category %}
-                            <div class="CategoriesButton-link">
-                                <a href="{{ category.get_absolute_url() }}">
-                                    <div class="CategoriesButton-icon">
-                                        {% if category.icon %}
-                                            <img src="{{ category.icon.url }}" />
-                                        {% endif %}
-                                    </div>
-                                    <span class="CategoriesButton-text">{{ category.name }}</span>
-                                </a>
-                                {% with subcategories = category.subcategories.all() %}
-                                    {% if subcategories %}
-                                        <a class="CategoriesButton-arrow" href="#"></a>
-                                        <div class="CategoriesButton-submenu">
-                                            {% for subcategory in subcategories %}
-                                                {% if subcategory.is_active %}
-                                                    <a href="{{ subcategory.get_absolute_url() }}">
-                                                        <div class="CategoriesButton-icon">
-                                                            {% if subcategory.icon %}
-                                                                <img src="{{ subcategory.icon.url }}" />
-                                                            {% endif %}
-                                                        </div>
-                                                        <span class="CategoriesButton-text">{{ subcategory.name }}</span>
-                                                    </a>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </div>
+                        <div class="CategoriesButton-link">
+                            <a href="{{ category.absolute_url }}">
+                                <div class="CategoriesButton-icon">
+                                    {% if category.icon_url %}
+                                        <img src="{{ category.icon_url }}"
+                                        alt="{{ category.icon_url }}"/>
                                     {% endif %}
-                                {% endwith %}
-                            </div>
-                        {% endif %}
+                                </div>
+                                <span class="CategoriesButton-text">{{ category.name }}</span>
+                            </a>
+                            {% with subcategories = category.subcategories %}
+                                {% if subcategories %}
+                                    <a class="CategoriesButton-arrow" href="#"></a>
+                                    <div class="CategoriesButton-submenu">
+                                        {% for subcategory in subcategories %}
+                                            <a href="{{ subcategory.absolute_url }}">
+                                                <div class="CategoriesButton-icon">
+                                                    {% if subcategory.icon_url %}
+                                                        <img src="{{ subcategory.icon_url }}"
+                                                        alt="subcategory.icon_url"/>
+                                                    {% endif %}
+                                                </div>
+                                                <span class="CategoriesButton-text">{{ subcategory.name }}</span>
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
                     {% endfor %}
                 </div>
             </div>

@@ -1,25 +1,23 @@
-from copy import deepcopy
+from typing import Any, Dict
 
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
-from django.urls import reverse
-from django_jinja.views.generic import DetailView, ListView, CreateView
+from django.core.cache import cache
+from django.views.generic import TemplateView, DetailView
 
-from .services.compare_products import (add_product_to_compare_list, get_compare_list, get_compare_list_amt,
-                                        delete_product_to_compare_list, delete_all_compare_products)
-
-from .banner import Banner
-from .models import Product, Property, Value
-# from .forms import PropertyNameForm, PropertyCategoryForm
-
-import uuid
+from .utils import Banner, LimitedProduct, TopSellerProduct
+from .models import Product, SellerProduct, Picture
+from catalog.models import Review
 
 
-def index_view(request: HttpRequest) -> HttpResponse:
-    context = {
-        'banners': Banner,
-    }
-    return render(request, 'index.jinja2', context)
+class IndexView(TemplateView):
+    template_name = 'index.jinja2'
+
+    def get_context_data(self, **kwargs) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['banners'] = Banner()
+        context['top_sellers'] = TopSellerProduct.get_top_sellers()
+        context['limited_offers'] = LimitedProduct.get_limited_offers()
+
+        return context
 
 
 def ProductCreateView():
@@ -27,15 +25,38 @@ def ProductCreateView():
 
 
 class ProductDetailsView(DetailView):
-    template_name = "products/product_detail.jinja2"
+    template_name = "products/product-details.jinja2"
     queryset = Product.objects.prefetch_related("images")
     context_object_name = "product"
+
+    def get_context_data(self, **kwargs):
+        """
+        Получение контекстных данных для представления деталей продукта
+        """
+        cache_key = f'product_details_{self.object.pk}'
+        context_data = cache.get(cache_key)
+
+        if context_data is None:
+            product = self.object
+            sellers = SellerProduct.objects.filter(product=product).select_related('seller')
+            images = Picture.objects.filter(product=product)
+            reviews = Review.objects.filter(product=product).order_by('-created_at')
+
+            context_data = {
+                'product': product,
+                'sellers': sellers,
+                'images': images,
+                'reviews': reviews
+            }
+
+            cache.set(cache_key, context_data, 60 * 60 * 24)
+
+        return context_data
 
     def post(self, request, *args, **kwargs):
         add_product_to_compare_list(
             request
         )
-        print(get_compare_list(request))
         return HttpResponseRedirect(
             reverse('products:product_details',
                     kwargs={'pk': kwargs.get('pk')}
@@ -91,59 +112,3 @@ class ProductsCompareView(ListView):
             return HttpResponseRedirect(reverse('products:product_compare'))
         delete_product_to_compare_list(request)
         return HttpResponseRedirect(reverse('products:product_compare'))
-
-
-# class PropertyCreateView(CreateView):
-#     template_name = 'products/create_property.jinja2'
-#     model = Property
-#     fields = '__all__'
-#
-#     def get_form(self, form_class=None, fields_amt=None):
-#         if fields_amt:
-#             form_class = PropertyNameForm(fields_amt)
-#             return form_class
-#         form_class = PropertyCategoryForm()
-#         return form_class
-#
-#     def post(self, request, *args, **kwargs):
-#         context = dict()
-#         print(request.POST)
-#         if request.POST.get('names_amt'):
-#             form = self.get_form(fields_amt=int(request.POST.get('names_amt')))
-#             context['form'] = form
-#             return render(request, 'products/create_property.jinja2', context=context)
-#
-#         fields_dict = deepcopy(request.POST)
-#         fields_dict.pop('csrfmiddlewaretoken')
-#
-#         for key, value in fields_dict.items():
-#             fields_dict[key] = value[0]
-#         print(fields_dict)
-#         # Property.object.bulk_create(
-#         # )
-#         return HttpResponseRedirect(reverse('products:create'))
-
-        # context = dict()
-        # if request.POST.get('fields_amt'):
-        #
-        #     fields_amt = int(request.POST.get('fields_amt'))
-        #     # context['form'] = form
-        #     context = self.get_context_data()
-        #
-        #     return render(request, 'products/create_property.jinja2', context=context)
-        # if request.POST.get('create'):
-        #     # form = PropertyCategoryForm
-        #     # print(form)
-        #     # context['form'] = form
-        #     # fields_dict = deepcopy(request.POST)
-        #     # fields_dict.pop('csrfmiddlewaretoken')
-        #     # fields_dict.pop('create')
-        #     # print(fields_dict)
-        #     # for key, value in fields_dict.items():
-        #     #     fields_dict[key] = value[0]
-        #
-        #     # Property.object.bulk_create(
-        #     #
-        #     # )
-        #     return HttpResponseRedirect(reverse('products:create'))
-
