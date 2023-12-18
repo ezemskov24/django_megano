@@ -2,6 +2,7 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Avg, Min
+from django.urls import reverse
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -33,7 +34,7 @@ class Product(models.Model):
 
     def get_absolute_url(self) -> str:
         'Получение абсолютной ссылки на продукт'
-        return '#'
+        return reverse('products:product_details', kwargs={'pk': self.pk})
 
     @property
     def average_price(self) -> int:
@@ -209,3 +210,33 @@ class Category(models.Model):
                     "%(parent)s is a subcategory and can't be a parent",
                     params={'parent': self.parent_category},
                 )
+
+
+class Property(models.Model):
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name='category_property'
+    )
+    name = models.CharField(max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+
+class Value(models.Model):
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='product_property_value'
+    )
+    property = models.ForeignKey(
+        Property,
+        on_delete=models.CASCADE,
+        related_name='category_property_value'
+    )
+    value = models.CharField(max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.value)
+

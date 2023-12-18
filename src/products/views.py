@@ -1,8 +1,12 @@
 from typing import Any, Dict
 
 from django.core.cache import cache
-from django.views.generic import TemplateView, DetailView
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.views.generic import TemplateView, DetailView, ListView
 
+from .services.compare_products import add_product_to_compare_list, get_compare_list, delete_all_compare_products, \
+    delete_product_to_compare_list
 from .utils import Banner, LimitedProduct, TopSellerProduct
 from .models import Product, SellerProduct, Picture
 from catalog.models import Review
@@ -26,7 +30,8 @@ def ProductCreateView():
 
 class ProductDetailsView(DetailView):
     template_name = "products/product-details.jinja2"
-    model = Product
+    queryset = Product.objects.prefetch_related("images")
+    context_object_name = "product"
 
     def get_context_data(self, **kwargs):
         """
@@ -52,6 +57,16 @@ class ProductDetailsView(DetailView):
 
         return context_data
 
+    def post(self, request, *args, **kwargs):
+        add_product_to_compare_list(
+            request
+        )
+        return HttpResponseRedirect(
+            reverse('products:product_details',
+                    kwargs={'pk': kwargs.get('pk')}
+                    )
+        )
+
 
 def ProductsListView():
     pass
@@ -59,3 +74,44 @@ def ProductsListView():
 
 def ProductUpdateView():
     pass
+
+
+class ProductsCompareView(ListView):
+    template_name = 'products/compare.jinja2'
+
+    def get_queryset(self):
+        return [
+            product[0] for product in [
+                Product.objects.filter(pk=pk).select_related('category')
+                for pk in get_compare_list(self.request)
+                ]
+            ]
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+
+        if not context['object_list']:
+            return context
+
+        for product in context.get('object_list'):
+            context['properties'] = [
+                {
+                    'property_name': value.property
+                }
+                for value in product.product_property_value.select_related('property')
+            ]
+
+        for property_name in context['properties']:
+            property_name['property_values'] = [
+                property_name['property_name'].category_property_value.filter(product=product)
+                for product in context.get('object_list')
+            ]
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get('product_from_compare') == 'delete':
+            delete_all_compare_products(request)
+            return HttpResponseRedirect(reverse('products:product_compare'))
+        delete_product_to_compare_list(request)
+        return HttpResponseRedirect(reverse('products:product_compare'))

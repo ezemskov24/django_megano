@@ -28,6 +28,33 @@ class PictureInline(admin.StackedInline):
     extra = 1
 
 
+@admin.register(models.Value)
+class PropertyValueAdmin(admin.ModelAdmin):
+
+    actions = [
+        mark_archived,
+        mark_unarchived
+    ]
+    list_display = [
+        'product',
+        'property',
+        'value',
+    ]
+
+
+@admin.register(models.Property)
+class PropertyAdmin(admin.ModelAdmin):
+
+    actions = [
+        mark_archived,
+        mark_unarchived
+    ]
+    list_display = [
+        'category',
+        'name',
+    ]
+
+
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     actions = [
@@ -110,3 +137,4 @@ class CategoryAdmin(admin.ModelAdmin):
                 parent_category=None,
             )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
