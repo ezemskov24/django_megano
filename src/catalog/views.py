@@ -1,11 +1,7 @@
 from django.shortcuts import render
 
-from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.views import View
+from django.http import HttpRequest
 
-from ..users.models import Profile
-from .forms import ReviewForm
-from .models import Review
 from .services import add_review, get_count_review, get_reviews_list
 
 

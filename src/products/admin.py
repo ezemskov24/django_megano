@@ -3,7 +3,6 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 
 from . import admin_filters, models
-# from .forms import PropertyAdminForm, PropertyValueAdminForm
 
 
 @admin.action(description="Archive selected products")

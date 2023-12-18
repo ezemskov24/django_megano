@@ -1,8 +1,12 @@
 from typing import Any, Dict
 
 from django.core.cache import cache
-from django.views.generic import TemplateView, DetailView
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.views.generic import TemplateView, DetailView, ListView
 
+from .services.compare_products import add_product_to_compare_list, get_compare_list, delete_all_compare_products, \
+    delete_product_to_compare_list
 from .utils import Banner, LimitedProduct, TopSellerProduct
 from .models import Product, SellerProduct, Picture
 from catalog.models import Review
@@ -103,7 +107,6 @@ class ProductsCompareView(ListView):
                 for product in context.get('object_list')
             ]
 
-        print(context)
         return context
 
     def post(self, request, *args, **kwargs):
