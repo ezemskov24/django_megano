@@ -10,7 +10,7 @@ from .services.compare_products import (add_product_to_compare_list, get_compare
 
 from .banner import Banner
 from .models import Product, Property, Value
-from .forms import PropertyNameForm, PropertyCategoryForm
+# from .forms import PropertyNameForm, PropertyCategoryForm
 
 import uuid
 
@@ -65,6 +65,9 @@ class ProductsCompareView(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
 
+        if not context['object_list']:
+            return context
+
         for product in context.get('object_list'):
             context['properties'] = [
                 {
@@ -79,6 +82,7 @@ class ProductsCompareView(ListView):
                 for product in context.get('object_list')
             ]
 
+        print(context)
         return context
 
     def post(self, request, *args, **kwargs):

@@ -27,10 +27,10 @@
                 <div class="Compare-products">
                     {% for product in object_list %}
                         <div class="Compare-product">
-                            <a class="Compare-nameProduct_main" href="#">#}
-                                <img class="Compare-pict"
+                            <img class="Compare-pict"
                                      src="{{ product.images.image }}"
-                                >
+                            >
+                            <a class="Compare-nameProduct_main" href="#">
                                 {{ product.name }}
                             </a>
                             <div class="Compare-row">
@@ -47,9 +47,11 @@
                     {% endfor %}
                 </div>
                 <div class="Compare">
+                    <h2 class="h2">Характеристики</h2>
                     {% for property_items in properties %}
+                        <div class="Compare-title">{{ property_items.property_name }}</div>
                         <div class="Compare-row">
-                            <div class="Compare-title">{{ property_items.property_name }}: </div>
+
                             {% for value in property_items.property_values %}
                                 <div class="Compare-product">{{ value[0] }}</div>
                             {% endfor %}
