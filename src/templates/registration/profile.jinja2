@@ -53,24 +53,14 @@
                                                           margin: 0;
                                                           top: 0;
                                                           left: 0;">
-{#                                              <img src="assets/img/icons/upload.png" alt="#.png" />Загрузить фото#}
-{#                                              {% if profile.avatar %}#}
-{#                                                <img src="{{ profile.avatar.url }}" alt="Загрузить фото." />#}
-{#                                              {% else %}#}
-{#                                                 <a href="/media/avatars/image.jpg">avatars/image.jpg</a>#}
-{#                                                <input type="file" id="avatar" name="avatar" accept="image/*">#}
-{#                                              {% endif %}#}
-                                            <div style="width: 100%; height: 100%;
-                                                background: url('/media/{{ profile.avatar }}') no-repeat center;
-                                                background-size: contain">
-{#                                              {{ form.avatar }}#}
-                                            <input type="file" name="avatar" accept="image/*" id="id_avatar" style="height: 100%; opacity: 0;">
-
-                                            </div>
-
+                                              <div style="width: 100%; height: 100%;
+                                                  background: url('/media/{{ profile.avatar }}') no-repeat center;
+                                                  background-size: contain">
+                                                <input type="file" name="avatar" accept="image/*" id="id_avatar"
+                                                       style="height: 100%; opacity: 0;">
+                                              </div>
                                             </label>
 
-{#                                            <input class="Profile-file form-input" id="avatar" name="avatar" type="file" data-validate="onlyImgAvatar" />#}
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -78,13 +68,10 @@
                                         <input class="form-input" id="name" name="name" type="text" value={{ user.username }} data-validate="require" />
                                         </label>
                                     </div>
-                             {% if form.errors %}
+                                     {% if form.errors %}
                                         <div style="color: red">
                                           <strong>Oops! There was an error:</strong>
                                           <ul>
-{#                                            {% for error in form.non_field_errors %}#}
-{#                                              <li>{{ error }}</li>#}
-{#                                            {% endfor %}#}
                                             {% for field in form %}
                                               {% if field.errors %}
                                                 {% for error in field.errors %}
@@ -99,44 +86,8 @@
                                 <div class="row-block">
                                     <div class="form-group">
                                         <label class="form-label" for="phone">Телефон
-
-{#                                        <input class="form-input" id="phone" name="phone" type="text" value={{ form.phone }} />#}
-{#                                        <input class="form-input" id="phone" name="phone" type="number" value={{ form.phone }} data-validate="require" />#}
-{#                                          <div class="form-input">{{ form.phone }}</div>#}
-{#                                          {{ form.phone }}#}
                                           <input type="text" name="phone" value={{ profile.phone }} maxlength="17" id="id_phone">
-
                                         </label>
-{#                                      {% if form.errors %}#}
-{#                                        <div style="color: red">#}
-{#                                          <strong>Oops! There was an error:</strong>#}
-{#                                          <ul>#}
-{#                                            {% for error in form.non_field_errors %}#}
-{#                                              <li>{{ error }}</li>#}
-{#                                            {% endfor %}#}
-{#                                            {% for field in form %}#}
-{#                                              {% if field.errors %}#}
-{#                                                {% for error in field.errors %}#}
-{#                                                  <li>{{ field.label }}: {{ error }}</li>#}
-{#                                                {% endfor %}#}
-{#                                              {% endif %}#}
-{#                                            {% endfor %}#}
-{#                                          </ul>#}
-{#                                        </div>#}
-{#                                      {% endif %}#}
-{#                                      <div action="#" class="contacts__form">#}
-{#                                        <input aria-label="Введите телефон" class="contacts__input contacts__phone" id="tel"#}
-{#                                                    name="phone"#}
-{#                                                    type="tel"#}
-{#                                                    value={{ user.phone }}#}
-{#                                                    placeholder="Телефон*"#}
-{#                                                    data-validate-field="tel"#}
-{#                                                    data-validate-rules="phone"#}
-{#                                                    >#}
-{#                                        <span>{{ form.errors.phone }}</span>#}
-
-
-{#                                      </div>#}
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label" for="mail">E-mail
@@ -155,10 +106,8 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="Profile-btn">
-{#                                          {% csrf_token %}#}
                                             <button class="btn btn_success" type="submit">Сохранить</button>
                                         </div>
-{#                                      <div class="Profile-success" style="opacity: 1;">fsdf</div>#}
                                         {% if not form.errors %}
                                           <div class="Profile-success">Профиль успешно сохранен
                                           </div>

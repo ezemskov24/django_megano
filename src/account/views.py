@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login
@@ -10,10 +9,8 @@ from .forms import UserRegistrationForm #, ProfileUpdateForm
 from .models import Profile
 
 
-# from django.shortcuts import render, redirect
 from .forms import ProfileForm
 from django.contrib import messages
-# from django.contrib.auth.decorators import login_required
 
 
 class ProfileUpdateView(UpdateView):
@@ -35,48 +32,6 @@ class ProfileUpdateView(UpdateView):
         return self.request.user
 
 
-
-# @login_required
-# def profile(request):
-#     if request.method == 'POST':
-#         form = ProfileForm(request.POST, request.FILES, instance=request.user)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, 'Profile updated successfully')
-#             return redirect('profile')
-#     else:
-#         form = ProfileForm(instance=request.user)
-#     return render(request, 'registration/profile.jinja2', {'form': form})
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         print('Form is_valid(self) = ', context['form'].is_valid())
-#         print(context)
-#
-#         return context
-
-# @login_required
-# def edit_profile(request):
-#     if request.method == 'POST':
-#         form = ProfileUpdateForm(request.POST, instance=request.user)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('account')
-#     else:
-#         form = ProfileUpdateForm(instance=request.user)
-#     return render(request, 'registration/profile.jinja2', {'form': form})
-# class ProfileUpdateView(UpdateView):
-#     model = Profile
-#     form_class = ProfileUpdateForm
-#     template_name = 'registration/profile.jinja2'
-#     success_url = reverse_lazy('account:profile')
-#
-#     def get_object(self, queryset=None):
-#         return self.request.user
-
-# class UserProfileView(TemplateView):
-#     template_name = 'registration/profile.jinja2'
-
 class RegisterView(CreateView):
     form_class = UserRegistrationForm
     template_name = 'registration/registr.jinja2'
@@ -88,7 +43,6 @@ class RegisterView(CreateView):
 
         username = form.cleaned_data.get('email')
         password = form.cleaned_data.get('password1')
-        # print('username = ', username, 'password = ', password)
         user = authenticate(
             self.request,
             username=username,
