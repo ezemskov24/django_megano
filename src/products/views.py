@@ -1,15 +1,11 @@
-import random
 from typing import Any, Dict
 
 from django.core.cache import cache
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
 from django.views.generic import TemplateView, DetailView
-from django.shortcuts import render, get_object_or_404
 
 from .utils import Banner, LimitedProduct, TopSellerProduct
-from .banner import Banner
 from .models import Product, SellerProduct, Picture
+from catalog.models import Review
 
 
 class IndexView(TemplateView):
@@ -43,11 +39,13 @@ class ProductDetailsView(DetailView):
             product = self.object
             sellers = SellerProduct.objects.filter(product=product).select_related('seller')
             images = Picture.objects.filter(product=product)
+            reviews = Review.objects.filter(product=product).order_by('-created_at')
 
             context_data = {
                 'product': product,
                 'sellers': sellers,
-                'images': images
+                'images': images,
+                'reviews': reviews
             }
 
             cache.set(cache_key, context_data, 60 * 60 * 24)

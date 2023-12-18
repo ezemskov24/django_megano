@@ -5,7 +5,17 @@ from django.http import HttpRequest
 
 from .models import Profile, Seller
 
-admin.site.register(Profile, UserAdmin)
+# admin.site.register(Profile, UserAdmin)
+
+
+@admin.register(Profile)
+class ProfileAdmin(UserAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'phone', 'address', 'archived')
+    search_fields = ('username', 'email', 'first_name', 'last_name', 'phone', 'address')
+    fieldsets = (
+        ('Personal Info', {'fields': ('first_name', 'last_name', 'email', 'phone', 'avatar', 'address', 'archived')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+    )
 
 
 class SellerInLine(admin.TabularInline):
