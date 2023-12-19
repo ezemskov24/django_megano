@@ -100,6 +100,9 @@ class UserProfileView(TemplateView):
     template_name = 'registration/profile.jinja2'
 
 
+class UserAccountView(TemplateView):
+    template_name = 'registration/account.jinja2'
+
 class SellerDetailView(DetailView):
     template_name = 'users/seller_details.jinja2'
     model = Seller
