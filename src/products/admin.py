@@ -28,9 +28,31 @@ class PictureInline(admin.StackedInline):
     extra = 1
 
 
-# class TagInline(admin.StackedInline):
-#     model = models.Tag
-#     extra = 1
+@admin.register(models.Value)
+class PropertyValueAdmin(admin.ModelAdmin):
+
+    actions = [
+        mark_archived,
+        mark_unarchived
+    ]
+    list_display = [
+        'product',
+        'property',
+        'value',
+    ]
+
+
+@admin.register(models.Property)
+class PropertyAdmin(admin.ModelAdmin):
+
+    actions = [
+        mark_archived,
+        mark_unarchived
+    ]
+    list_display = [
+        'category',
+        'name',
+    ]
 
 
 @admin.register(models.Product)

@@ -2411,7 +2411,16 @@ a.Cart-title {
     width: 99px;
     height: 99px;
     border-radius: 100px;
-    /*background: #0063d1 url("../img/icons/user_icon.svg") center center no-repeat;*/
+    background: #0063d1 url("../img/icons/user_icon.svg") center center no-repeat;
+}
+
+.Comment-avatar-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
 }
 
 .Comment-rating {

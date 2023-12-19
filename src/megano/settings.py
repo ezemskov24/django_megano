@@ -82,6 +82,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'products.context_processors.header_menu',
+                'products.context_processors.product_compare_list_amt',
             ],
         },
     },

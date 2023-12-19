@@ -5,6 +5,8 @@ from .forms import SearchForm
 from .models import Category
 from .utils import CacheableContextCategory
 
+from .services.compare_products import get_compare_list_amt
+
 
 CATEGORIES_KEY = 'header_menu_categories'
 
@@ -40,4 +42,11 @@ def header_menu(request):
     return {
         'categories': menu_categories,
         'search_form': SearchForm()
+    }
+
+
+def product_compare_list_amt(request):
+    compare_list_amt = get_compare_list_amt(request)
+    return {
+        'compare_amt': compare_list_amt,
     }

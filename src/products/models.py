@@ -1,7 +1,10 @@
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Avg, Min
 from django.urls import reverse
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from .validators import validate_not_subcategory
 
@@ -57,7 +60,7 @@ class Product(models.Model):
 
     def get_absolute_url(self) -> str:
         'Получение абсолютной ссылки на продукт'
-        return '#'
+        return reverse('products:product_details', kwargs={'pk': self.pk})
 
     @property
     def average_price(self) -> int:
@@ -91,6 +94,15 @@ class Product(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+
+
+@receiver(post_save, sender=Product)
+def clear_product_cache(sender, instance, **kwargs):
+    """
+    Очистка кеша модели Product при изменении товара в БД
+    """
+    cache_key = f'product_details_{instance.pk}'
+    cache.delete(cache_key)
 
 
 def product_images_directory_path(
@@ -151,7 +163,7 @@ class SellerProduct(models.Model):
         on_delete=models.CASCADE,
     )
     seller = models.ForeignKey(
-        'users.Seller',
+        'account.Seller',
         on_delete=models.CASCADE,
     )
     count = models.PositiveIntegerField(default=0)
@@ -161,7 +173,7 @@ class SellerProduct(models.Model):
         ordering = ['seller', 'product']
 
     def __str__(self):
-        return f'{self.product} by {self.seller}'
+        return f'{self.product} by {self.seller.name}'
 
 
 class Category(models.Model):
@@ -224,3 +236,33 @@ class Category(models.Model):
                     "%(parent)s is a subcategory and can't be a parent",
                     params={'parent': self.parent_category},
                 )
+
+
+class Property(models.Model):
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name='category_property'
+    )
+    name = models.CharField(max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+
+class Value(models.Model):
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='product_property_value'
+    )
+    property = models.ForeignKey(
+        Property,
+        on_delete=models.CASCADE,
+        related_name='category_property_value'
+    )
+    value = models.CharField(max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.value)
+
