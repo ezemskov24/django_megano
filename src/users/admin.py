@@ -3,7 +3,7 @@ from django.http import HttpRequest
 from django.db.models import QuerySet
 
 from .models import Seller
-from account.models import  Profile
+from account.models import Profile
 
 
 class SellerInLine(admin.TabularInline):

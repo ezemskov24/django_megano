@@ -28,6 +28,33 @@ class PictureInline(admin.StackedInline):
     extra = 1
 
 
+@admin.register(models.Value)
+class PropertyValueAdmin(admin.ModelAdmin):
+
+    actions = [
+        mark_archived,
+        mark_unarchived
+    ]
+    list_display = [
+        'product',
+        'property',
+        'value',
+    ]
+
+
+@admin.register(models.Property)
+class PropertyAdmin(admin.ModelAdmin):
+
+    actions = [
+        mark_archived,
+        mark_unarchived
+    ]
+    list_display = [
+        'category',
+        'name',
+    ]
+
+
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     actions = [
@@ -41,10 +68,13 @@ class ProductAdmin(admin.ModelAdmin):
         'sellers_amount',
         'min_price',
         'avg_price',
+        'sort_index',
+        'limited',
         'archived',
     ]
     list_filter = [
         'category',
+        'limited',
         'archived',
         admin_filters.MinPriceListFilter,
         admin_filters.AvgPriceListFilter,
@@ -61,11 +91,11 @@ class ProductAdmin(admin.ModelAdmin):
 
     @admin.display(description='Min price', empty_value=0)
     def min_price(self, obj: models.Product) -> int:
-        return obj.min_price()
+        return obj.min_price
 
     @admin.display(description='Avg price', empty_value=0)
     def avg_price(self, obj: models.Product) -> int:
-        return obj.average_price()
+        return obj.average_price
 
     def delete_queryset(self, request: HttpRequest, queryset: QuerySet):
         queryset.update(archived=True)
@@ -107,3 +137,4 @@ class CategoryAdmin(admin.ModelAdmin):
                 parent_category=None,
             )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+

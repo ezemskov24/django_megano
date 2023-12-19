@@ -10,3 +10,5 @@ class SiteSettings(models.Model):
     products_images = models.PositiveIntegerField(default=3, verbose_name='Количество изображений в карточке товара')
     amount_products_from_the_seller = models.PositiveIntegerField(default=20,
                                                                   verbose_name="количество товаров от одного продавца")
+    top_product_cache_time = models.IntegerField(default=3600,
+                                                 verbose_name="время кеширования топ товаров на странице продавца")

@@ -1,24 +1,71 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from typing import Any, Dict
 
-from .banner import Banner
+from django.core.cache import cache
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.views.generic import TemplateView, DetailView, ListView
+
+from .services.compare_products import add_product_to_compare_list, get_compare_list, delete_all_compare_products, \
+    delete_product_to_compare_list
+from .utils import Banner, LimitedProduct, TopSellerProduct
+from .models import Product, SellerProduct, Picture
+from catalog.models import Review
 
 
-def index_view(request: HttpRequest) -> HttpResponse:
-    context = {
-        'banners': Banner(),
-    }
-    return render(request, 'index.jinja2', context)
+class IndexView(TemplateView):
+    template_name = 'index.jinja2'
+
+    def get_context_data(self, **kwargs) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['banners'] = Banner()
+        context['top_sellers'] = TopSellerProduct.get_top_sellers()
+        context['limited_offers'] = LimitedProduct.get_limited_offers()
+
+        return context
 
 
 def ProductCreateView():
     pass
 
 
-def ProductDetailsView(DetailView):
-    template_name = "shopapp/products-details.html"
+class ProductDetailsView(DetailView):
+    template_name = "products/product-details.jinja2"
     queryset = Product.objects.prefetch_related("images")
     context_object_name = "product"
+
+    def get_context_data(self, **kwargs):
+        """
+        Получение контекстных данных для представления деталей продукта
+        """
+        cache_key = f'product_details_{self.object.pk}'
+        context_data = cache.get(cache_key)
+
+        if context_data is None:
+            product = self.object
+            sellers = SellerProduct.objects.filter(product=product).select_related('seller')
+            images = Picture.objects.filter(product=product)
+            reviews = Review.objects.filter(product=product).order_by('-created_at')
+
+            context_data = {
+                'product': product,
+                'sellers': sellers,
+                'images': images,
+                'reviews': reviews
+            }
+
+            cache.set(cache_key, context_data, 60 * 60 * 24)
+
+        return context_data
+
+    def post(self, request, *args, **kwargs):
+        add_product_to_compare_list(
+            request
+        )
+        return HttpResponseRedirect(
+            reverse('products:product_details',
+                    kwargs={'pk': kwargs.get('pk')}
+                    )
+        )
 
 
 def ProductsListView():
@@ -27,3 +74,44 @@ def ProductsListView():
 
 def ProductUpdateView():
     pass
+
+
+class ProductsCompareView(ListView):
+    template_name = 'products/compare.jinja2'
+
+    def get_queryset(self):
+        return [
+            product[0] for product in [
+                Product.objects.filter(pk=pk).select_related('category')
+                for pk in get_compare_list(self.request)
+                ]
+            ]
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+
+        if not context['object_list']:
+            return context
+
+        for product in context.get('object_list'):
+            context['properties'] = [
+                {
+                    'property_name': value.property
+                }
+                for value in product.product_property_value.select_related('property')
+            ]
+
+        for property_name in context['properties']:
+            property_name['property_values'] = [
+                property_name['property_name'].category_property_value.filter(product=product)
+                for product in context.get('object_list')
+            ]
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get('product_from_compare') == 'delete':
+            delete_all_compare_products(request)
+            return HttpResponseRedirect(reverse('products:product_compare'))
+        delete_product_to_compare_list(request)
+        return HttpResponseRedirect(reverse('products:product_compare'))

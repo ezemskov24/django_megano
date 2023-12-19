@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'adminsettings.apps.AdminsettingsConfig',
     'payments.apps.PaymentsConfig',
     'products.apps.ProductsConfig',
-    'users.apps.UsersConfig',
     'catalog.apps.CatalogConfig',
 ]
 
@@ -82,6 +81,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'products.context_processors.categories',
+                'products.context_processors.product_compare_list_amt',
             ],
         },
     },
