@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.cache import cache
 
+from .forms import SearchForm
 from .models import Category
 from .utils import CacheableContextCategory
 
@@ -23,7 +24,7 @@ class MenuCategory(CacheableContextCategory):
                               ).all()]
 
 
-def categories(request):
+def header_menu(request):
     menu_categories = cache.get(CATEGORIES_KEY)
 
     if not menu_categories:
@@ -40,6 +41,7 @@ def categories(request):
 
     return {
         'categories': menu_categories,
+        'search_form': SearchForm()
     }
 
 

@@ -80,7 +80,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'products.context_processors.categories',
+                'products.context_processors.header_menu',
                 'products.context_processors.product_compare_list_amt',
             ],
         },
@@ -95,7 +95,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'products.context_processors.categories',
+                'products.context_processors.header_menu',
             ],
         },
     },
@@ -173,3 +173,5 @@ CACHES = {
         "TIMEOUT": 600,
     }
 }
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'

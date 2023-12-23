@@ -27,7 +27,7 @@ urlpatterns = [
     path('adminsettings/', include('adminsettings.urls')),
     path('catalog/', include('products.urls')),
     path('account/', include('account.urls')),
-    path('', IndexView.as_view()),
+    path('', IndexView.as_view(), name='index'),
 ]
 
 if settings.DEBUG:

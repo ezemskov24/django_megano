@@ -48,16 +48,18 @@
         <div class="Header-searchLink">
             <img src="{{ static('assets/img/icons/search.svg') }}" alt="search.svg" />
         </div>
-        <div class="Header-search">
-            <div class="search">
-                <form class="form form_search" action="#" method="post">
-                    {% csrf_token %}
-                    <input class="search-input" id="query" name="query" type="text" placeholder="NVIDIA GeForce RTX 3060" />
-                    <button class="search-button" type="submit" name="search" id="search">
-                        <img src="{{ static('assets/img/icons/search.svg') }}" alt="search.svg" />Поиск
-                    </button>
-                </form>
+        {% if search_form %}
+            <div class="Header-search">
+                <div class="search">
+                    <form class="form form_search" action="{{ url('products:catalog') }}" method="post">
+                        {% csrf_token %}
+                        {{ search_form.query }}
+                        <button class="search-button" type="submit" name="search" id="search">
+                            <img src="{{ static('assets/img/icons/search.svg') }}" alt="search.svg" />Поиск
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
+        {% endif %}
     </div>
 </div>
