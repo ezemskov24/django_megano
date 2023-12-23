@@ -1,62 +1,42 @@
 {% extends 'base.jinja2' %}
 
+{% block title %}
+  Registration
+{% endblock %}
+
+{% block header %}
+  {% include 'common/header_min.jinja2' %}
+{% endblock %}
+
 {% block content %}
-<link rel="stylesheet" type="text/css" href="{{ static('assets/css/fonts.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ static('assets/css/basic.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ static('assets/css/extra.css') }}">
-
-<head>
-    <title>Megano</title>
-    <meta name="description" content="Описание страницы">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <link href="favicon.ico" rel="shortcut icon">
-    <link rel="preload" href="assets/fonts/Roboto/Roboto-Regular.woff" as="font">
-    <link rel="preload" href="assets/fonts/Roboto/Roboto-Italic.woff" as="font">
-    <link rel="preload" href="assets/fonts/Roboto/Roboto-Bold.woff" as="font">
-    <link rel="preload" href="assets/fonts/Roboto/Roboto-Bold_Italic.woff" as="font">
-    <link rel="preload" href="assets/fonts/Roboto/Roboto-Light.woff" as="font">
-    <link rel="preload" href="assets/fonts/Roboto/Roboto-Light_Italic.woff" as="font">
-    <link rel="stylesheet" href="assets/css/fonts.css?v=65245665">
-    <link rel="stylesheet" href="assets/css/basic.css?v=65245665">
-    <link rel="stylesheet" href="assets/css/extra.css?v=65245665">
-    <script src="assets/plg/CountDown/countdown.js"></script>
-    <!--[if lt IE 9]>
-  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-</head>
-
     <div class="wrap">
-        <div class="row Header-rowMain">
-            <div class="row-block Header-logo"><a class="logo" href="index.html"><img class="logo-image" src="assets/img/logo.png" alt="logo.png" /></a>
-            </div>
-        </div>
-
-
-
-
-
-
         <div class="wrapper">
             <div class="header">
                 <h3 class="sign-in">Регистрация</h3>
 
             </div>
             <div class="clear"></div>
-            <form action="#">
-                <div>
-                    <input class="user-input" type="text" name="name" id="name" placeholder="Имя" />
-                </div>
-                <div>
-                    <input class="user-input" type="email" name="login" id="name" placeholder="E-mail" />
-                </div>
-                <div>
 
-                    <input type="password" name="pass" id="name" placeholder="Пароль" />
+            <form method="POST">
+                {% csrf_token %}
+                <div>
+                    <input class="user-input" type="text" name="username" id="username" placeholder="Имя" required>
                 </div>
+                <div>
+                    <input class="user-input" type="email" name="email" id="email" placeholder="E-mail" required autofocus>
+                </div>
+                <br>
+                <div>
+                    <input type="password" name="password1" id="password1" placeholder="Пароль" required>
+                </div>
+                <div>
+                    <input type="password" name="password2" id="password2" placeholder="Подтверждение пароля" required>
+                </div>
+                <div class='error'>{{form.errors}}</div>
                 <input type="submit" value="Зарегистрироваться" />
 
 
-                <a class="registr" href="login.html">
+                <a class="registr" href="../login">
                     Вход
                 </a>
                 <div class="clear"></div>
