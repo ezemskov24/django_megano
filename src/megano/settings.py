@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'payments.apps.PaymentsConfig',
     'products.apps.ProductsConfig',
     'catalog.apps.CatalogConfig',
+
+    # 'django.contrib.messages',
 ]
 
 MIDDLEWARE = [
@@ -173,3 +175,5 @@ CACHES = {
         "TIMEOUT": 600,
     }
 }
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'

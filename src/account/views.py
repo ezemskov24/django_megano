@@ -16,6 +16,8 @@ from products.models import Product
 from .forms import ProfileForm
 from django.contrib import messages
 
+import re
+
 
 class ProfileUpdateView(UpdateView):
     model = Profile
@@ -23,14 +25,24 @@ class ProfileUpdateView(UpdateView):
     template_name = 'registration/profile.jinja2'
     success_url = reverse_lazy('account:profile')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        print('Form is_valid(self) = ', context['form'].is_valid())
-        print('*'*8, '\ncontext ', context['form'])
-        print('*'*8)
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Данные успешно обновлены.")
+        # phone_number = form.cleaned_data.get('phone', '')  # Assuming 'phone_number' is the field name
+        # cleaned_phone_number = re.sub(r'\D', '', phone_number)  # Remove all non-digit characters
+        # form.instance.phone_number = cleaned_phone_number
+        # print('***********phone_number ', phone_number)
+        return response
 
-
-        return context
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        messages.error(self.request, "Ошибка обновления данных.")
+        # #
+        # phone_number = form.cleaned_data.get('phone', '')  # Assuming 'phone_number' is the field name
+        # # cleaned_phone_number = re.sub(r'\D', '', phone_number)  # Remove all non-digit characters
+        # # form.instance.phone_number = cleaned_phone_number
+        # print('***********phone_number ', phone_number)
+        return response
 
     def get_object(self, queryset=None):
         return self.request.user
@@ -102,6 +114,12 @@ class UserProfileView(TemplateView):
 
 class UserAccountView(TemplateView):
     template_name = 'registration/account.jinja2'
+
+
+class UserEmailView(TemplateView):
+    template_name = 'registration/e-mail.jinja2'
+    # template_name = 'registration/e-mail.jinja2'
+
 
 class SellerDetailView(DetailView):
     template_name = 'users/seller_details.jinja2'
