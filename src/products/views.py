@@ -2,28 +2,31 @@ from enum import Enum
 from typing import Any, Dict
 
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
-from django.db.models import Count, Max, Min, Sum
-from django.http import HttpRequest, HttpResponse
-from django.views.generic import ListView, TemplateView
+from django.db.models import Count, Max, Min, Sum, QuerySet
 from django.core.cache import cache
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpRequest, HttpResponse
 from django.urls import reverse
 from django.views.generic import TemplateView, DetailView, ListView
 
 
 from .forms import FilterForm, SearchForm
-from .models import Category, Product, Tag
-from .services.compare_products import add_product_to_compare_list, get_compare_list, delete_all_compare_products, \
-    delete_product_to_compare_list
+from .models import Category, Picture, Product, SellerProduct, Tag
+from .services.compare_products import (
+    add_product_to_compare_list,
+    get_compare_list,
+    delete_all_compare_products,
+    delete_product_to_compare_list,
+)
 from .utils import Banner, LimitedProduct, TopSellerProduct
-from .models import Product, SellerProduct, Picture
 from catalog.models import Review
 
 
 class IndexView(TemplateView):
+    """ View главной страницы сайта. """
     template_name = 'index.jinja2'
 
     def get_context_data(self, **kwargs) -> Dict[str, Any]:
+        """ Получение контекстных данных для ответа. """
         context = super().get_context_data(**kwargs)
         context['banners'] = Banner()
         context['top_sellers'] = TopSellerProduct.get_top_sellers()
@@ -33,6 +36,7 @@ class IndexView(TemplateView):
 
 
 class CatalogView(ListView):
+    """ View каталога товаров. """
     template_name = 'catalog/catalog.jinja2'
     model = Product
     context_object_name = 'products'
@@ -51,6 +55,7 @@ class CatalogView(ListView):
         self.search_query = None
 
     class SortEnum(Enum):
+        """ Перечисление параметров сортировки товаров. """
         POP_ASC = '-pop'
         POP_DEC = 'pop'
         PRI_ASC = '-pri'
@@ -61,7 +66,8 @@ class CatalogView(ListView):
         CRE_DEC = 'cre'
         NONE = 'none'
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """ Получение queryset списка товаров для отображения. """
         products_list = self._get_base_queryset()
         products_list = self._get_filtered_queryset(products_list)
         sort = self._get_selected_sort_type()
@@ -77,10 +83,12 @@ class CatalogView(ListView):
             products = paginator.page(paginator.num_pages)
         return products
 
-    def _get_base_queryset(self):
+    def _get_base_queryset(self) -> QuerySet:
+        """ Получение базового queryset для дальнейшей работы. """
         search_query = self.request.session.get('search_query')
+        base_filter = {'seller_count__gt': 0}
         if self.tag or self.categories or search_query:
-            base_filter = {}
+
             if self.tag:
                 base_filter['tags'] = self.tag
             if self.categories:
@@ -88,9 +96,9 @@ class CatalogView(ListView):
             if search_query:
                 base_filter['name__icontains'] = search_query
 
-            products_list = Product.active.filter(**base_filter)
-        else:
-            products_list = Product.active
+        products_list = Product.active.annotate(
+            seller_count=Count('sellerproduct'),
+        ).filter(**base_filter)
 
         prices = products_list.aggregate(
             min=Min('sellerproduct__price'),
@@ -111,7 +119,13 @@ class CatalogView(ListView):
             self.filter_prices['selected_max'] = str(max_pr)
         return products_list
 
-    def _get_filtered_queryset(self, queryset):
+    def _get_filtered_queryset(self, queryset: QuerySet) -> QuerySet:
+        """
+        Получение отфильтрованного queryset.
+
+        Args:
+            - queryset: queryset, подлежащий фильтрованию.
+        """
         if self.filter_params:
             if 'amount__gt' or 'price__lte' in self.filter_params:
                 queryset = queryset.annotate(
@@ -122,7 +136,8 @@ class CatalogView(ListView):
                 queryset = queryset.filter(**self.filter_params)
         return queryset
 
-    def _get_selected_sort_type(self):
+    def _get_selected_sort_type(self) -> str:
+        """ Получение выбранного типа сортировки из запроса. """
         sort = self.request.GET.get('sort')
         if sort:
             if (sort == self.SortEnum.NONE.value and
@@ -135,7 +150,14 @@ class CatalogView(ListView):
             sort = self.SortEnum.NONE.value
         return sort
 
-    def _get_sorted_queryset(self, queryset, sort):
+    def _get_sorted_queryset(self, queryset: QuerySet, sort: str) -> QuerySet:
+        """
+        Получение отсортированного queryset.
+
+        Args:
+            - queryset: queryset, подлежащего сортировке.
+            - sort: тип сортировки.
+        """
         if sort == self.SortEnum.CRE_ASC.value:
             return queryset.order_by('created_at').all()
         if sort == self.SortEnum.CRE_DEC.value:
@@ -152,22 +174,19 @@ class CatalogView(ListView):
             return queryset.annotate(
                 price=Min('sellerproduct__price')
             ).order_by('price').all()
-        # Обёрнуто в try-except, чтобы избегать исключений, пока не будут готовы обзоры
-        try:
-            if sort == self.SortEnum.REV_ASC.value:
-                return queryset.annotate(
-                    rev_count=Count('reviews')
-                ).order_by('-rev_count').all()
-            if sort == self.SortEnum.REV_DEC.value:
-                return queryset.annotate(
-                    rev_count=Count('reviews')
-                ).order_by('rev_count').all()
-        except:
-            pass
+        if sort == self.SortEnum.REV_ASC.value:
+            return queryset.annotate(
+                rev_count=Count('reviews')
+            ).order_by('-rev_count').all()
+        if sort == self.SortEnum.REV_DEC.value:
+            return queryset.annotate(
+                rev_count=Count('reviews')
+            ).order_by('rev_count').all()
 
         return queryset.order_by('sort_index').all()
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs) -> Dict[str, Any]:
+        """ Получение контекстных данных для ответа. """
         context = super().get_context_data(**kwargs)
         context['sort'] = self.SortEnum
         curr_sort = self.request.session.get('sort')
@@ -194,8 +213,9 @@ class CatalogView(ListView):
 
         return context
 
-    def get(self, request, *args, **kwargs):
-        self._get_path_params(**kwargs)
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """ Оброаботка метода GET. """
+        self._process_path_params(**kwargs)
         if self.search_query:
             request.session['search_query'] = self.search_query
         elif (
@@ -207,8 +227,9 @@ class CatalogView(ListView):
 
         return super().get(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        self._get_path_params(**kwargs)
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """ Оброаботка метода POST. """
+        self._process_path_params(**kwargs)
         filter_form = FilterForm(request.POST)
         search_form = SearchForm(request.POST)
         if filter_form.is_valid():
@@ -231,7 +252,8 @@ class CatalogView(ListView):
 
         return self.get(request, args, kwargs)
 
-    def _get_path_params(self, **kwargs):
+    def _process_path_params(self, **kwargs):
+        """ Обработка параметров из пути запроса. """
         tag_slug = kwargs.get('tag')
         if tag_slug:
             tag = Tag.objects.filter(slug=tag_slug).first()
@@ -249,10 +271,6 @@ class CatalogView(ListView):
                 self.categories = categories
 
 
-def ProductCreateView():
-    pass
-
-
 class ProductDetailsView(DetailView):
     template_name = "products/product-details.jinja2"
     queryset = Product.objects.prefetch_related("images")
@@ -260,16 +278,20 @@ class ProductDetailsView(DetailView):
 
     def get_context_data(self, **kwargs):
         """
-        Получение контекстных данных для представления деталей продукта
+        Получение контекстных данных для представления деталей продукта.
         """
         cache_key = f'product_details_{self.object.pk}'
         context_data = cache.get(cache_key)
 
         if context_data is None:
             product = self.object
-            sellers = SellerProduct.objects.filter(product=product).select_related('seller')
+            sellers = SellerProduct.objects.filter(
+                product=product,
+            ).select_related('seller')
             images = Picture.objects.filter(product=product)
-            reviews = Review.objects.filter(product=product).order_by('-created_at')
+            reviews = Review.objects.filter(
+                product=product,
+            ).order_by('-created_at')
 
             context_data = {
                 'product': product,
@@ -293,14 +315,6 @@ class ProductDetailsView(DetailView):
         )
 
 
-def ProductsListView():
-    pass
-
-
-def ProductUpdateView():
-    pass
-
-
 class ProductsCompareView(ListView):
     template_name = 'products/compare.jinja2'
 
@@ -309,8 +323,8 @@ class ProductsCompareView(ListView):
             product[0] for product in [
                 Product.objects.filter(pk=pk).select_related('category')
                 for pk in get_compare_list(self.request)
-                ]
             ]
+        ]
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()

@@ -28,6 +28,11 @@ class PictureInline(admin.StackedInline):
     extra = 1
 
 
+class SellerInline(admin.TabularInline):
+    model = models.SellerProduct
+    extra = 1
+
+
 @admin.register(models.Value)
 class PropertyValueAdmin(admin.ModelAdmin):
 
@@ -61,7 +66,7 @@ class ProductAdmin(admin.ModelAdmin):
         mark_archived,
         mark_unarchived
     ]
-    inlines = [PictureInline]
+    inlines = [PictureInline, SellerInline]
     list_display = [
         'name',
         'category',

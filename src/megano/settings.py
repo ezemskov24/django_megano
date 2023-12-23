@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'adminsettings.apps.AdminsettingsConfig',
     'payments.apps.PaymentsConfig',
     'products.apps.ProductsConfig',
-    'users.apps.UsersConfig',
     'catalog.apps.CatalogConfig',
 ]
 
@@ -174,3 +173,20 @@ CACHES = {
         "TIMEOUT": 600,
     }
 }
+
+# LOGGING = {
+#     'version': 1,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django.db.backends': {
+#             'level': 'DEBUG',
+#         },
+#     },
+#     'root': {
+#         'handlers': ['console'],
+#     }
+# }
