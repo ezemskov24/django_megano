@@ -1,3 +1,4 @@
+from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
 from django.views.generic import TemplateView, DetailView
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
@@ -6,12 +7,13 @@ from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView, UpdateView
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
 
-from .forms import UserRegistrationForm #, ProfileUpdateForm
+from .forms import UserRegistrationForm
 from .models import Profile
 
 from .models import Seller
 from adminsettings.models import SiteSettings
 from products.models import Product
+from .models import BrowsingHistory
 
 from .forms import ProfileForm
 from django.contrib import messages
@@ -121,5 +123,24 @@ class SellerDetailView(DetailView):
         context['top_products_cache_time'] = (
             SiteSettings.objects.values('top_product_cache_time')[0]['top_product_cache_time']
         )
+
+        return context
+
+
+class UserBrowsingHistoryView(LoginRequiredMixin, TemplateView):
+    template_name = 'registration/browsing-history.jinja2'
+    login_url = 'account:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        history = BrowsingHistory.objects.filter(profile=self.request.user).order_by('-timestamp')[:20]
+
+        for item in history:
+            product = item.product
+            first_image = product.images.first()
+
+            item.image_url = first_image.image.url if first_image else None
+
+        context['history'] = history
 
         return context
