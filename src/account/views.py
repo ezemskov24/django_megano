@@ -35,12 +35,14 @@ from django.urls import reverse_lazy
 #     return render(request, 'registration/login.jinja2', {'error': 'invalid login'})
 
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 
 from account.models import Seller
 from adminsettings.models import SiteSettings
 from products.models import Product
+from .models import BrowsingHistory
 
 
 def UserLoginView(request: HttpRequest) -> HttpResponse:
@@ -85,5 +87,24 @@ class SellerDetailView(DetailView):
         context['top_products_cache_time'] = (
             SiteSettings.objects.values('top_product_cache_time')[0]['top_product_cache_time']
         )
+
+        return context
+
+
+class UserBrowsingHistoryView(LoginRequiredMixin, TemplateView):
+    template_name = 'registration/browsing-history.jinja2'
+    login_url = 'account:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        history = BrowsingHistory.objects.filter(profile=self.request.user).order_by('-timestamp')[:20]
+
+        for item in history:
+            product = item.product
+            first_image = product.images.first()
+
+            item.image_url = first_image.image.url if first_image else None
+
+        context['history'] = history
 
         return context

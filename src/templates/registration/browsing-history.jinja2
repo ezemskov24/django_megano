@@ -1,0 +1,24 @@
+{% extends 'base.jinja2' %}
+{% include 'common/header_full.jinja2' %}
+
+{% block title %}
+    История просмотров
+{% endblock %}
+
+{% block content %}
+    <h1 style="text-align: center;">История просмотров</h1>
+        {% if history %}
+            <div class="Cards-browsing-history">
+                {% for item in history %}
+                    <div class="Card"><a class="Card-picture" href="#"><<img src="{{ item.image_url }}" alt="{{ item.product.name }}">></a>
+                        <div class="Card-content">
+                            <strong class="Card-title"><a href="#">{{ item.product.name }}</a>
+                            </strong>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>История просмотров пуста</p>
+        {% endif %}
+{% endblock %}

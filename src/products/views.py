@@ -1,15 +1,20 @@
 from typing import Any, Dict
 
 from django.core.cache import cache
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView, DetailView, ListView
+from django.utils import timezone
 
+from catalog.forms import ReviewForm
+from catalog.services import get_reviews_list, add_review, get_count_review
 from .services.compare_products import add_product_to_compare_list, get_compare_list, delete_all_compare_products, \
     delete_product_to_compare_list
 from .utils import Banner, LimitedProduct, TopSellerProduct
 from .models import Product, SellerProduct, Picture
 from catalog.models import Review
+from account.models import BrowsingHistory
 
 
 class IndexView(TemplateView):
@@ -33,6 +38,22 @@ class ProductDetailsView(DetailView):
     queryset = Product.objects.prefetch_related("images")
     context_object_name = "product"
 
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if request.user.is_authenticated:
+            browsing_history, created = BrowsingHistory.objects.get_or_create(
+                profile=request.user, product=self.object
+            )
+
+            if not created:
+                browsing_history.timestamp = timezone.now()
+                browsing_history.save()
+
+        context_data = self.get_context_data()
+
+        return self.render_to_response(context_data)
+
     def get_context_data(self, **kwargs):
         """
         Получение контекстных данных для представления деталей продукта
@@ -50,7 +71,9 @@ class ProductDetailsView(DetailView):
                 'product': product,
                 'sellers': sellers,
                 'images': images,
-                'reviews': reviews
+                'reviews': reviews,
+                'reviews_list': get_reviews_list(product.pk),
+                'get_count_review': get_count_review(product.pk)
             }
 
             cache.set(cache_key, context_data, 60 * 60 * 24)
@@ -58,9 +81,14 @@ class ProductDetailsView(DetailView):
         return context_data
 
     def post(self, request, *args, **kwargs):
-        add_product_to_compare_list(
-            request
-        )
+        form = ReviewForm(request.POST)
+
+        if form.is_valid():
+            add_review(post=request.POST, user_id=request.user.id, pk=kwargs['pk'])
+
+            return redirect('products:product_details', pk=kwargs['pk'])
+
+        add_product_to_compare_list(request)
         return HttpResponseRedirect(
             reverse('products:product_details',
                     kwargs={'pk': kwargs.get('pk')}

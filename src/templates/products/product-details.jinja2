@@ -200,68 +200,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="Tabs-block" id="reviews">
-                                <header class="Section-header">
-                                    <h3 class="Section-title">
-                                    {{ reviews|length }} отзыв{{
-                                        '' if reviews|length % 10 == 1 and reviews|length % 100 != 11
-                                        else 'а' if reviews|length % 10 in [2, 3, 4] and reviews|length % 100 not in [12, 13, 14]
-                                        else 'ов'
-                                    }}
-                                    </h3>
-                                </header>
-                                <div class="Comments">
-                                    {% for review in reviews %}
-                                        <div class="Comment">
-                                            <div class="Comment-column Comment-column_pict">
-                                                {% if review.author.avatar %}
-                                                    <img src="{{ review.author.avatar.url }}" alt="Avatar" class="Comment-avatar-image">
-                                                {% else %}
-                                                <div class="Comment-avatar">
-                                                </div>
-                                                {% endif %}
-                                            </div>
-                                            <div class="Comment-column">
-                                                <header class="Comment-header">
-                                                    <div>
-                                                        <strong class="Comment-title">{{ review.author.first_name + ' ' + review.author.last_name }}
-                                                        </strong><span class="Comment-date">
-                                                            {% set russian_months = {
-                                                                1: 'ЯНВАРЬ', 2: 'ФЕВРАЛЬ', 3: 'МАРТ', 4: 'АПРЕЛЬ',
-                                                                5: 'МАЙ', 6: 'ИЮНЬ', 7: 'ИЮЛЬ', 8: 'АВГУСТ',
-                                                                9: 'СЕНТЯБРЬ', 10: 'ОКТЯБРЬ', 11: 'НОЯБРЬ', 12: 'ДЕКАБРЬ'
-                                                            } %}
-                                                            {{ russian_months[review.created_at.month] }} {{ review.created_at.day }} / {{ review.created_at.year }} / {{ review.created_at.hour }}:{{ review.created_at.minute }}
-                                                        </span>
-                                                    </div>
-                                                </header>
-                                                <div class="Comment-content">{{ review.text }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                <header class="Section-header Section-header_product">
-                                    <h3 class="Section-title">Добавить отзыв
-                                    </h3>
-                                </header>
-                                <div class="Tabs-addComment">
-                                    <form class="form" action="#" method="post">
-                                        <div class="form-group">
-                                            <textarea class="form-textarea" name="review" id="review" placeholder="Отзыв"></textarea>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <button class="btn btn_muted" type="submit">Отправить отзыв
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
+                            {% include 'catalog/review.jinja2' %}
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

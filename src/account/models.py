@@ -20,6 +20,15 @@ class Profile(AbstractUser):
     REQUIRED_FIELDS = ['username']  # 'username' требуется по умолчанию
 
 
+class BrowsingHistory(models.Model):
+    """
+    Модель истории просмотра товаров пользователем
+    """
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+
 class Seller(models.Model):
     """
     Модель для описания продавцов.
