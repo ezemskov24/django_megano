@@ -4,10 +4,8 @@ from typing import Any, Dict
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db.models import Count, Max, Min, Sum, QuerySet
 from django.core.cache import cache
-from django.http import HttpResponseRedirect, HttpResponse, HttpRequest
 from django.shortcuts import redirect
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import TemplateView, DetailView, ListView
 from django.utils import timezone
@@ -42,12 +40,6 @@ class IndexView(TemplateView):
         return context
 
 
-from rest_framework.viewsets import ModelViewSet
-
-from .serializer import ProductSerializer, PropertiesSerializer, ValuesSerializer
-
-from .services.compare_products import (add_product_to_compare_list, get_compare_list, get_compare_list_amt,
-                                        delete_product_to_compare_list, delete_all_compare_products)
 class CatalogView(ListView):
     """ View каталога товаров. """
     template_name = 'catalog/catalog.jinja2'
@@ -360,8 +352,7 @@ def ProductUpdateView():
 
 
 class ProductsCompareView(ListView):
-    '''View для отображения страницы сравнения'''
-    template_name = 'products/compare_page/compare.jinja2'
+    template_name = 'products/compare.jinja2'
 
     def get_queryset(self):
         return [
@@ -400,6 +391,13 @@ class ProductsCompareView(ListView):
 
         return context
 
+    def post(self, request, *args, **kwargs):
+        if request.POST.get('product_from_compare') == 'delete':
+            delete_all_compare_products(request)
+            return HttpResponseRedirect(reverse('products:product_compare'))
+        delete_product_to_compare_list(request)
+        return HttpResponseRedirect(reverse('products:product_compare'))
+
 
 def delete_all_compare_products_view(request):
     '''функция ajax запроса для доступа к сервису сравнения'''
@@ -411,66 +409,3 @@ def delete_product_to_compare_list_view(request, pk):
     '''функция ajax запроса для доступа к сервису сравнения'''
     delete_product_to_compare_list(request, pk)
     return HttpResponse()
-
-
-'''
-    --------------------------
-    вью для  api, пока не используются
-    -------------------------
-'''
-
-
-# class PropertyCreateView(CreateView):
-#     template_name = 'products/create_property.jinja2'
-#     model = Property
-#     fields = '__all__'
-#
-#     def get_form(self, form_class=None, fields_amt=None):
-#         if fields_amt:
-#             form_class = PropertyNameForm(fields_amt)
-#             return form_class
-#         form_class = PropertyCategoryForm()
-#         return form_class
-#
-#     def post(self, request, *args, **kwargs):
-#         context = dict()
-#         print(request.POST)
-#         if request.POST.get('names_amt'):
-#             form = self.get_form(fields_amt=int(request.POST.get('names_amt')))
-#             context['form'] = form
-#             return render(request, 'products/create_property.jinja2', context=context)
-#
-#         fields_dict = deepcopy(request.POST)
-#         fields_dict.pop('csrfmiddlewaretoken')
-#
-#         for key, value in fields_dict.items():
-#             fields_dict[key] = value[0]
-#         print(fields_dict)
-#         # Property.object.bulk_create(
-#         # )
-#         return HttpResponseRedirect(reverse('products:create'))
-
-        # context = dict()
-        # if request.POST.get('fields_amt'):
-        #
-        #     fields_amt = int(request.POST.get('fields_amt'))
-        #     # context['form'] = form
-        #     context = self.get_context_data()
-        #
-        #     return render(request, 'products/create_property.jinja2', context=context)
-        # if request.POST.get('create'):
-        #     # form = PropertyCategoryForm
-        #     # print(form)
-        #     # context['form'] = form
-        #     # fields_dict = deepcopy(request.POST)
-        #     # fields_dict.pop('csrfmiddlewaretoken')
-        #     # fields_dict.pop('create')
-        #     # print(fields_dict)
-        #     # for key, value in fields_dict.items():
-        #     #     fields_dict[key] = value[0]
-        #
-        #     # Property.object.bulk_create(
-        #     #
-        #     # )
-        #     return HttpResponseRedirect(reverse('products:create'))
-
