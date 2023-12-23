@@ -1,9 +1,13 @@
 from copy import deepcopy
 
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django_jinja.views.generic import DetailView, ListView, CreateView
+
+from rest_framework.viewsets import ModelViewSet
+
+from .serializer import ProductSerializer, PropertiesSerializer, ValuesSerializer
 
 from .services.compare_products import (add_product_to_compare_list, get_compare_list, get_compare_list_amt,
                                         delete_product_to_compare_list, delete_all_compare_products)
@@ -35,7 +39,6 @@ class ProductDetailsView(DetailView):
         add_product_to_compare_list(
             request
         )
-        print(get_compare_list(request))
         return HttpResponseRedirect(
             reverse('products:product_details',
                     kwargs={'pk': kwargs.get('pk')}
@@ -52,7 +55,8 @@ def ProductUpdateView():
 
 
 class ProductsCompareView(ListView):
-    template_name = 'products/compare.jinja2'
+    '''View для отображения страницы сравнения'''
+    template_name = 'products/compare_page/compare.jinja2'
 
     def get_queryset(self):
         return [
@@ -82,68 +86,49 @@ class ProductsCompareView(ListView):
                 for product in context.get('object_list')
             ]
 
-        print(context)
+        context['dif_properties'] = []
+        for property_name in context['properties']:
+            for property_value in property_name['property_values']:
+                if property_value[0].value != property_name['property_values'][0][0].value:
+                    context['dif_properties'].append(property_name)
+                    break
+
         return context
 
-    def post(self, request, *args, **kwargs):
-        if request.POST.get('product_from_compare') == 'delete':
-            delete_all_compare_products(request)
-            return HttpResponseRedirect(reverse('products:product_compare'))
-        delete_product_to_compare_list(request)
-        return HttpResponseRedirect(reverse('products:product_compare'))
+
+def delete_all_compare_products_view(request):
+    '''функция ajax запроса для доступа к сервису сравнения'''
+    delete_all_compare_products(request)
+    return HttpResponse()
 
 
-# class PropertyCreateView(CreateView):
-#     template_name = 'products/create_property.jinja2'
-#     model = Property
-#     fields = '__all__'
-#
-#     def get_form(self, form_class=None, fields_amt=None):
-#         if fields_amt:
-#             form_class = PropertyNameForm(fields_amt)
-#             return form_class
-#         form_class = PropertyCategoryForm()
-#         return form_class
-#
-#     def post(self, request, *args, **kwargs):
-#         context = dict()
-#         print(request.POST)
-#         if request.POST.get('names_amt'):
-#             form = self.get_form(fields_amt=int(request.POST.get('names_amt')))
-#             context['form'] = form
-#             return render(request, 'products/create_property.jinja2', context=context)
-#
-#         fields_dict = deepcopy(request.POST)
-#         fields_dict.pop('csrfmiddlewaretoken')
-#
-#         for key, value in fields_dict.items():
-#             fields_dict[key] = value[0]
-#         print(fields_dict)
-#         # Property.object.bulk_create(
-#         # )
-#         return HttpResponseRedirect(reverse('products:create'))
+def delete_product_to_compare_list_view(request, pk):
+    '''функция ajax запроса для доступа к сервису сравнения'''
+    delete_product_to_compare_list(request, pk)
+    return HttpResponse()
 
-        # context = dict()
-        # if request.POST.get('fields_amt'):
-        #
-        #     fields_amt = int(request.POST.get('fields_amt'))
-        #     # context['form'] = form
-        #     context = self.get_context_data()
-        #
-        #     return render(request, 'products/create_property.jinja2', context=context)
-        # if request.POST.get('create'):
-        #     # form = PropertyCategoryForm
-        #     # print(form)
-        #     # context['form'] = form
-        #     # fields_dict = deepcopy(request.POST)
-        #     # fields_dict.pop('csrfmiddlewaretoken')
-        #     # fields_dict.pop('create')
-        #     # print(fields_dict)
-        #     # for key, value in fields_dict.items():
-        #     #     fields_dict[key] = value[0]
-        #
-        #     # Property.object.bulk_create(
-        #     #
-        #     # )
-        #     return HttpResponseRedirect(reverse('products:create'))
 
+'''
+    --------------------------
+    вью для  api, пока не используются
+    -------------------------
+'''
+
+
+class ProductsCompareViewSet(ModelViewSet):
+    serializer_class = ProductSerializer
+
+    def get_queryset(self):
+        return [
+            product[0] for product in [
+                Product.objects.filter(pk=pk).select_related('category')
+                for pk in get_compare_list(self.request)
+                ]
+            ]
+
+
+class PropertiesCompareViewSet(ModelViewSet):
+    serializer_class = PropertiesSerializer
+
+    def get_queryset(self):
+        pass

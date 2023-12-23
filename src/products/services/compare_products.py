@@ -9,11 +9,10 @@ session_key = 'compare_list_key'
 max_list_amt = 4
 
 
-def delete_product_to_compare_list(request):
+def delete_product_to_compare_list(request, pk):
     '''убирает товар из списка сравнения'''
     compare_list = request.session.get(session_key, [])
-    product = request.POST.get('product_from_compare')
-    compare_list.remove(product)
+    compare_list.remove(str(pk))
     request.session[session_key] = compare_list
     return
 
