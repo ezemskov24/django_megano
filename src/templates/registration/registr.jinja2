@@ -4,6 +4,10 @@
   Registration
 {% endblock %}
 
+{% block header %}
+  {% include 'common/header_min.jinja2' %}
+{% endblock %}
+
 {% block content %}
     <div class="wrap">
         <div class="wrapper">
@@ -33,7 +37,7 @@
                 <input type="submit" value="Зарегистрироваться" />
 
 
-                <a class="registr" href="login.html">
+                <a class="registr" href="../login">
                     Вход
                 </a>
                 <div class="clear"></div>

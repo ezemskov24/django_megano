@@ -4,6 +4,10 @@
   Login
 {% endblock %}
 
+{% block header %}
+  {% include 'common/header_min.jinja2' %}
+{% endblock %}
+
 {% block content %}
 {#<link rel="stylesheet" type="text/css" href="{{ static('assets/css/fonts.css') }}">#}
 {#<link rel="stylesheet" type="text/css" href="{{ static('assets/css/basic.css') }}">#}
@@ -26,7 +30,7 @@
             <div>
                 <input type="submit" value="Войти" />
             </div>
-            <a class="forgot-label" href="e-mail.html">Забыли пароль?</a>
+            <a class="forgot-label" href="../e-mail">Забыли пароль?</a>
 {#            <a class="registr" href="registr.jinja2">#}
             <a class="registr" href="../registr">
                 Регистрация
