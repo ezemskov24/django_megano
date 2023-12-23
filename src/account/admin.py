@@ -5,8 +5,6 @@ from django.http import HttpRequest
 
 from .models import Profile, Seller
 
-# admin.site.register(Profile, UserAdmin)
-
 
 @admin.register(Profile)
 class ProfileAdmin(UserAdmin):
