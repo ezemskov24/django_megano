@@ -16,8 +16,6 @@ from products.models import Product
 from .forms import ProfileForm
 from django.contrib import messages
 
-import re
-
 
 class ProfileUpdateView(UpdateView):
     model = Profile
@@ -28,20 +26,11 @@ class ProfileUpdateView(UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         messages.success(self.request, "Данные успешно обновлены.")
-        # phone_number = form.cleaned_data.get('phone', '')  # Assuming 'phone_number' is the field name
-        # cleaned_phone_number = re.sub(r'\D', '', phone_number)  # Remove all non-digit characters
-        # form.instance.phone_number = cleaned_phone_number
-        # print('***********phone_number ', phone_number)
         return response
 
     def form_invalid(self, form):
         response = super().form_invalid(form)
         messages.error(self.request, "Ошибка обновления данных.")
-        # #
-        # phone_number = form.cleaned_data.get('phone', '')  # Assuming 'phone_number' is the field name
-        # # cleaned_phone_number = re.sub(r'\D', '', phone_number)  # Remove all non-digit characters
-        # # form.instance.phone_number = cleaned_phone_number
-        # print('***********phone_number ', phone_number)
         return response
 
     def get_object(self, queryset=None):
