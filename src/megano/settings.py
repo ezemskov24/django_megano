@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'django_jinja',
     'django_cleanup.apps.CleanupConfig',
+    'rest_framework',
 
     'account.apps.AccountConfig',
     'adminsettings.apps.AdminsettingsConfig',
@@ -172,6 +173,12 @@ CACHES = {
         "LOCATION": "/var/tmp/django_cache",
         "TIMEOUT": 600,
     }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
 }
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'

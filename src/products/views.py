@@ -4,8 +4,8 @@ from typing import Any, Dict
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db.models import Count, Max, Min, Sum, QuerySet
 from django.core.cache import cache
-from django.http import HttpResponseRedirect, HttpResponse, HttpRequest
 from django.shortcuts import redirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import TemplateView, DetailView, ListView
 from django.utils import timezone
@@ -382,6 +382,13 @@ class ProductsCompareView(ListView):
                 for product in context.get('object_list')
             ]
 
+        context['dif_properties'] = []
+        for property_name in context['properties']:
+            for property_value in property_name['property_values']:
+                if property_value[0].value != property_name['property_values'][0][0].value:
+                    context['dif_properties'].append(property_name)
+                    break
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -390,3 +397,15 @@ class ProductsCompareView(ListView):
             return HttpResponseRedirect(reverse('products:product_compare'))
         delete_product_to_compare_list(request)
         return HttpResponseRedirect(reverse('products:product_compare'))
+
+
+def delete_all_compare_products_view(request):
+    '''функция ajax запроса для доступа к сервису сравнения'''
+    delete_all_compare_products(request)
+    return HttpResponse()
+
+
+def delete_product_to_compare_list_view(request, pk):
+    '''функция ajax запроса для доступа к сервису сравнения'''
+    delete_product_to_compare_list(request, pk)
+    return HttpResponse()

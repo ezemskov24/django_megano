@@ -1,8 +1,13 @@
 {% extends 'base.jinja2' %}
 
 {% block title %}
-    Сравнение
+    Сравнение товаров
 {% endblock %}
+
+{% block extra_css %}
+    <link href="{{ static('assets/css/extra.css') }}" rel="stylesheet">
+{% endblock %}
+
 
 {% block header %}
     {% include 'common/header_parts/header_middle_full.jinja2' %}
@@ -10,97 +15,183 @@
 {% endblock %}
 
 {% block content %}
-    <div class="Middle">
-        {% if compare_amt > 0 %}
-            <div class="wrap">
+    <div class="Middle Middle-main">
+            <div class="wrap-content">
                 <div class="Compare-header">
                     <h1 class="h1">Сравнение продуктов</h1>
-                    <form class="form" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn Compare-btn">
+                    <button type="submit" class="btn Compare-btn" onclick="delete_all()">
                             <img src="{{ static('assets/img/icons/card/delete.svg') }}" alt="delete.svg">
                             Удалить всё
                             <input name="product_from_compare" type="hidden" value="delete">
-                        </button>
-                    </form>
+                    </button>
                 </div>
-                <div class="Compare-products">
-                    {% for product in object_list %}
-                        <div class="Compare-product">
+                <div class="Compare" id="no_products">Недостаточно товаров для сравнения</div>
+                <div class="Compare-products" id="compare_products"></div>
+                <div class="Compare">
+                    <div class="Compare-row">
+                        <h2 class="h2" id="properties_h2">Характеристики</h2>
+                        <div id="properties_chekbox_div">
+                            <label for="type_properties">Только различающиеся:</label>
+                            <input type="checkbox" id="type_properties" onclick="change_property_view()">
+                        </div>
+                    </div>
+                    <div class="Compare" id="compare_properties"></div>
+                </div>
+
+
+            <script type="text/javascript">
+                const no_products = document.getElementById('no_products')
+                const compare_products = document.querySelector('#compare_products')
+                const compare_properties = document.querySelector('#compare_properties')
+                const checkbox_properties = document.getElementById('type_properties')
+                const properties_div = document.getElementById('properties_chekbox_div')
+                const properies_h2 = document.getElementById('properties_h2')
+
+                let product_list = [
+                        {% for product in object_list %}
+                            {
+                                'product_name': '{{ product }}',
+                                'product_price': '{{ product.price }}',
+                                'product_description': '{{ product.description }}',
+                                'product_pk': {{ product.pk }},
+                                {#'product_image': {{ product.image }}#}
+                            },
+                        {% endfor %}
+                    ]
+                let properties_list = [
+                    {% for property_items in properties %}
+                        {
+                            '{{ property_items.property_name }}': [
+                                {% for value in property_items.property_values %}
+                                    '{{ value[0] }}',
+                                {% endfor %}
+                            ]
+                        },
+                    {% endfor%}
+                ]
+                let diff_properties_list = [
+                    {% for property_items in dif_properties %}
+                        {
+                            '{{ property_items.property_name }}': [
+                                {% for value in property_items.property_values %}
+                                    '{{ value[0] }}',
+                                {% endfor %}
+                            ]
+                        },
+                    {% endfor%}
+                ]
+
+                function products_length_check() {
+                    if (product_list.length === 0) {
+                        no_products.style.display = 'flex'
+                        properies_h2.style.display = 'none'
+                        properties_div.style.display = 'none'
+                    } else if (product_list.length === 1) {
+                        no_products.style.display = 'none'
+                        properies_h2.style.display = 'flex'
+                        properties_div.style.display = 'none'
+                    } else {
+                        no_products.style.display = 'none'
+                        properties_div.style.display = 'flex'
+                        properies_h2.style.display = 'flex'
+                    }
+                }
+                function change_property_view() {
+                    if (checkbox_properties.checked && product_list.length !== 1) {
+                        compare_properties.innerHTML = properties_view(diff_properties_list)
+                    } else {
+                        compare_properties.innerHTML = properties_view(properties_list)
+                    }
+                }
+                function products_view(product_list) {
+                    let products_list_view = []
+                    for (let product of product_list) {
+                            products_list_view.push(
+                        `<div class="Compare-product">
                             <img class="Compare-pict"
-                                     src="{{ product.images.image }}"
+                                     src="${ product.product_image }"
                             >
                             <a class="Compare-nameProduct_main" href="#">
-                                {{ product.name }}
+                                ${ product.product_name }
                             </a>
                             <div class="Compare-row">
-                                <div class="Compare-price">{{ product.price }} $</div>
+                                <div class="Compare-price">${ product.product_price } $</div>
+                                <div class="Compare-title">Описание:</div>
+                                <div class="Compare-title">${ product.product_description } $</div>
                             </div>
-                            <form class="form" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn Compare-btn">
+                                <button type="submit" class="btn Compare-btn" onclick='delete_product(${ product.product_pk })'>
                                     <img src="{{ static('assets/img/icons/card/delete.svg') }}" alt="delete.svg">
-                                    <input name="product_from_compare" type="hidden" value="{{ product.pk }}">
+                                    <input name="product_from_compare" type="hidden" value="${ product.product_pk }">
                                 </button>
-                            </form>
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="Compare">
-                    <h2 class="h2">Характеристики</h2>
-                    {% for property_items in properties %}
-                        <div class="Compare-title">{{ property_items.property_name }}</div>
-                        <div class="Compare-row">
+                        </div>`)
+                    }
+                    return products_list_view.join('')
+                }
+                function properties_view(properties_list) {
+                    let properties_list_view = []
 
-                            {% for value in property_items.property_values %}
-                                <div class="Compare-product">{{ value[0] }}</div>
-                            {% endfor %}
-                        </div>
-                    {% endfor%}
-                </div>
-{#                <div class="Compare-products">#}
-{#                    {% for product in products %}#}
-{#                        <div class="Compare-product">#}
-{#                            <div class="Compare-header">#}
-{#                                <a class="Compare-nameProduct_main" href="#">#}
-{#                                    <img class="Compare-pict"#}
-{#                                         src="{{ product.images.all }}"#}
-{#                                    >#}
-{#                                    {{ product.product_obj.name }}#}
-{#                                </a>#}
-{#                                <div class="Compare-row">#}
-{#                                    <div class="Compare-price">{{ product.product_obj.price }} $</div>#}
-{#                                </div>#}
-{#                                <form class="form" method="post">#}
-{#                                    {% csrf_token %}#}
-{#                                    <button type="submit" class="btn Compare-btn">#}
-{#                                        <img src="{{ static('assets/img/icons/card/delete.svg') }}" alt="delete.svg">#}
-{#                                        <input name="product_from_compare" type="hidden" value="{{ product.product_obj.pk }}">#}
-{#                                    </button>#}
-{#                                </form>#}
-{#                            </div>#}
-{#                            <div class="Compare-row">#}
-{#                                {% if product.product_count == 0 %}#}
-{#                                    <div class="Compare-title">Описание:</div>#}
-{#                                {% endif %}#}
-{#                                <div class="Compare-feature">{{ product.product_obj.description }}</div>#}
-{#                            </div>#}
-{#                            {% for property in product.product_properties %}#}
-{#                                <div class="Compare-row">#}
-{#                                    {% if product.product_count == 0 %}#}
-{#                                        <div class="Compare-title">{{ property.property_name }}:</div>#}
-{#                                    {% endif %}#}
-{#                                    <div class="Compare-feature">{{ property.property_value }}</div>#}
-{#                                </div>#}
-{#                            {% endfor %}#}
-{#                        </div>#}
-{#                    {% endfor %}#}
-{#                </div>#}
+                    for (let property_items of properties_list) {
+                        let values_list = []
+                        for (let [key, values] of Object.entries(property_items)){
+                            for (let value of values) {
+                                values_list.push(`<div class="Compare-product">${ value }</div>`)
+                            }
+                        }
+                            properties_list_view.push(
+                                `<div class="Compare">
+                                <div class="Compare-title">${Object.keys(property_items)}</div>
+                                <div class="Compare-row">
+                                    ${ values_list.join('') }
+                                </div>
+                                </div>`
+                            )
+                    }
+                    return properties_list_view.join('')
+                }
+
+                function page_view() {
+                    compare_products.innerHTML = products_view(product_list)
+                    products_length_check()
+                    change_property_view()
+                }
+
+                async function delete_all() {
+                    await fetch('delete_all/')
+                    product_list = []
+                    properties_list = []
+                    diff_properties_list = []
+                    page_view()
+                 }
+
+                async function delete_product(pk) {
+                    await fetch('delete/' + pk + '/')
+                    let id = 0
+                    for (let product of product_list) {
+                        if (product.product_pk === pk) {
+                            break
+                        }
+                        id++
+                    }
+                    product_list.splice(id, 1)
+                    if (product_list.length === 0) {
+                        properties_list = []
+                        diff_properties_list = []
+                    } else {
+                        for (let property of properties_list) {
+                            for (let key of Object.keys(property)) {
+                                property[key].splice(id, 1)
+                            }
+                        }
+                        for (let property of diff_properties_list) {
+                            for (let key of Object.keys(property)) {
+                                property[key].splice(id, 1)
+                            }
+                        }
+                    }
+                    page_view()
+                }
+                page_view()
+            </script>
             </div>
-        {% else %}
-            <div class="Middle Middle-main">
-                <span class="">Недостаточно данных для сравнения</span>
-            </div>
-        {% endif %}
     </div>
 {% endblock %}
