@@ -3,7 +3,6 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 
 from . import admin_filters, models
-# from .forms import PropertyAdminForm, PropertyValueAdminForm
 
 
 @admin.action(description="Archive selected products")
@@ -26,6 +25,11 @@ def mark_unarchived(
 
 class PictureInline(admin.StackedInline):
     model = models.Picture
+    extra = 1
+
+
+class SellerInline(admin.TabularInline):
+    model = models.SellerProduct
     extra = 1
 
 
@@ -62,17 +66,20 @@ class ProductAdmin(admin.ModelAdmin):
         mark_archived,
         mark_unarchived
     ]
-    inlines = [PictureInline]
+    inlines = [PictureInline, SellerInline]
     list_display = [
         'name',
         'category',
         'sellers_amount',
         'min_price',
         'avg_price',
+        'sort_index',
+        'limited',
         'archived',
     ]
     list_filter = [
         'category',
+        'limited',
         'archived',
         admin_filters.MinPriceListFilter,
         admin_filters.AvgPriceListFilter,
@@ -89,11 +96,11 @@ class ProductAdmin(admin.ModelAdmin):
 
     @admin.display(description='Min price', empty_value=0)
     def min_price(self, obj: models.Product) -> int:
-        return obj.min_price()
+        return obj.min_price
 
     @admin.display(description='Avg price', empty_value=0)
     def avg_price(self, obj: models.Product) -> int:
-        return obj.average_price()
+        return obj.average_price
 
     def delete_queryset(self, request: HttpRequest, queryset: QuerySet):
         queryset.update(archived=True)
@@ -136,3 +143,13 @@ class CategoryAdmin(admin.ModelAdmin):
             )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+
+@admin.register(models.Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = [
+        'name',
+        'slug',
+    ]
+    prepopulated_fields = {
+        'slug': ('name',),
+    }

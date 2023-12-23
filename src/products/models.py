@@ -1,48 +1,100 @@
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Avg, Min
 from django.urls import reverse
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from .validators import validate_not_subcategory
 
 
+class Tag(models.Model):
+    """
+    Модель тега продуктов.
+
+    name - Наименование тега;
+    slug - Слаг тега.
+    """
+    name = models.CharField(max_length=50, null=False, blank=False)
+    slug = models.SlugField(max_length=50, unique=True, null=False, blank=False)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('products:products-by-tag', args=[self.slug])
+
+
+class ActiveProductsManager(models.Manager):
+    """ Менеджер активных(не архивированных) продуктов. """
+    def get_queryset(self):
+        return super().get_queryset().filter(archived=False)
+
+
 class Product(models.Model):
-    """Модель продукта"""
+    """
+    Модель продукта.
+
+    category - связь с категорией, к которой относится товар;
+    name - наименование товара;
+    slug - слаг товара;
+    description - описание товара;
+    created_at - дата/время создания записи;
+    count_sells - количество проданных единиц товара;
+    archived - флаг архивирования (мягкого удаления) товара;
+    sort_index - индекс сортировки товара;
+    limited - флаг ограниченного количества товара.
+    """
     category = models.ForeignKey(
         "Category",
         related_name='products',
         on_delete=models.CASCADE,
     )
     name = models.CharField(max_length=200, null=False, blank=False)
-    slug = models.SlugField(max_length=200, unique=True, null=True)
+    slug = models.SlugField(max_length=200, unique=True, null=False)
     description = models.TextField(blank=True)
     manufacturer = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     count_sells = models.IntegerField(default=0)
     archived = models.BooleanField(default=False)
+    sort_index = models.IntegerField(default=0)
+    limited = models.BooleanField(default=False)
+
+    tags = models.ManyToManyField(
+        'Tag',
+        related_name='products',
+        blank=True
+    )
+
+    objects = models.Manager()
+    active = ActiveProductsManager()
 
     class Meta:
-        ordering = ['name']
+        ordering = ['sort_index', 'name']
         indexes = [
             models.Index(fields=['name']),
         ]
 
     def get_absolute_url(self) -> str:
-        'Получение абсолютной ссылки на продукт'
-        return reverse('products:product_details', kwargs={'pk': self.pk})
+        """ Получение абсолютной ссылки на продукт. """
+        return reverse('products:product_details', kwargs={'slug': self.slug})
 
+    @property
     def average_price(self) -> int:
-        'Получение средней цены'
+        """ Средняя цена продукта. """
         avg_price = self.sellers.aggregate(
             avg=Avg('sellerproduct__price')
         ).get('avg')
         return round(avg_price, 2) if avg_price else 0.00
 
+    @property
     def average_discounted_price(self) -> int:
-        'Получение средней цены со скидкой'
+        """ Средняя цены продукта со скидкой. """
 
+    @property
     def min_price(self) -> int:
-        'Получение минимальной цены'
+        """ Минимальная цена продукта. """
         min_price = self.sellers.aggregate(
             min=Min('sellerproduct__price')
         ).get('min')
@@ -62,11 +114,20 @@ class Product(models.Model):
         return f'{self.name}'
 
 
+@receiver(post_save, sender=Product)
+def clear_product_cache(sender, instance, **kwargs):
+    """
+    Очистка кеша модели Product при изменении товара в БД.
+    """
+    cache_key = f'product_details_{instance.pk}'
+    cache.delete(cache_key)
+
+
 def product_images_directory_path(
         instance: "ProductImage",
         filename: str
 ) -> str:
-    'Сгенерировать путь для сохранения изображения продукта'
+    """Сгенерировать путь для сохранения изображения продукта."""
     return "products/images/product_{pk}/{filename}".format(
         pk=instance.product.pk,
         filename=filename,
@@ -77,7 +138,7 @@ def category_images_directory_path(
         instance: "Category",
         filename: str
 ) -> str:
-    'Сгенерировать путь для сохранения изображения'
+    """Сгенерировать путь для сохранения изображения."""
     return "categories/images/category_{pk}/{filename}".format(
         pk=instance.pk,
         filename=filename,
@@ -88,7 +149,7 @@ def category_icons_directory_path(
         instance: "Category",
         filename: str
 ) -> str:
-    'Сгенерировать путь для сохранения иконки'
+    """Сгенерировать путь для сохранения иконки."""
     return "categories/icons/category_{pk}/{filename}".format(
         pk=instance.pk,
         filename=filename,
@@ -96,7 +157,12 @@ def category_icons_directory_path(
 
 
 class Picture(models.Model):
-    """Модель изображения продукта"""
+    """
+    Модель изображения продукта.
+
+    product - связь с продуктом, к которому относится изображение;
+    image - файл изображения.
+    """
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
@@ -120,7 +186,7 @@ class SellerProduct(models.Model):
         on_delete=models.CASCADE,
     )
     seller = models.ForeignKey(
-        'users.Seller',
+        'account.Seller',
         on_delete=models.CASCADE,
     )
     count = models.PositiveIntegerField(default=0)
@@ -130,12 +196,19 @@ class SellerProduct(models.Model):
         ordering = ['seller', 'product']
 
     def __str__(self):
-        return f'{self.product} by {self.seller}'
+        return f'{self.product} by {self.seller.name}'
 
 
 class Category(models.Model):
     """
-    Класс категорий товаров
+    Модель категорий товаров.
+
+    name - наименование категории;
+    slug - слаг категории;
+    is_active - флаг активности (мягкого удаления) категории;
+    parent_category - связь с родительской категорией;
+    icon - иконка категории;
+    sort_index - индекс сортировки категории.
     """
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True, null=True)
@@ -171,9 +244,17 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def full_name(self):
+        """ Полное наименование категории. """
+        if not self.parent_category:
+            return self.name
+
+        return f'{self.parent_category.name} / {self.name}'
+
     def get_absolute_url(self) -> str:
-        'Получение абсолютной ссылки на категорию'
-        return '#'
+        """ Получение абсолютной ссылки на категорию. """
+        return reverse('products:products-by-category', args=[self.slug])
 
     def clean(self):
         if self.parent_category:
