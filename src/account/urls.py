@@ -14,6 +14,14 @@ app_name = 'account'
 
 urlpatterns = [
     path('login/', UserLoginView, name='login'),
+    # path(
+    #     'login/',
+    #     LoginView.as_view(
+    #         template_name="registration/login.jinja2",
+    #         redirect_authenticated_user=True,
+    #     ),
+    #     name="login",
+    # ),
     path('registr/', RegisterView.as_view(), name='registr'),
     path('logout/', UserLogoutView.as_view(), name='logout'),
     path('e-mail/', UserEmailView.as_view(), name='e-mail'),
