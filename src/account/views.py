@@ -1,3 +1,6 @@
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView, DetailView
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
@@ -17,7 +20,9 @@ from .forms import ProfileForm
 from django.contrib import messages
 
 
-class ProfileUpdateView(UpdateView):
+# @method_decorator(login_required(login_url='../login'), name='dispatch')
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    login_url = '/account/login/'
     model = Profile
     form_class = ProfileForm
     template_name = 'registration/profile.jinja2'
@@ -25,11 +30,13 @@ class ProfileUpdateView(UpdateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
+        # messages.success(self.request, "Data updated.")
         messages.success(self.request, "Данные успешно обновлены.")
         return response
 
     def form_invalid(self, form):
         response = super().form_invalid(form)
+        # messages.error(self.request, "Data not updated.")
         messages.error(self.request, "Ошибка обновления данных.")
         return response
 
@@ -45,6 +52,10 @@ class RegisterView(CreateView):
     def form_valid(self, form):
         form.save()
         response = super().form_valid(form)
+
+        if form.cleaned_data['password1'] != form.cleaned_data['password2']:
+            messages.error(self.request, 'Пароли не совпадают.')
+            return self.render_to_response(self.get_context_data(form=form))
 
         username = form.cleaned_data.get('email')
         password = form.cleaned_data.get('password1')
@@ -83,7 +94,7 @@ def UserLoginView(request: HttpRequest) -> HttpResponse:
     user = authenticate(request, email=email, password=password)
     if user is not None:
         login(request, user)
-        return redirect('/account/profile/')
+        return redirect('/account/account/')
 
     return render(request, 'registration/login.jinja2', {'error': 'Неверный логин или пароль'})
 
@@ -97,11 +108,16 @@ class UserLogoutView(LogoutView):
         return context
 
 
-class UserProfileView(TemplateView):
+# @login_required(login_url='login')
+class UserProfileView(LoginRequiredMixin, TemplateView):
+    login_url = '/account/login/'
     template_name = 'registration/profile.jinja2'
 
 
-class UserAccountView(TemplateView):
+# @login_required(login_url='login')
+# @method_decorator(login_required(login_url='../login'), name='dispatch')
+class UserAccountView(LoginRequiredMixin, TemplateView):
+    login_url = '/account/login/'
     template_name = 'registration/account.jinja2'
 
 
