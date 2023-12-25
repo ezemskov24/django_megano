@@ -4,7 +4,6 @@ from django.core.cache import cache
 from .forms import SearchForm
 from .models import Category
 from .utils import CacheableContextCategory
-
 from .services.compare_products import get_compare_list_amt
 
 

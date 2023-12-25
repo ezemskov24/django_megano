@@ -78,7 +78,7 @@ class Product(models.Model):
 
     def get_absolute_url(self) -> str:
         """ Получение абсолютной ссылки на продукт. """
-        return reverse('products:product_details', kwargs={'slug': self.slug})
+        return reverse('products:product_details', kwargs={'pk': self.pk})
 
     @property
     def average_price(self) -> int:
@@ -276,6 +276,10 @@ class Property(models.Model):
         related_name='category_property'
     )
     name = models.CharField(max_length=200, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'property'
+        verbose_name_plural = 'properties'
 
     def __str__(self):
         return str(self.name)
