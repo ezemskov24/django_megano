@@ -1,4 +1,4 @@
-from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView, DetailView
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
@@ -68,8 +68,6 @@ class RegisterView(CreateView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
-
-
 
 
 def UserLoginView(request: HttpRequest) -> HttpResponse:

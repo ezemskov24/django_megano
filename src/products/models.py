@@ -54,7 +54,6 @@ class Product(models.Model):
     name = models.CharField(max_length=200, null=False, blank=False)
     slug = models.SlugField(max_length=200, unique=True, null=False)
     description = models.TextField(blank=True)
-    manufacturer = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     count_sells = models.IntegerField(default=0)
     archived = models.BooleanField(default=False)
@@ -226,7 +225,7 @@ class Category(models.Model):
         null=True,
         blank=True,
     )
-    icon = models.ImageField(
+    icon = models.FileField(
         upload_to=category_icons_directory_path,
         null=True,
         blank=True,
