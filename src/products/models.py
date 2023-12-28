@@ -77,7 +77,7 @@ class Product(models.Model):
 
     def get_absolute_url(self) -> str:
         """ Получение абсолютной ссылки на продукт. """
-        return reverse('products:product_details', kwargs={'pk': self.pk})
+        return reverse('products:product_details', kwargs={'slug': self.slug})
 
     @property
     def average_price(self) -> int:
