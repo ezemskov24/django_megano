@@ -10,20 +10,19 @@ from django.urls import reverse
 from django.views.generic import TemplateView, DetailView, ListView
 from django.utils import timezone
 
-from catalog.forms import ReviewForm
-from catalog.services import get_reviews_list, add_review, get_count_review
-
 from .forms import FilterForm, SearchForm
 from .models import Category, Picture, Product, SellerProduct, Tag, Value
 from .services.compare_products import (
     add_product_to_compare_list,
-    get_compare_list,
     delete_all_compare_products,
     delete_product_to_compare_list,
+    get_compare_list,
 )
 from .utils import Banner, LimitedProduct, TopSellerProduct
-from catalog.models import Review
 from account.models import BrowsingHistory
+from catalog.forms import ReviewForm
+from catalog.models import Review
+from catalog.services import get_reviews_list, add_review, get_count_review
 
 
 class IndexView(TemplateView):
@@ -396,12 +395,12 @@ class ProductsCompareView(ListView):
 
 
 def delete_all_compare_products_view(request):
-    '''функция ajax запроса для доступа к сервису сравнения'''
+    """ Функция ajax запроса для доступа к сервису сравнения. """
     delete_all_compare_products(request)
     return HttpResponse()
 
 
 def delete_product_to_compare_list_view(request, pk):
-    '''функция ajax запроса для доступа к сервису сравнения'''
+    """ Функция ajax запроса для доступа к сервису сравнения. """
     delete_product_to_compare_list(request, pk)
     return HttpResponse()
