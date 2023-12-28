@@ -33,7 +33,6 @@ urlpatterns = [
         CatalogView.as_view(),
         name='products-by-category'
     ),
-    path("<int:pk>/", ProductDetailsView.as_view(), name="product_details"),
+    path("<str:slug>/", ProductDetailsView.as_view(), name="product_details"),
     path('', CatalogView.as_view(), name='catalog'),
 ]
-

@@ -25,7 +25,7 @@ urlpatterns = [
     ),
     path('profile/', ProfileUpdateView.as_view(), name='profile'),
     path(
-        'profile/browsing-history',
+        'browsing-history',
         UserBrowsingHistoryView.as_view(),
         name='browsing_history',
     ),
