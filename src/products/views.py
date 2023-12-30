@@ -5,10 +5,11 @@ from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db.models import Count, Max, Min, Sum, QuerySet
 from django.core.cache import cache
 from django.shortcuts import redirect
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.views.generic import TemplateView, DetailView, ListView
 from django.utils import timezone
+from django.contrib import messages
 
 from catalog.forms import ReviewForm
 from catalog.services import get_reviews_list, add_review, get_count_review
@@ -18,6 +19,7 @@ from .models import Category, Picture, Product, SellerProduct, Tag
 from .services.compare_products import (
     add_product_to_compare_list,
     get_compare_list,
+    get_compare_list_amt,
     delete_all_compare_products,
     delete_product_to_compare_list,
 )
@@ -352,51 +354,81 @@ def ProductUpdateView():
 
 
 class ProductsCompareView(ListView):
-    template_name = 'products/compare.jinja2'
+    template_name = 'products/compare/compare.jinja2'
 
     def get_queryset(self):
         return [
             product[0] for product in [
-                Product.objects.filter(pk=pk).select_related('category')
-                for pk in get_compare_list(self.request)
+                Product.objects.filter(slug=slug).select_related('category').prefetch_related("images")
+                for slug in get_compare_list(self.request)
             ]
         ]
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        messages.success(self.request, 'Profile details updated.')
         context = super().get_context_data()
 
         if not context['object_list']:
             return context
 
-        for product in context.get('object_list'):
-            context['properties'] = [
+        messages.error(self.request, 'Несравнимое не сравнить')
+        messages.error(self.request, 'Недостаточно товаров')
+
+        context['messages_errors'] = dict()
+        for message in messages.get_messages(self.request):
+            if str(message) == 'Несравнимое не сравнить':
+                context['messages_errors']['no_equal'] = message
+            elif str(message) == 'Недостаточно товаров':
+                context['messages_errors']['no_products'] = message
+
+        print(context['messages_errors'])
+
+        context['properties'] = [
+            {
+                'category': product.category,
+                'product': product.name_short(),
+                'product_price': product.min_price,
+                'product_slug': product.slug,
+                'product_img': product.images.all()[0].image.url,
+                'product_properties': [
+                    {
+                        'property_name': value.property.name,
+                        'property_value': value.value,
+                    }
+                    for value in product.product_property_value.select_related('property')
+                ]
+            }
+            for product in context.get('object_list')
+        ]
+
+        diff_properties = dict()
+        for product in context['properties']:
+            for product_property in product['product_properties']:
+                if diff_properties.get(product_property['property_name']):
+                    diff_properties[product_property['property_name']].append(product_property['property_value'])
+                else:
+                    diff_properties[product_property['property_name']] = [product_property['property_value']]
+
+        context['not_dif_category'] = [
+            key for key, value in diff_properties.items() if len(set(value)) == 1 and len(context['properties']) > 1
+        ]
+
+        for product in context['properties']:
+            product['dif_properties'] = [
                 {
-                    'property_name': value.property
+                    'property_name': properties['property_name'],
+                    'property_value': properties['property_value'],
                 }
-                for value in product.product_property_value.select_related('property')
+                for properties in product['product_properties']
+                if properties['property_name'] not in context['not_dif_category']
             ]
 
-        for property_name in context['properties']:
-            property_name['property_values'] = [
-                property_name['property_name'].category_property_value.filter(product=product)
-                for product in context.get('object_list')
-            ]
-
-        context['dif_properties'] = []
-        for property_name in context['properties']:
-            for property_value in property_name['property_values']:
-                if property_value[0].value != property_name['property_values'][0][0].value:
-                    context['dif_properties'].append(property_name)
-                    break
-
+        for product in context['properties']:
+            if len(product['dif_properties']) == len(product['product_properties']) and len(context['properties']) != 1:
+                context['diff_category'] = True
+            else:
+                context['diff_category'] = False
         return context
-
-    def post(self, request, *args, **kwargs):
-        if request.POST.get('product_from_compare') == 'delete':
-            delete_all_compare_products(request)
-            return HttpResponseRedirect(reverse('products:product_compare'))
-        delete_product_to_compare_list(request)
-        return HttpResponseRedirect(reverse('products:product_compare'))
 
 
 def delete_all_compare_products_view(request):
@@ -405,7 +437,17 @@ def delete_all_compare_products_view(request):
     return HttpResponse()
 
 
-def delete_product_to_compare_list_view(request, pk):
+def delete_product_to_compare_list_view(request, slug):
     '''функция ajax запроса для доступа к сервису сравнения'''
-    delete_product_to_compare_list(request, pk)
+    delete_product_to_compare_list(request, slug)
     return HttpResponse()
+
+
+def add_product_to_compare_list_view(request, slug):
+    '''функция ajax запроса для доступа к сервису сравнения'''
+    add_product_to_compare_list(request, slug)
+    return HttpResponse()
+
+
+def compare_list_length_view(request):
+    return JsonResponse({'len': get_compare_list_amt(request)})

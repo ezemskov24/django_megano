@@ -57,10 +57,13 @@
                                     </div>
                                 </div>
                                 <div class="ProductCard-cartElement">
-                                    <a class="btn btn_primary" href="#modal_open">
+                                    <a class="btn btn_primary" href="#modal_open" onclick="add_to_cart('{{ product.slug }}')">
                                         <img class="btn-icon" src="{{ static('assets/img/icons/card/cart_white.svg') }}" alt="cart_white.svg" />
                                         <span class="btn-content">Купить</span>
                                     </a>
+                                    <button type="submit" class="btn Compare-btn" onclick="add_to_compare('{{ product.slug }}')">
+                                        <img class="btn_icon" src="{{ static('assets/img/icons/link.svg') }}" alt="link.svg">
+                                    </button>
                                 </div>
                                 <div id="modal_open" class="my_modal">
                                     <div class="my_modal-dialog">
@@ -145,7 +148,7 @@
                                                                 {{ seller.seller.name }}
                                                             </a>
                                                             <div class="ProductCard-cartElement" style="margin-top: 10px;">
-                                                                <a class="btn btn_primary" href="#modal_open">
+                                                                <a class="btn btn_primary" href="#modal_open" onclick="add_to_cart('{{ product.slug }}', '{{ seller.pk }}')">
                                                                     <img class="btn-icon" src="{{ static('assets/img/icons/card/cart_white.svg') }}" alt="cart_white.svg" />
                                                                     <span class="btn-content">Купить</span>
                                                                 </a>
@@ -207,4 +210,5 @@
             </div>
         </div>
     </div>
+<script src='{{ static('assets/js/add_to_compare.js') }}'></script>
 {% endblock %}
