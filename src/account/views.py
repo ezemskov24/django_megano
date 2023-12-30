@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
 from django.views.generic import TemplateView, DetailView
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect

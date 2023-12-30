@@ -357,6 +357,12 @@ class ProductsCompareView(ListView):
     template_name = 'products/compare/compare.jinja2'
 
     def get_queryset(self):
+        print([
+            product[0] for product in [
+                Product.objects.filter(slug=slug).select_related('category').prefetch_related("images")
+                for slug in get_compare_list(self.request)
+            ]
+        ])
         return [
             product[0] for product in [
                 Product.objects.filter(slug=slug).select_related('category').prefetch_related("images")
