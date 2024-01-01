@@ -11,8 +11,14 @@ from cart.services.cart_actions import (
     get_total_price,
     change_cart_product_amt,
 )
-
 from cart.models import Cart
+
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.viewsets import ModelViewSet
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import action
+
+from cart.serializer import CartSerializer
 
 
 class CartView(ListView):
@@ -20,7 +26,6 @@ class CartView(ListView):
     template_name = 'cart/cart.jinja2'
 
     def get_queryset(self):
-        print(get_cart_product_list(self.request.user))
         return get_cart_product_list(self.request.user)
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -66,3 +71,28 @@ def change_cart_product_amt_view(request, slug, change, pk):
         change = -1
     change_cart_product_amt(request.user, slug, change, pk)
     return HttpResponse()
+
+
+class CartApiViewSet(ModelViewSet):
+    serializer_class = CartSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ['product_name', 'product_seller__seller']
+
+    def get_queryset(self):
+        return Cart.objects.filter(profile=self.request.user)
+
+    def get_object(self):
+        return Cart.objects.get(pk=self.kwargs['pk'])
+
+    def partial_update(self, request, *args, **kwargs):
+        pass
+
+    def destroy(self, request, *args, **kwargs):
+        pass
+
+
+# class CartApiView(RetrieveUpdateDestroyAPIView):
+#     queryset = Cart.objects.all()
+#     serializer_class = CartSerializer
+#     filter_backends = (DjangoFilterBackend,)
+#     filterset_fields = ['product_name', 'product_seller']

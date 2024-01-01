@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_jinja',
     'django_cleanup.apps.CleanupConfig',
     'rest_framework',
+    'django_filters',
 
     'account.apps.AccountConfig',
     'adminsettings.apps.AdminsettingsConfig',

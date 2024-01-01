@@ -23,7 +23,7 @@ urlpatterns = [
     path("<str:slug>/", ProductDetailsView.as_view(), name="product_details"),
     path('compare/delete/<str:slug>/', delete_product_to_compare_list_view, name='delete_product_to_compare_list'),
     path('compare/add/<str:slug>/', add_product_to_compare_list_view, name='add_product_to_compare_list'),
-    path('api/', include(routers.urls)),
+    # path('api/', include(routers.urls)),
     path('t/<slug:tag>', CatalogView.as_view(), name='products-by-tag'),
     path(
         'category/<slug:category>',
