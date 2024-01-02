@@ -36,14 +36,14 @@
                             <div class="Cart-block Cart-block_amount">
                                 <div class="Cart-amount">
                                     <div class="Amount">
-                                        <button class="Amount-remove" type="button"></button>
-                                        <input class="Amount-input form-input" name="amount" type="text" value="{{ product.count }}">
-                                        <button class="Amount-add" type="button"></button>
+                                        <button class="Amount-remove" type="button" onclick="changing_product_amt('{{ product.pk }}', -1)"></button>
+                                        <input class="Amount-input form-input" name="amount" type="text" id="input_{{ product.pk }}" value="{{ product.count }}">
+                                        <button class="Amount-add" type="button" onclick="changing_product_amt('{{ product.pk }}', 1)"></button>
                                     </div>
                                 </div>
                             </div>
                             <div class="Cart-block Cart-block_delete">
-                                <a class="Cart-delete" href="#">
+                                <a class="Cart-delete" href="#" id="remove_{{ product.pk }}" onclick="remove_product('{{ product.pk }}')">
                                     <img src="{{ static('assets/img/icons/card/delete.svg') }}" alt="delete.svg">
                                 </a>
                             </div>
@@ -53,7 +53,7 @@
                     <div class="Cart-total">
                         <div class="Cart-block Cart-block_total">
                             <strong class="Cart-title">Итого:</strong>
-                            <span class="Cart-price">200.99$</span>
+                            <span class="Cart-price" id="total_price">{{ total_price }}$</span>
                         </div>
                         <div class="Cart-block">
                             <a class="btn btn_success btn_lg" href="#">Оформить заказ</a>

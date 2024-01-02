@@ -1,11 +1,11 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 
 from products.models import Product
 from products.models import SellerProduct
 from cart.models import Cart
 
 
-class ProductSerializer(ModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = (
@@ -15,12 +15,11 @@ class ProductSerializer(ModelSerializer):
         )
 
 
-class ProductSellerSerializer(ModelSerializer):
-    # product = ProductSerializer()
-
+class ProductSellerSerializer(serializers.ModelSerializer):
     class Meta:
         model = SellerProduct
         fields = (
+            'pk',
             'product',
             'seller',
             'count',
@@ -28,9 +27,21 @@ class ProductSellerSerializer(ModelSerializer):
         )
 
 
-class CartSerializer(ModelSerializer):
+class CartSerializer(serializers.ModelSerializer):
     product_seller = ProductSellerSerializer()
 
+    class Meta:
+        model = Cart
+        fields = (
+            'pk',
+            'product_name',
+            'product_seller',
+            'profile',
+            'count',
+        )
+
+
+class CartPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = (

@@ -9,13 +9,15 @@ from .views import (
     get_total_price_view,
     change_cart_product_amt_view,
     CartApiViewSet,
+    SellerApiViewSet,
 )
 
 
 app_name = "cart"
 
 router = DefaultRouter()
-router.register(r'cart', CartApiViewSet, basename='cart_api_view')
+router.register(r'cart', CartApiViewSet, basename='cart_api')
+router.register(r'product-seller', SellerApiViewSet, basename='product_seller_api')
 print(DefaultRouter.routes)
 
 urlpatterns = [
