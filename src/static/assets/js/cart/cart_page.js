@@ -21,6 +21,10 @@ async function remove_product(pk) {
             'X-CSRFToken': csrftoken,
         }
     })
+        .then(() => {
+            cart_amt()
+        })
+    document.getElementById('product_cart_'+ pk).style.display = 'none'
     get_total_price()
 }
 
@@ -38,7 +42,14 @@ async function changing_product_amt(pk, term) {
             'X-CSRFToken': csrftoken,
         }
     })
-    get_total_price()
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            let product_price = data.count * data.product_seller.price
+            document.getElementById('product_price_'+ pk).innerHTML = product_price + '$'
+            get_total_price()
+        })
 }
 
 async function changing_product_seller() {

@@ -148,7 +148,7 @@
                                                                 {{ seller.seller.name }}
                                                             </a>
                                                             <div class="ProductCard-cartElement" style="margin-top: 10px;">
-                                                                <a class="btn btn_primary" href="#modal_open" onclick="add_to_cart('{{ product.pk }}', '{{ seller.pk }}')">
+                                                                <a class="btn btn_primary" href="#modal_open" onclick="add_to_cart('{{ product.pk }}', '{{ seller.seller.pk }}')">
                                                                     <img class="btn-icon" src="{{ static('assets/img/icons/card/cart_white.svg') }}" alt="cart_white.svg" />
                                                                     <span class="btn-content">Купить</span>
                                                                 </a>

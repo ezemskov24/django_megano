@@ -14,18 +14,21 @@
         <div class="Section">
             <div class="wrap">
                 {% for product in cart %}
-                    <div class="Cart-product">
+                    <div class="Cart-product" id="product_cart_{{ product.pk }}">
                         <div class="Cart-block Cart-block_row">
                             <div class="Cart-block Cart-block_pict">
-                                <a class="Cart-pict" href="#">
+                                <a class="Cart-pict" href="{{ product.product_obj.get_absolute_url() }}">
                                     <img class="Cart-img" src="{{ product.pict }}">
                                 </a>
                             </div>
-                            <div class="Cart-block Cart-block_info"><a class="Cart-title" href="#">{{ product.name }}</a>
+                            <div class="Cart-block Cart-block_info">
+                                <a class="Cart-title" href="{{ product.product_obj.get_absolute_url() }}">
+                                    {{ product.name }}
+                                </a>
                                 <div class="Cart-desc">{{ product.desc }}</div>
                             </div>
                             <div class="Cart-block Cart-block_price">
-                                <div class="Cart-price">{{ product.price }}$</div>
+                                <div class="Cart-price" id="product_price_{{ product.pk }}">{{ product.price * product.count }}$</div>
                             </div>
                         </div>
                         <div class="Cart-block Cart-block_row">

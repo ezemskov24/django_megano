@@ -1,3 +1,5 @@
+const cart_header = document.getElementById('cart_amt_header')
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -15,13 +17,22 @@ function getCookie(name) {
 }
 const csrftoken = getCookie('csrftoken');
 
+async function cart_amt(){
+    await fetch('http://127.0.0.1:8000/cart/api/cart/')
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            cart_header.innerHTML = data.length
+        })
+}
+
 async function add_to_cart(product_pk, seller=''){
     await fetch('http://127.0.0.1:8000/cart/api/product-seller/?product='+ product_pk +'&seller=' + seller)
         .then((response) => {
             return response.json()
         })
         .then((data) => {
-            console.log(data[0].pk)
             fetch('http://127.0.0.1:8000/cart/api/cart/', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -33,10 +44,11 @@ async function add_to_cart(product_pk, seller=''){
                     'X-CSRFToken': csrftoken,
                 },
             })
+                .then(() => {
+                    cart_amt()
+                })
         })
 }
 
-async function cart_amt(){
-
-}
+cart_amt()
 

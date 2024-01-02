@@ -40,6 +40,7 @@ class CartView(ListView):
 
         context['cart'] = [
             {
+                'product_obj': cart_product.product_seller.product,
                 'pk': cart_product.pk,
                 'seller': cart_product.product_seller.pk,
                 'slug': cart_product.product_name,
@@ -54,31 +55,6 @@ class CartView(ListView):
 
         context['total_price'] = get_total_price(self.request.user)
         return context
-
-
-def add_product_to_cart_view(request, slug, pk):
-    add_product_to_cart(request.user, slug, pk)
-    return HttpResponse()
-
-
-def cart_amt_view(request):
-    return JsonResponse({'amt': get_cart_product_amt(request.user)})
-
-
-def remove_product_from_cart_view(request, slug, pk):
-    remove_product_from_cart(request.user, slug, pk)
-    return HttpResponse(200)
-
-
-def get_total_price_view(request):
-    return JsonResponse({'price': get_total_price(request.user)})
-
-
-def change_cart_product_amt_view(request, slug, change, pk):
-    if change == 2:
-        change = -1
-    change_cart_product_amt(request.user, slug, change, pk)
-    return HttpResponse()
 
 
 class CartApiViewSet(ModelViewSet):

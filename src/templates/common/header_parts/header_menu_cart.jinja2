@@ -35,7 +35,7 @@
                 </div>
             </div>
         {% endif %}
-        <a class="CartBlock-block" href="#">
+        <a class="CartBlock-block" href="{{ url('cart:cart_view') }}">
             <img class="CartBlock-img"
                  src="{{ static('assets/img/icons/cart.svg') }}"
                  alt="Корзина" />
