@@ -39,9 +39,9 @@
                             <div class="Cart-block Cart-block_amount">
                                 <div class="Cart-amount">
                                     <div class="Amount">
-                                        <button class="Amount-remove" type="button" onclick="changing_product_amt('{{ product.pk }}', -1)"></button>
+                                        <button class="Amount-remove" type="button" onclick="changing_product_amt('{{ product.pk }}', -1, '{{ request.user.is_authenticated }}')"></button>
                                         <input class="Amount-input form-input" name="amount" type="text" id="input_{{ product.pk }}" value="{{ product.count }}">
-                                        <button class="Amount-add" type="button" onclick="changing_product_amt('{{ product.pk }}', 1)"></button>
+                                        <button class="Amount-add" type="button" onclick="changing_product_amt('{{ product.pk }}', 1, '{{ request.user.is_authenticated }}')"></button>
                                     </div>
                                 </div>
                             </div>

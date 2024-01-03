@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from products.models import Product, SellerProduct
@@ -6,15 +8,13 @@ from account.models import Profile
 
 
 class Cart(models.Model):
-    product_name = models.SlugField(max_length=200, null=True)
     product_seller = models.ForeignKey(SellerProduct, on_delete=models.CASCADE, null=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='cart_profile')
-    count = models.IntegerField(
-        default=1,
-        validators=[
+    count = models.PositiveIntegerField(default=1)
 
-        ]
-    )
-
-    # def __str__(self):
-    #     return self.product.name
+    def clean(self, product_amt=0):
+        if (product_amt > self.product_seller.count) \
+                or ((self.count + 1 > self.product_seller.count) and (product_amt == 0)):
+            raise ValidationError(
+                    "Can't be more than total",
+                )

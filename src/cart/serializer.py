@@ -34,7 +34,6 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = (
             'pk',
-            'product_name',
             'product_seller',
             'profile',
             'count',
@@ -46,7 +45,6 @@ class CartPostSerializer(serializers.ModelSerializer):
         model = Cart
         fields = (
             'pk',
-            'product_name',
             'product_seller',
             'profile',
             'count',

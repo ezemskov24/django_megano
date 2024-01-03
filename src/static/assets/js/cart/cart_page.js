@@ -1,6 +1,6 @@
 const total_price_span = document.getElementById('total_price')
 
-async function get_total_price() {
+async function get_total_price(auth) {
     await fetch('http://127.0.0.1:8000/cart/api/cart/')
         .then((response) => {
             return response.json()
@@ -8,7 +8,11 @@ async function get_total_price() {
         .then((data) => {
             let total_price = 0
             for (elem of data) {
-                total_price += elem.product_seller.price * elem.count
+                if (auth === 'True') {
+                    total_price += elem.product_seller.price * elem.count
+                } else {
+                    total_price += elem.price * elem.cart_count
+                }
             }
             total_price_span.innerHTML = total_price + '$'
         })
@@ -28,7 +32,8 @@ async function remove_product(pk) {
     get_total_price()
 }
 
-async function changing_product_amt(pk, term) {
+async function changing_product_amt(pk, term, auth) {
+    console.log(auth)
     let value = Number(document.getElementById('input_'+pk).value) + term
     if (value === 0) {
         remove_product(pk)
@@ -46,9 +51,13 @@ async function changing_product_amt(pk, term) {
             return response.json()
         })
         .then((data) => {
-            let product_price = data.count * data.product_seller.price
+            if (auth === 'True') {
+                var product_price = data.count * data.product_seller.price
+            } else {
+                var product_price = data.count * data.price
+            }
             document.getElementById('product_price_'+ pk).innerHTML = product_price + '$'
-            get_total_price()
+            get_total_price(auth)
         })
 }
 

@@ -8,6 +8,5 @@ class PropertyValueAdmin(admin.ModelAdmin):
 
     list_display = [
         'product_seller',
-        'product_name',
         'count',
     ]
