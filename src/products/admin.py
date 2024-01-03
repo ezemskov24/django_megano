@@ -73,6 +73,7 @@ class ProductAdmin(admin.ModelAdmin):
         'sellers_amount',
         'min_price',
         'avg_price',
+        'avg_disc_price',
         'sort_index',
         'limited',
         'archived',
@@ -101,6 +102,10 @@ class ProductAdmin(admin.ModelAdmin):
     @admin.display(description='Avg price', empty_value=0)
     def avg_price(self, obj: models.Product) -> int:
         return obj.average_price
+
+    @admin.display(description='Avg disc price', empty_value=0)
+    def avg_disc_price(self, obj: models.Product) -> int:
+        return obj.average_discounted_price
 
     def delete_queryset(self, request: HttpRequest, queryset: QuerySet):
         queryset.update(archived=True)

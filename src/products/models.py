@@ -1,10 +1,14 @@
+from datetime import datetime
+from decimal import Decimal
+
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Avg, Min
+from django.db.models import Avg, Min, Q
 from django.urls import reverse
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.timezone import now
 
 from .validators import validate_not_subcategory
 
@@ -80,8 +84,15 @@ class Product(models.Model):
         """ Получение абсолютной ссылки на продукт. """
         return reverse('products:product_details', kwargs={'pk': self.pk})
 
+    def _get_discount(self):
+        return self.product_discounts.filter(
+            Q(start=None) | Q(start__lte=now()),
+            active=True,
+            end__gte=now(),
+        ).order_by('weight').first()
+
     @property
-    def average_price(self) -> int:
+    def average_price(self) -> Decimal:
         """ Средняя цена продукта. """
         avg_price = self.sellers.aggregate(
             avg=Avg('sellerproduct__price')
@@ -89,16 +100,34 @@ class Product(models.Model):
         return round(avg_price, 2) if avg_price else 0.00
 
     @property
-    def average_discounted_price(self) -> int:
+    def average_discounted_price(self) -> Decimal:
         """ Средняя цены продукта со скидкой. """
+        avg_price = self.average_price
+
+        discount = self._get_discount()
+
+        if discount:
+            return round(discount.get_discounted_price(avg_price), 2)
+        return avg_price
 
     @property
-    def min_price(self) -> int:
+    def min_price(self) -> Decimal:
         """ Минимальная цена продукта. """
         min_price = self.sellers.aggregate(
             min=Min('sellerproduct__price')
         ).get('min')
         return round(min_price, 2) if min_price else 0.00
+
+    @property
+    def discounted_min_price(self) -> Decimal:
+        """ Минимальная цены продукта со скидкой. """
+        min_price = self.min_price
+
+        discount = self._get_discount()
+
+        if discount:
+            return round(discount.get_discounted_price(min_price), 2)
+        return min_price
 
     def description_short(self, length: int=100) -> str:
         if len(self.description) <= length:

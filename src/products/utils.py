@@ -26,6 +26,7 @@ class ProductPreviewCard(CacheableContextProduct):
         super().__init__(product)
         self.category = product.category.full_name
         self.price = product.min_price
+        self.discounted_price = product.discounted_min_price
 
 
 class CacheableContextCategory:
