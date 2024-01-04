@@ -149,7 +149,7 @@ Sort-sortBy_dec
                                         {{ product.category.full_name }}
                                     </div>
                                     <div class="Card-hover">
-                                        <a class="Card-btn" href="{{ product.get_absolute_url() }}">
+                                        <a class="Card-btn" onclick="add_to_cart('{{ product.pk }}')">
                                             <img src="{{ static('assets/img/icons/card/cart.svg') }}" alt="cart.svg" />
                                         </a>
                                     </div>

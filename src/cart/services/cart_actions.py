@@ -1,23 +1,26 @@
-def add_product_to_cart(request):
-    '''метод добавляет товар в корзину'''
-    pass
+from django.core.exceptions import ValidationError
+
+from cart.models import Cart
+from products.models import SellerProduct
+from rest_framework.response import Response
 
 
-def remove_product_from_cart(request):
-    '''метод удаляет определённый товар из корзины'''
-    pass
-
-
-def change_cart_product_amt(request):
-    '''метод изменяет количество определенного товара в корзине'''
-    pass
-
-
-def get_cart_product_list(request):
-    '''метод возвращает список товаров в корзине'''
-    pass
-
-
-def get_cart_product_amt(request):
-    '''метод возвращает кол-во товаров вв корзине'''
-    pass
+def merge_cart_products(user, cart_list_session):
+    for product_session in cart_list_session:
+        product, created = Cart.objects.get_or_create(
+            profile=user,
+            product_seller__pk=product_session['product_seller'],
+            defaults={
+                'product_seller': SellerProduct.objects.get(pk=product_session['product_seller']),
+                'count': product_session['count'],
+                'profile': user,
+            }
+        )
+        if not created:
+            try:
+                product.clean(product.count + product_session['count'])
+                product.count += product_session['count']
+                product.save()
+            except ValidationError:
+                product.count = product.product_seller.count
+                product.save()

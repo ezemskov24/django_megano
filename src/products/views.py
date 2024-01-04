@@ -10,10 +10,14 @@ from django.urls import reverse
 from django.views.generic import TemplateView, DetailView, ListView
 from django.utils import timezone
 
+from catalog.forms import ReviewForm
+from catalog.services import get_reviews_list, add_review, get_count_review
+
 from .forms import FilterForm, SearchForm
-from .models import Category, Picture, Product, SellerProduct, Tag, Value
+from .models import Category, Picture, Product, SellerProduct, Tag
 from .services.compare_products import (
     add_product_to_compare_list,
+    get_compare_list,
     delete_all_compare_products,
     delete_product_to_compare_list,
     get_compare_list,
@@ -53,7 +57,6 @@ class CatalogView(ListView):
         super().__init__()
         self.tag = None
         self.categories = None
-        self.products = None
         self.filter_params = {}
         self.filter_prices = {}
         self.filter_name = None
@@ -93,14 +96,12 @@ class CatalogView(ListView):
         """ Получение базового queryset для дальнейшей работы. """
         search_query = self.request.session.get('search_query')
         base_filter = {'seller_count__gt': 0}
-        if self.tag or self.categories or self.products or search_query:
+        if self.tag or self.categories or search_query:
 
             if self.tag:
                 base_filter['tags'] = self.tag
             if self.categories:
                 base_filter['category__in'] = self.categories
-            if self.products:
-                base_filter['pk__in'] = self.products
             if search_query:
                 base_filter['name__icontains'] = search_query
 
@@ -233,10 +234,6 @@ class CatalogView(ListView):
         ):
             del request.session['search_query']
 
-        discount_query = request.GET.get('d')
-        if discount_query:
-            self._process_discout_query(discount_query)
-
         return super().get(request, *args, **kwargs)
 
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -282,75 +279,6 @@ class CatalogView(ListView):
                 )
                 self.categories = categories
 
-        discount_slug = kwargs.get('sale')
-        if discount_slug:
-            self._process_discount_slug(discount_slug)
-
-    def _process_discount_slug(self, discount_slug: str):
-        product_discount = ProductDiscount.current.filter(
-                slug=discount_slug,
-            ).prefetch_related('products').first()
-
-        category_discount = CategoryDiscount.current.filter(
-                slug=discount_slug,
-            ).prefetch_related('categories').first()
-
-        combo_discount = ComboDiscount.current.filter(
-            slug=discount_slug,
-        ).prefetch_related('set_1', 'set_2').first()
-
-        products = []
-        categories = []
-
-        if product_discount:
-            products = list(
-                product_discount.products.values_list('pk', flat=True).all(),
-            )
-
-        if category_discount:
-            categories = list(
-                category_discount.categories.values_list('pk', flat=True).all(),
-            )
-
-        if combo_discount:
-            products.extend(
-                list(
-                    combo_discount.set_1.products.values_list(
-                        'pk',
-                        flat=True,
-                    ).all(),
-                ),
-            )
-            products.extend(
-                list(
-                    combo_discount.set_2.products.values_list(
-                        'pk',
-                        flat=True,
-                    ).all(),
-                ),
-            )
-            categories.extend(
-                list(
-                    combo_discount.set_1.categories.values_list(
-                        'pk',
-                        flat=True,
-                    ).all(),
-                ),
-            )
-            categories.extend(
-                list(
-                    combo_discount.set_2.categories.values_list(
-                        'pk',
-                        flat=True,
-                    ).all(),
-                ),
-            )
-
-        if products:
-            self.products = products
-        if categories:
-            self.categories = categories
-
 
 class ProductDetailsView(DetailView):
     template_name = "products/product-details.jinja2"
@@ -389,16 +317,12 @@ class ProductDetailsView(DetailView):
             reviews = Review.objects.filter(
                 product=product,
             ).order_by('-created_at')
-            properties_and_values = Value.objects.filter(
-                product=product
-            ).select_related('property')
 
             context_data = {
                 'product': product,
                 'sellers': sellers,
                 'images': images,
                 'reviews': reviews,
-                'properties_and_values': properties_and_values,
                 'reviews_list': get_reviews_list(product.pk),
                 'get_count_review': get_count_review(product.pk)
             }
@@ -424,17 +348,18 @@ class ProductDetailsView(DetailView):
 
 
 class ProductsCompareView(ListView):
-    template_name = 'products/compare.jinja2'
+    template_name = 'products/compare/compare.jinja2'
 
     def get_queryset(self):
         return [
             product[0] for product in [
-                Product.objects.filter(pk=pk).select_related('category')
-                for pk in get_compare_list(self.request)
+                Product.objects.filter(slug=slug).select_related('category').prefetch_related("images")
+                for slug in get_compare_list(self.request)
             ]
         ]
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        messages.success(self.request, 'Profile details updated.')
         context = super().get_context_data()
 
         if not context['object_list']:
@@ -454,30 +379,43 @@ class ProductsCompareView(ListView):
                 for product in context.get('object_list')
             ]
 
-        context['dif_properties'] = []
-        for property_name in context['properties']:
-            for property_value in property_name['property_values']:
-                if property_value[0].value != property_name['property_values'][0][0].value:
-                    context['dif_properties'].append(property_name)
-                    break
+        diff_properties = dict()
+        for product in context['properties']:
+            for product_property in product['product_properties']:
+                if diff_properties.get(product_property['property_name']):
+                    diff_properties[product_property['property_name']].append(product_property['property_value'])
+                else:
+                    diff_properties[product_property['property_name']] = [product_property['property_value']]
 
+        context['not_dif_category'] = [
+            key for key, value in diff_properties.items() if len(set(value)) == 1 and len(context['properties']) > 1
+        ]
+
+        for product in context['properties']:
+            product['dif_properties'] = [
+                {
+                    'property_name': properties['property_name'],
+                    'property_value': properties['property_value'],
+                }
+                for properties in product['product_properties']
+                if properties['property_name'] not in context['not_dif_category']
+            ]
+
+        for product in context['properties']:
+            if len(product['dif_properties']) == len(product['product_properties']) and len(context['properties']) != 1:
+                context['diff_category'] = True
+            else:
+                context['diff_category'] = False
         return context
-
-    def post(self, request, *args, **kwargs):
-        if request.POST.get('product_from_compare') == 'delete':
-            delete_all_compare_products(request)
-            return HttpResponseRedirect(reverse('products:product_compare'))
-        delete_product_to_compare_list(request)
-        return HttpResponseRedirect(reverse('products:product_compare'))
 
 
 def delete_all_compare_products_view(request):
-    """ Функция ajax запроса для доступа к сервису сравнения. """
+    '''функция ajax запроса для доступа к сервису сравнения'''
     delete_all_compare_products(request)
     return HttpResponse()
 
 
 def delete_product_to_compare_list_view(request, pk):
-    """ Функция ajax запроса для доступа к сервису сравнения. """
+    '''функция ajax запроса для доступа к сервису сравнения'''
     delete_product_to_compare_list(request, pk)
     return HttpResponse()

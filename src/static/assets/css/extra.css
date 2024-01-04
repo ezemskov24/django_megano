@@ -184,6 +184,31 @@
     letter-spacing: 0;
 }
 
+.Product-compare {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0;
+}
+
+.Product-delete-all{
+    display: flex;
+    justify-content: space-between;
+    height: 32px;
+    margin-bottom: 35px;
+}
+
+.Property_checkout label{
+    color: #000000;
+    margin-bottom: 10px;
+}
+
+.Delete-all-products {
+    margin-bottom: 50px;
+    text-decoration: none;
+    color: #000000;
+}
+
 .Article:before,
 .Product .Tabs-block:before,
 .Article:after,
@@ -355,6 +380,14 @@
 .Article table,
 .Product .Tabs-block table {
     margin-top: 50px;
+}
+
+.table-no-diff {
+    display: none;
+}
+
+.table-diff {
+    display: inline;
 }
 
 .Article table:last-child,
@@ -3995,6 +4028,14 @@ a.Cart-title {
     margin-bottom: 50px;
 }
 
+.ProductCard-comparasion {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    flex-direction: row;
+    padding: 0;
+    margin-bottom: 0;
+}
+
 @media screen and (max-width: 990px) {
     .ProductCard {
         display: block;
@@ -4016,6 +4057,11 @@ a.Cart-title {
     width: 49%;
     padding: 0;
     padding-left: 46px;
+}
+
+.ProductCard-desc-compare {
+    margin-bottom: 50px;
+    padding: 0;
 }
 
 @media screen and (max-width: 990px) {
@@ -4172,6 +4218,11 @@ a.Cart-title {
     max-height: 100%;
 }
 
+.ProductCard-photo-compare img {
+    max-width: 50%;
+    max-height: 50%;
+}
+
 @media screen and (max-width: 990px) {
     .ProductCard-photo {
         min-height: auto;
@@ -4209,6 +4260,11 @@ a.Cart-title {
     font-size: 32px;
     font-weight: 600;
     margin-bottom: 17px;
+}
+
+.ProductCard-title-compare {
+    display: flex;
+    justify-content: space-between;
 }
 
 .ProductCard-footer {
@@ -6162,6 +6218,17 @@ input[type="submit"] {
     border: 1px solid #e0e0e0;
     border-top: none;
     margin-top: 0;
+}
+
+.Tabs-wrap-compare {
+    display: block;
+}
+
+.Tabs-wrap-properties {
+    padding: 50px;
+    padding-top: 20px;
+    border: 1px solid #e0e0e0;
+    margin-top: 20px;
 }
 
 @media screen and (max-width: 990px) {
