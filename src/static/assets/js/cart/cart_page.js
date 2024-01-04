@@ -18,7 +18,7 @@ async function get_total_price(auth) {
         })
 }
 
-async function remove_product(pk) {
+async function remove_product(pk, auth) {
     await fetch('http://127.0.0.1:8000/cart/api/cart/'+ pk +'/', {
         method: 'DELETE',
         headers: {
@@ -29,14 +29,13 @@ async function remove_product(pk) {
             cart_amt()
         })
     document.getElementById('product_cart_'+ pk).style.display = 'none'
-    get_total_price()
+    get_total_price(auth)
 }
 
 async function changing_product_amt(pk, term, auth) {
-    console.log(auth)
     let value = Number(document.getElementById('input_'+pk).value) + term
     if (value === 0) {
-        remove_product(pk)
+        remove_product(pk, auth)
         return
     }
     await fetch('http://127.0.0.1:8000/cart/api/cart/'+ pk +'/', {

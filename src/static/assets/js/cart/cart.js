@@ -33,7 +33,6 @@ async function add_to_cart(product_pk, seller=''){
             return response.json()
         })
         .then((data) => {
-            console.log(data)
             fetch('http://127.0.0.1:8000/cart/api/cart/', {
                 method: 'POST',
                 body: JSON.stringify({

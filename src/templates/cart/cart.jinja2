@@ -46,7 +46,7 @@
                                 </div>
                             </div>
                             <div class="Cart-block Cart-block_delete">
-                                <a class="Cart-delete" href="#" id="remove_{{ product.pk }}" onclick="remove_product('{{ product.pk }}')">
+                                <a class="Cart-delete" href="#" id="remove_{{ product.pk }}" onclick="remove_product('{{ product.pk }}', '{{ request.user.is_authenticated }}')">
                                     <img src="{{ static('assets/img/icons/card/delete.svg') }}" alt="delete.svg">
                                 </a>
                             </div>
