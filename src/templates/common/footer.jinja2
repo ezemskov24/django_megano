@@ -12,17 +12,19 @@
                 <strong class="Footer-title">Навигация</strong>
                 <ul class="menu menu_vt Footer-menu">
                     <li class="menu-item">
-                        <a class="menu-link" href="#">Главная</a>
+                        <a class="menu-link" href="{{ url('index') }}">Главная</a>
                     </li>
                     <li class="menu-item">
-                        <a class="menu-link" href="#">Каталог</a>
+                        <a class="menu-link" href="{{ url('products:catalog') }}">Каталог</a>
                     </li>
                     <li class="menu-item">
-                        <a class="menu-link" href="#">Сравнение</a>
+                        <a class="menu-link" href="{{ url('products:product_compare') }}">Сравнение</a>
                     </li>
-                    <li class="menu-item">
-                        <a class="menu-link" href="#">Профиль</a>
-                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{ url('account:account') }}">Профиль</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
             <div class="row-block">
