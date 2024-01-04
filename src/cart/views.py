@@ -124,13 +124,17 @@ class CartApiViewSet(ModelViewSet):
         if not request.user.is_authenticated:
             cart_list = request.session.get('cart')
             if cart_list is None:
-                cart_list = [request.data]
-                request.session['cart'] = cart_list
+                request.session['cart'] = [request.data]
                 return Response(200)
             for product in cart_list:
                 if request.data['product_seller'] == product['product_seller']:
-                    product['count'] += 1
-                    request.session['cart'] = cart_list
+                    try:
+                        if product['count'] + 1 > SellerProduct.objects.get(pk=request.data['product_seller']).count:
+                            raise ValidationError("Can't be more than total")
+                        product['count'] += 1
+                        request.session['cart'] = cart_list
+                    except ValidationError:
+                        return Response(400)
                     return Response(200)
             cart_list.append(request.data)
             request.session['cart'] = cart_list
@@ -144,7 +148,7 @@ class CartApiViewSet(ModelViewSet):
             try:
                 cart_product[0].clean()
                 cart_product.update(count=F('count') + 1)
-            except ValidationError:
+            except ValidationError("Can't be more than total"):
                 pass
             return Response(request.data)
         request.data['profile'] = request.user.pk
@@ -155,8 +159,13 @@ class CartApiViewSet(ModelViewSet):
             cart_list = request.session.get('cart')
             for product in cart_list:
                 if int(kwargs['pk']) == product['product_seller']:
-                    product['count'] = request.data['count']
-                    request.session['cart'] = cart_list
+                    try:
+                        if request.data['count'] > self.get_object().count:
+                            raise ValidationError("Can't be more than total")
+                        product['count'] = request.data['count']
+                        request.session['cart'] = cart_list
+                    except ValidationError:
+                        pass
                     return Response({'price': self.get_object().price, 'count': product['count']})
 
         try:
