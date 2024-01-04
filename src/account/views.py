@@ -19,6 +19,8 @@ from .models import BrowsingHistory
 from .forms import ProfileForm
 from django.contrib import messages
 
+from cart.services.cart_actions import merge_cart_products
+
 
 class ProfileUpdateView(UpdateView):
     model = Profile
@@ -71,13 +73,10 @@ class RegisterView(CreateView):
             return self.form_invalid(form)
 
 
-
-
 def UserLoginView(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         if request.user.is_authenticated:
             return redirect('/account/profile/')
-
         return render(request, 'registration/login.jinja2')
 
     email = request.POST.get('email')
@@ -85,6 +84,7 @@ def UserLoginView(request: HttpRequest) -> HttpResponse:
 
     user = authenticate(request, email=email, password=password)
     if user is not None:
+        merge_cart_products(user, request.session.get('cart'))
         login(request, user)
         return redirect('/account/profile/')
 
@@ -94,6 +94,7 @@ def UserLoginView(request: HttpRequest) -> HttpResponse:
 # Logout
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('account:login')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         print(context['form'].as_p())

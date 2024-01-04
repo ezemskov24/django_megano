@@ -52,25 +52,20 @@ class CartView(ListView):
                 }
                 for product_seller in context['object_list']
             ]
-
-            context['total_price'] = 0
-            for product in context['cart']:
-                context['total_price'] += product['price'] * product['count']
-            return context
-
-        context['cart'] = [
-            {
-                'product_obj': cart_product.product_seller.product,
-                'pk': cart_product.pk,
-                'seller': cart_product.product_seller.pk,
-                'pict': cart_product.product_seller.product.images.first().image.url,
-                'name': cart_product.product_seller.product.name,
-                'price': cart_product.product_seller.price,
-                'count': cart_product.count,
-                'desc': cart_product.product_seller.product.description
-            }
-            for cart_product in context['object_list']
-        ]
+        else:
+            context['cart'] = [
+                {
+                    'product_obj': cart_product.product_seller.product,
+                    'pk': cart_product.pk,
+                    'seller': cart_product.product_seller.pk,
+                    'pict': cart_product.product_seller.product.images.first().image.url,
+                    'name': cart_product.product_seller.product.name,
+                    'price': cart_product.product_seller.price,
+                    'count': cart_product.count,
+                    'desc': cart_product.product_seller.product.description
+                }
+                for cart_product in context['object_list']
+            ]
 
         context['total_price'] = 0
         for product in context['cart']:
@@ -80,7 +75,6 @@ class CartView(ListView):
 
 class CartApiViewSet(ModelViewSet):
     def get_serializer_class(self):
-
         if not self.request.user.is_authenticated:
             return ProductSellerSerializer
 
@@ -136,11 +130,9 @@ class CartApiViewSet(ModelViewSet):
             for product in cart_list:
                 if request.data['product_seller'] == product['product_seller']:
                     product['count'] += 1
-                    print(cart_list)
                     request.session['cart'] = cart_list
                     return Response(200)
             cart_list.append(request.data)
-            print(cart_list)
             request.session['cart'] = cart_list
             return Response(200)
 
@@ -152,8 +144,8 @@ class CartApiViewSet(ModelViewSet):
             try:
                 cart_product[0].clean()
                 cart_product.update(count=F('count') + 1)
-            except ValidationError as e:
-                print(e)
+            except ValidationError:
+                pass
             return Response(request.data)
         request.data['profile'] = request.user.pk
         return super().create(request)
@@ -170,8 +162,7 @@ class CartApiViewSet(ModelViewSet):
         try:
             self.get_object().clean(request.data['count'])
             return super().partial_update(request)
-        except ValidationError as e:
-            print(e)
+        except ValidationError:
             return Response(request.data)
 
 
