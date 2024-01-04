@@ -1,8 +1,11 @@
 {% extends 'base.jinja2' %}
-{% include 'common/header_full.jinja2' %}
 
 {% block title %}
     {{ product.name }}
+{% endblock %}
+
+{% block header %}
+    {% include 'common/header_full.jinja2' %}
 {% endblock %}
 
 {% block content %}
@@ -182,22 +185,12 @@
 
                             <div class="Tabs-block" id="addit">
                                 <div class="Product-props">
-                                    <div class="Product-prop">
-                                        <strong>Производитель
-                                        </strong><span> {{ product.manufacturer }}</span>
-                                    </div>
-                                    <div class="Product-prop">
-                                        <strong>ipsum
-                                        </strong><span> Lorem ipsum dolor sit</span>
-                                    </div>
-                                    <div class="Product-prop">
-                                        <strong>dolor sit
-                                        </strong><span> 5 ans</span>
-                                    </div>
-                                    <div class="Product-prop">
-                                        <strong>psum dolo
-                                        </strong><span> 2–3 jours</span>
-                                    </div>
+                                    {% for property_value in properties_and_values %}
+                                        <div class="Product-prop">
+                                            <strong>{{ property_value.property.name }}
+                                            </strong><span> {{ property_value.value }}</span>
+                                        </div>
+                                    {% endfor %}
                                 </div>
                             </div>
                             {% include 'catalog/review.jinja2' %}

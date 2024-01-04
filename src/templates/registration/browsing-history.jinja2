@@ -1,5 +1,8 @@
 {% extends 'base.jinja2' %}
-{% include 'common/header_full.jinja2' %}
+
+{% block header %}
+    {% include 'common/header_full.jinja2' %}
+{% endblock %}
 
 {% block title %}
     История просмотров
@@ -10,9 +13,9 @@
         {% if history %}
             <div class="Cards-browsing-history">
                 {% for item in history %}
-                    <div class="Card"><a class="Card-picture" href="#"><<img src="{{ item.image_url }}" alt="{{ item.product.name }}">></a>
+                    <div class="Card"><a class="Card-picture" href="{{ item.get_absolute_url() }}"><<img src="{{ item.image_url }}" alt="{{ item.product.name }}">></a>
                         <div class="Card-content">
-                            <strong class="Card-title"><a href="#">{{ item.product.name }}</a>
+                            <strong class="Card-title"><a href="{{ item.get_absolute_url() }}">{{ item.product.name }}</a>
                             </strong>
                         </div>
                     </div>
