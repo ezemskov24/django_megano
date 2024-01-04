@@ -6,16 +6,6 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
-# from cart.services.cart_actions import (
-#     add_product_to_cart,
-#     get_cart_product_amt,
-#     get_cart_product_list,
-#     get_total_price,
-#     remove_product_from_cart,
-#     get_total_price,
-#     change_cart_product_amt,
-# )
-
 from cart.serializer import CartSerializer, ProductSellerSerializer, CartPostSerializer
 
 from products.models import SellerProduct
@@ -67,9 +57,7 @@ class CartView(ListView):
                 for cart_product in context['object_list']
             ]
 
-        context['total_price'] = 0
-        for product in context['cart']:
-            context['total_price'] += product['price'] * product['count']
+        context['total_price'] = sum(map(lambda product: product['price'] * product['count'], context['cart']))
         return context
 
 
@@ -102,8 +90,8 @@ class CartApiViewSet(ModelViewSet):
             cart_list = request.session.get('cart')
             queryset = self.filter_queryset(self.get_queryset())
             serializer = self.get_serializer(queryset, many=True)
-            for iter, item in enumerate(serializer.data):
-                item['cart_count'] = cart_list[iter]['count']
+            for item, cart_product in zip(serializer.data, cart_list):
+                item['cart_count'] = cart_product['count']
             return Response(serializer.data)
 
         return super().list(request)

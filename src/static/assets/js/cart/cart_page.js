@@ -14,7 +14,7 @@ async function get_total_price(auth) {
                     total_price += elem.price * elem.cart_count
                 }
             }
-            total_price_span.innerHTML = total_price + '$'
+            total_price_span.innerHTML = parseFloat(total_price).toFixed(2) + '$'
         })
 }
 
@@ -55,11 +55,7 @@ async function changing_product_amt(pk, term, auth) {
             } else {
                 var product_price = data.count * data.price
             }
-            document.getElementById('product_price_'+ pk).innerHTML = product_price + '$'
+            document.getElementById('product_price_'+ pk).innerHTML = parseFloat(product_price).toFixed(2) + '$'
             get_total_price(auth)
         })
-}
-
-async function changing_product_seller() {
-
 }
