@@ -33,10 +33,12 @@ class Order(models.Model):
     delivery_type - способ доставки;
     payment_type - способ оплаты;
     comment - коментарий к заказу;
+    archived - метка для мягкого удаления;
+    created_at - дата и время создания заказа.
     """
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=False, blank=False, related_name='order')
     fio = models.CharField(max_length=255, null=False, blank=False)
-    phone = models.CharField(max_length=14, unique=True, blank=True, null=True)
+    phone = models.CharField(max_length=10, blank=True, null=True)
     email = models.EmailField(null=False, blank=False)
     cart = models.ForeignKey(Cart, on_delete=models.DO_NOTHING, related_name='order')
     delivery_address = models.CharField(max_length=255, null=False, blank=False)
@@ -44,3 +46,4 @@ class Order(models.Model):
     payment_type = models.CharField(max_length=40)
     comment = models.TextField(null=False, blank=True)
     archived = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)

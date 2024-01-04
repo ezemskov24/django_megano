@@ -1,6 +1,3 @@
-console.log('Hello World')
-
-
 let visible = 3
 
 const btnMore = document.getElementById("btn-more");
@@ -9,7 +6,6 @@ const btnMoreBox = document.querySelector('.Comment-more')
 
 btnMore.addEventListener('click', function() {
     for (let i = visible; i < Math.min(visible + 3, commentItems.length); i++) {
-        console.log(i)
         commentItems.item(i).classList.add('visible')
     }
     visible += 3
