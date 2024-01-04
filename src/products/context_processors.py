@@ -5,7 +5,7 @@ from .forms import SearchForm
 from .models import Category
 from .utils import CacheableContextCategory
 from .services.compare_products import get_compare_list_amt
-
+from discounts.models import Discount
 
 CATEGORIES_KEY = 'header_menu_categories'
 
@@ -38,9 +38,12 @@ def header_menu(request):
 
         cache.set(CATEGORIES_KEY, menu_categories)
 
+    active_discounts = Discount.get_active_count()
+
     return {
         'categories': menu_categories,
-        'search_form': SearchForm()
+        'search_form': SearchForm(),
+        'active_discounts': active_discounts,
     }
 
 

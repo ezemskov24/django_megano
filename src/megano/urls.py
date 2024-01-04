@@ -28,6 +28,7 @@ urlpatterns = [
     path('catalog/', include('products.urls')),
     path('account/', include('account.urls')),
     path('cart/', include('cart.urls')),
+    path('sale/', include('discounts.urls')),
     path('', IndexView.as_view(), name='index'),
 ]
 

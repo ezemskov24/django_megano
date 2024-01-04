@@ -26,6 +26,7 @@ class ProductPreviewCard(CacheableContextProduct):
         super().__init__(product)
         self.category = product.category.full_name
         self.price = product.min_price
+        self.discounted_price = product.discounted_min_price
 
 
 class CacheableContextCategory:
@@ -48,7 +49,7 @@ class Banner:
             ).annotate(
                 min=Min('sellerproduct__price'),
             ).order_by('min').prefetch_related('images').first()
-            self.min_price = sample.min_price
+            self.min_price = sample.discounted_min_price
             self.image_url = sample.images.first().image.url
 
     def __init__(self, fixed_amount=3, slider_amount=3):
@@ -99,6 +100,7 @@ class TopSellerProduct(ProductPreviewCard):
     @staticmethod
     def get_top_sellers(amount=8):
         top_sellers = cache.get(TOP_SELLERS_KEY)
+
         if not top_sellers:
             products = Product.objects.annotate(
                 seller_count=Count('sellerproduct')
