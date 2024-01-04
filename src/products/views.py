@@ -23,7 +23,7 @@ from account.models import BrowsingHistory
 from catalog.forms import ReviewForm
 from catalog.models import Review
 from catalog.services import get_reviews_list, add_review, get_count_review
-from discounts.models import CategoryDiscount, ProductDiscount
+from discounts.models import CategoryDiscount, ComboDiscount, ComboSet, ProductDiscount
 
 
 class IndexView(TemplateView):
@@ -295,8 +295,12 @@ class CatalogView(ListView):
                 slug=discount_slug,
             ).prefetch_related('categories').first()
 
-        products = None
-        categories = None
+        combo_discount = ComboDiscount.current.filter(
+            slug=discount_slug,
+        ).prefetch_related('set_1', 'set_2').first()
+
+        products = []
+        categories = []
 
         if product_discount:
             products = list(
@@ -306,6 +310,40 @@ class CatalogView(ListView):
         if category_discount:
             categories = list(
                 category_discount.categories.values_list('pk', flat=True).all(),
+            )
+
+        if combo_discount:
+            products.extend(
+                list(
+                    combo_discount.set_1.products.values_list(
+                        'pk',
+                        flat=True,
+                    ).all(),
+                ),
+            )
+            products.extend(
+                list(
+                    combo_discount.set_2.products.values_list(
+                        'pk',
+                        flat=True,
+                    ).all(),
+                ),
+            )
+            categories.extend(
+                list(
+                    combo_discount.set_1.categories.values_list(
+                        'pk',
+                        flat=True,
+                    ).all(),
+                ),
+            )
+            categories.extend(
+                list(
+                    combo_discount.set_2.categories.values_list(
+                        'pk',
+                        flat=True,
+                    ).all(),
+                ),
             )
 
         if products:

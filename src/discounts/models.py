@@ -34,7 +34,7 @@ class Discount(models.Model):
     weight = models.IntegerField(default=0)
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, unique=True)
-    description = models.CharField(max_length=100)
+    description = models.TextField(max_length=100)
 
     discount_type = models.CharField(
         max_length=20,
@@ -120,3 +120,38 @@ class CategoryDiscount(Discount):
 class BulkDiscount(Discount):
     product_amount = models.PositiveIntegerField()
     total_sum = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class ComboSet(models.Model):
+    products = models.ManyToManyField(
+        Product,
+        related_name='combo_discounts',
+        blank=True,
+    )
+    categories = models.ManyToManyField(
+        Category,
+        related_name='combo_discounts',
+        blank=True,
+    )
+
+    def __str__(self):
+        return f'Combo set #{self.pk}'
+
+
+class ComboDiscount(Discount):
+    set_1 = models.ForeignKey(
+        ComboSet,
+        on_delete=models.CASCADE,
+        related_name='discounts_1',
+    )
+    set_2 = models.ForeignKey(
+        ComboSet,
+        on_delete=models.CASCADE,
+        related_name='discounts_2',
+    )
+
+    def clean(self, *args, **kwargs):
+        super().clean()
+
+        if self.set_1 == self.set_2:
+            raise ValidationError('Sets 1 and 2 can\'t be thee same set')

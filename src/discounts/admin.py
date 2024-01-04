@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from .models import BulkDiscount, CategoryDiscount, ProductDiscount
+from . import models
 
 
-@admin.register(ProductDiscount)
+@admin.register(models.ProductDiscount)
 class ProductDiscountAdmin(admin.ModelAdmin):
     list_display = [
         'name',
@@ -20,7 +20,7 @@ class ProductDiscountAdmin(admin.ModelAdmin):
     }
 
 
-@admin.register(CategoryDiscount)
+@admin.register(models.CategoryDiscount)
 class CategoryDiscountAdmin(admin.ModelAdmin):
     list_display = [
         'name',
@@ -37,8 +37,8 @@ class CategoryDiscountAdmin(admin.ModelAdmin):
     }
 
 
-@admin.register(BulkDiscount)
-class BulkCategoryDiscount(admin.ModelAdmin):
+@admin.register(models.BulkDiscount)
+class BulkCategoryDiscountAdmin(admin.ModelAdmin):
     list_display = [
         'name',
         'weight',
@@ -52,3 +52,25 @@ class BulkCategoryDiscount(admin.ModelAdmin):
     prepopulated_fields = {
         'slug': ('name',),
     }
+
+
+@admin.register(models.ComboDiscount)
+class ComboDiscountAdmin(admin.ModelAdmin):
+    list_display = [
+        'name',
+        'weight',
+        'start',
+        'end',
+        'active',
+    ]
+    list_editable = [
+        'weight',
+    ]
+    prepopulated_fields = {
+        'slug': ('name',),
+    }
+
+
+@admin.register(models.ComboSet)
+class ComboSetAdmin(admin.ModelAdmin):
+    pass
