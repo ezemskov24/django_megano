@@ -138,7 +138,12 @@ Sort-sortBy_dec
                                 </strong>
                                 <div class="Card-description">
                                     <div class="Card-cost">
-                                        <span class="Card-price">${{ product.average_price }}</span>
+                                        {% with regular_price = product.average_price, discounted_price = product.average_discounted_price %}
+                                        {% if regular_price != discounted_price %}
+                                            <span class="Card-priceOld">${{ regular_price }}</span>
+                                        {% endif %}
+                                        <span class="Card-price">${{ discounted_price }}</span>
+                                        {% endwith %}
                                     </div>
                                     <div class="Card-category">
                                         {{ product.category.full_name }}

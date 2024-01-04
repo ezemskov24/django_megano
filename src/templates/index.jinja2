@@ -141,7 +141,10 @@
                                         </strong>
                                         <div class="Card-description">
                                             <div class="Card-cost">
-                                                <span class="Card-price">${{ card.price }}</span>
+                                                {% if card.price != card.discounted_price %}
+                                                    <span class="Card-priceOld">${{ card.price }}</span>
+                                                {% endif %}
+                                                <span class="Card-price">${{ card.discounted_price }}</span>
                                             </div>
                                             <div class="Card-category">
                                                 {{ card.category }}

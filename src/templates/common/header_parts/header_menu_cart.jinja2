@@ -6,7 +6,9 @@
             </li>
             <li class="menu-item">
                 {% if active_discounts %}
-                    <span class="menu-label menu-label_success">Скидки</span>
+                    <a href="{{ url('discounts:discounts_list') }}">
+                        <span class="menu-label menu-label_success">Скидки</span>
+                    </a>
                 {% endif %}
                 <a class="menu-link" href="{{ url('products:catalog') }}">Каталог</a>
             </li>
@@ -35,9 +37,9 @@
                          alt="loon-icon.svg" />
                 </button>
                 <div class="dropdown-content">
-                    <a class="dropdown-content-a" href="#">Личный кабинет</a>
+                    <a class="dropdown-content-a" href="{{ url('account:account') }}">Личный кабинет</a>
                     <a class="dropdown-content-a" href="#">Административный раздел</a>
-                    <a class="dropdown-content-a" href="#">Выход</a>
+                    <a class="dropdown-content-a" href="{{ url('account:logout') }}">Выход</a>
                 </div>
             </div>
         {% endif %}

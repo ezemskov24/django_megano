@@ -3,8 +3,26 @@ import decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Q
+from django.utils.timezone import now
 
 from products.models import Category, Product
+
+
+class CurrentDiscountsManager(models.Manager):
+    """ Менеджер актуальных скидок. """
+    def get_queryset(self):
+        return super().get_queryset().filter(active=True, end__gte=now())
+
+
+def discount_images_directory_path(
+        instance: "Category",
+        filename: str
+) -> str:
+    """Сгенерировать путь для сохранения изображения."""
+    return "discounts/images/category_{pk}/{filename}".format(
+        pk=instance.pk,
+        filename=filename,
+    )
 
 
 class Discount(models.Model):
@@ -15,6 +33,7 @@ class Discount(models.Model):
     active = models.BooleanField(default=True)
     weight = models.IntegerField(default=0)
     name = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=50, unique=True)
     description = models.CharField(max_length=100)
 
     discount_type = models.CharField(
@@ -27,8 +46,20 @@ class Discount(models.Model):
     )
     value = models.DecimalField(max_digits=10, decimal_places=2)
 
+    image = models.ImageField(
+        upload_to=discount_images_directory_path,
+        null=True,
+        blank=True,
+    )
+
+    objects = models.Manager()
+    current = CurrentDiscountsManager()
+
     class Meta:
         abstract = True
+        indexes = [
+            models.Index(fields=['slug'])
+        ]
 
     def clean(self, *args, **kwargs):
         super().clean()

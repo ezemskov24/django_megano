@@ -15,6 +15,9 @@ class ProductDiscountAdmin(admin.ModelAdmin):
     list_editable = [
         'weight',
     ]
+    prepopulated_fields = {
+        'slug': ('name',),
+    }
 
 
 @admin.register(CategoryDiscount)
@@ -29,6 +32,9 @@ class CategoryDiscountAdmin(admin.ModelAdmin):
     list_editable = [
         'weight',
     ]
+    prepopulated_fields = {
+        'slug': ('name',),
+    }
 
 
 @admin.register(BulkDiscount)
@@ -43,3 +49,6 @@ class BulkCategoryDiscount(admin.ModelAdmin):
     list_editable = [
         'weight',
     ]
+    prepopulated_fields = {
+        'slug': ('name',),
+    }

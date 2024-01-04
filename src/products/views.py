@@ -23,6 +23,7 @@ from account.models import BrowsingHistory
 from catalog.forms import ReviewForm
 from catalog.models import Review
 from catalog.services import get_reviews_list, add_review, get_count_review
+from discounts.models import CategoryDiscount, ProductDiscount
 
 
 class IndexView(TemplateView):
@@ -52,6 +53,7 @@ class CatalogView(ListView):
         super().__init__()
         self.tag = None
         self.categories = None
+        self.products = None
         self.filter_params = {}
         self.filter_prices = {}
         self.filter_name = None
@@ -91,12 +93,14 @@ class CatalogView(ListView):
         """ Получение базового queryset для дальнейшей работы. """
         search_query = self.request.session.get('search_query')
         base_filter = {'seller_count__gt': 0}
-        if self.tag or self.categories or search_query:
+        if self.tag or self.categories or self.products or search_query:
 
             if self.tag:
                 base_filter['tags'] = self.tag
             if self.categories:
                 base_filter['category__in'] = self.categories
+            if self.products:
+                base_filter['pk__in'] = self.products
             if search_query:
                 base_filter['name__icontains'] = search_query
 
@@ -229,6 +233,10 @@ class CatalogView(ListView):
         ):
             del request.session['search_query']
 
+        discount_query = request.GET.get('d')
+        if discount_query:
+            self._process_discout_query(discount_query)
+
         return super().get(request, *args, **kwargs)
 
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -273,6 +281,37 @@ class CatalogView(ListView):
                     [cat.pk for cat in category.subcategories.all()]
                 )
                 self.categories = categories
+
+        discount_slug = kwargs.get('sale')
+        if discount_slug:
+            self._process_discount_slug(discount_slug)
+
+    def _process_discount_slug(self, discount_slug: str):
+        product_discount = ProductDiscount.current.filter(
+                slug=discount_slug,
+            ).prefetch_related('products').first()
+
+        category_discount = CategoryDiscount.current.filter(
+                slug=discount_slug,
+            ).prefetch_related('categories').first()
+
+        products = None
+        categories = None
+
+        if product_discount:
+            products = list(
+                product_discount.products.values_list('pk', flat=True).all(),
+            )
+
+        if category_discount:
+            categories = list(
+                category_discount.categories.values_list('pk', flat=True).all(),
+            )
+
+        if products:
+            self.products = products
+        if categories:
+            self.categories = categories
 
 
 class ProductDetailsView(DetailView):

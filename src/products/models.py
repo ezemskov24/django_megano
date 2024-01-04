@@ -77,7 +77,7 @@ class Product(models.Model):
     class Meta:
         ordering = ['sort_index', 'name']
         indexes = [
-            models.Index(fields=['name']),
+            models.Index(fields=['name', 'slug']),
         ]
 
     def get_absolute_url(self) -> str:
@@ -85,11 +85,25 @@ class Product(models.Model):
         return reverse('products:product_details', kwargs={'pk': self.pk})
 
     def _get_discount(self):
-        return self.product_discounts.filter(
+        product_disount = self.product_discounts.filter(
             Q(start=None) | Q(start__lte=now()),
             active=True,
             end__gte=now(),
         ).order_by('weight').first()
+
+        category_discount = self.category.category_discounts.filter(
+            Q(start=None) | Q(start__lte=now()),
+            active=True,
+            end__gte=now(),
+        ).order_by('weight').first()
+
+        if product_disount and category_discount:
+            if category_discount.weight > product_disount.weight:
+                return category_discount
+            else:
+                return product_disount
+        else:
+            return product_disount or category_discount
 
     @property
     def average_price(self) -> Decimal:
@@ -265,7 +279,7 @@ class Category(models.Model):
     class Meta:
         ordering = ['sort_index', 'name']
         indexes = [
-            models.Index(fields=['name']),
+            models.Index(fields=['name', 'slug']),
         ]
         verbose_name = 'category'
         verbose_name_plural = 'categories'
