@@ -20,7 +20,7 @@ class DiscountsListView(TemplateView):
         product_discounts = ProductDiscount.current.all()
         for discount in product_discounts:
             discount.url = reverse(
-                'products:products-on-sale',
+                'discounts:products-on-sale',
                 kwargs={'sale': discount.slug},
             )
         discounts.extend(product_discounts)
@@ -28,7 +28,7 @@ class DiscountsListView(TemplateView):
         category_discounts = CategoryDiscount.current.all()
         for discount in category_discounts:
             discount.url = reverse(
-                'products:products-on-sale',
+                'discounts:products-on-sale',
                 kwargs={'sale': discount.slug},
             )
         discounts.extend(category_discounts)
@@ -41,7 +41,7 @@ class DiscountsListView(TemplateView):
         combo_discounts = ComboDiscount.current.all()
         for discount in combo_discounts:
             discount.url = reverse(
-                'products:products-on-sale',
+                'discounts:products-on-sale',
                 kwargs={'sale': discount.slug},
             )
         discounts.extend(combo_discounts)
