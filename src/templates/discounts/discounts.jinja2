@@ -27,7 +27,7 @@
                 <div class="Cards Cards_blog">
                     {% for discount in discounts %}
                         <div class="Card">
-                            <a class="Card-picture" href="{{ discount.url }} ">
+                            <a class="Card-picture" href="{{ discount.get_absolute_url() }} ">
                                 <img src="{% if discount.image %}
                                             {{ discount.image.url }}
                                           {% else %}

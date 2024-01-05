@@ -3,6 +3,7 @@ import decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Q
+from django.urls import reverse
 from django.utils.timezone import now
 
 from products.models import Category, Product
@@ -60,6 +61,12 @@ class Discount(models.Model):
         indexes = [
             models.Index(fields=['slug'])
         ]
+
+    def get_absolute_url(self):
+        return reverse(
+            'discounts:products-on-sale',
+            kwargs={'sale': self.slug},
+        )
 
     def clean(self, *args, **kwargs):
         super().clean()
@@ -120,6 +127,9 @@ class CategoryDiscount(Discount):
 class BulkDiscount(Discount):
     product_amount = models.PositiveIntegerField()
     total_sum = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def get_absolute_url(self):
+        return reverse('products:catalog')
 
 
 class ComboSet(models.Model):
