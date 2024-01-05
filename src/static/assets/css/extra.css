@@ -387,7 +387,7 @@
 }
 
 .table-diff {
-    display: inline;
+    display: flex;
 }
 
 .Article table:last-child,

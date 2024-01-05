@@ -2,7 +2,6 @@ from django.core.exceptions import ValidationError
 
 from cart.models import Cart
 from products.models import SellerProduct
-from rest_framework.response import Response
 
 
 def merge_cart_products(user, cart_list_session):
