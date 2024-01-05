@@ -6,8 +6,11 @@ function compare_length() {
         return response.json()
     }).then((data) => {
         if (data === 0) {
-        compare_amt.style.display = 'none'
-    } else {
+            compare_main.innerHTML = 'недостаточно товаров для сравнения'
+            compare_amt.style.display = 'none'
+    } else if (data === 1) {
+            compare_main_label.innerHTML = 'недостаточно товаров для сравнения'
+        } else {
         compare_amt.style.display = 'flex'
         compare_amt.innerHTML = data
     }

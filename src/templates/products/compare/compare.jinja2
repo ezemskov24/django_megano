@@ -12,7 +12,12 @@
 {% block content %}
     <div class="Middle">
             <div class="wrap">
-                <div class="Product Product-compare">
+            {% if properties|length != 0 %}
+                <div class="Product Product-compare" id="compare-main">
+                    <label class="label_success_message" id="compare-main-error"></label>
+                    {% if diff_category %}
+                        <label class="label_success_message" id="compare_dif_category">Неасравнимое не сравнить</label>
+                    {% endif %}
                     <div class="Product-delete-all">
                         <div class="form-group" id="properties_chekbox_div">
                             <label class="toggle">
@@ -41,18 +46,20 @@
                                                  alt="bigGoods.png">
                                         </div>
                                     </div>
-                                    <div class="Tabs Tabs_default">
-                                        <div class="Tabs-wrap">
-                                            <div class="Tabs-block" id="description">
-                                                <div class="table table-diff">
-                                                    {% include 'products/compare/properties-diff.jinja2' %}
-                                                </div>
-                                                <div class="table table-no-diff">
-                                                    {% include 'products/compare/properties.jinja2' %}
+                                    {% if not elem.diff_category %}
+                                        <div class="Tabs Tabs_default">
+                                            <div class="Tabs-wrap">
+                                                <div class="Tabs-block" id="description">
+                                                    <div class="table table-diff">
+                                                        {% include 'products/compare/properties-diff.jinja2' %}
+                                                    </div>
+                                                    <div class="table table-no-diff">
+                                                        {% include 'products/compare/properties.jinja2' %}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                 </div>
                                 <div class="ProductCard-info">
                                     <div class="ProductCard-cost">
@@ -72,6 +79,9 @@
                         {% endfor %}
                     </div>
                 </div>
+            {% else %}
+                <div class="Product Product-compare">недостаточно товаров для сравнения</div>
+            {% endif %}
             </div>
     </div>
 <script src="{{ static('assets/js/compare/compare.js') }}"></script>

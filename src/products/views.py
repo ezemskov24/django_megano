@@ -364,15 +364,6 @@ class ProductsCompareView(ListView):
         if not context['object_list']:
             return context
 
-        # for product in context.get('object_list'):
-        #     context['properties'] = [
-        #         {
-        #             'product': product,
-        #             'property_name': value.property,
-        #             'property_value': value.value,
-        #         }
-        #         for value in product.product_property_value.select_related('property')
-        #     ]
         context['properties'] = [
             {
                 'product': product,
@@ -389,14 +380,7 @@ class ProductsCompareView(ListView):
             }
             for product in context['object_list']
         ]
-        # for product in context['properties']:
-        #     print(product)
-        # for property_name in context['properties']:
-        #     property_name['property_values'] = [
-        #         property_name['property_name'].category_property_value.filter(product=product)
-        #         for product in context.get('object_list')
-        #     ]
-        # print(context['properties'])
+
         diff_properties = dict()
         for product in context['properties']:
             for product_property in product['property']:
@@ -404,13 +388,15 @@ class ProductsCompareView(ListView):
                     diff_properties[product_property['property_name']].append(product_property['property_value'])
                 else:
                     diff_properties[product_property['property_name']] = [product_property['property_value']]
-
+        for key, value in diff_properties.items():
+            print(len(set(map(lambda elem: elem.lower(), value))) == 1, len(context['properties']) > 1)
         context['not_dif_category'] = [
             key for key, value in diff_properties.items()
             if len(set(map(lambda elem: elem.lower(), value))) == 1
             and
             len(context['properties']) > 1
         ]
+        print(context['not_dif_category'])
 
         for product in context['properties']:
             product['dif_properties'] = [
@@ -422,16 +408,15 @@ class ProductsCompareView(ListView):
                 if properties['property_name'] not in context['not_dif_category']
             ]
 
-        # print(context['not_dif_category'])
-        # for product in context['properties']:
-        #     print(product['dif_properties'])
+        for product in context['properties']:
+            if (len(product['dif_properties']) == len(product['property']) or len(product['dif_properties']) == 0) \
+                    and \
+                    len(context['properties']) != 1:
+                product['diff_category'] = True
+                context['diff_category'] = True
+            else:
+                product['diff_category'] = False
 
-        # for product in context['properties']:
-        #     print(product)
-        #     if len(product['dif_properties']) == len(product['property_name']) and len(context['properties']) != 1:
-        #         product['diff_category'] = True
-        #     else:
-        #         context['diff_category'] = False
         return context
 
 

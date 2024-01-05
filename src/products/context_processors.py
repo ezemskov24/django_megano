@@ -45,10 +45,3 @@ def header_menu(request):
         'search_form': SearchForm(),
         'active_discounts': active_discounts,
     }
-
-
-def product_compare_list_amt(request):
-    compare_list_amt = get_compare_list_amt(request)
-    return {
-        'compare_amt': compare_list_amt,
-    }
