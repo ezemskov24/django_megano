@@ -105,7 +105,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     @admin.display(description='Avg disc price', empty_value=0)
     def avg_disc_price(self, obj: models.Product) -> int:
-        return obj.average_discounted_price
+        return obj.discounted_average_price
 
     def delete_queryset(self, request: HttpRequest, queryset: QuerySet):
         queryset.update(archived=True)

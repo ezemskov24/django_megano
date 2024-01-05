@@ -10,6 +10,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.timezone import now
 
+from .services import product_utils
 from .validators import validate_not_subcategory
 
 
@@ -83,74 +84,25 @@ class Product(models.Model):
         """ Получение абсолютной ссылки на продукт. """
         return reverse('products:product_details', kwargs={'slug': self.slug})
 
-    def _get_discount(self):
-        product_disount = self.product_discounts.filter(
-            Q(start=None) | Q(start__lte=now()),
-            active=True,
-            end__gte=now(),
-        ).order_by('weight').first()
-
-        category_discount = self.category.category_discounts.filter(
-            Q(start=None) | Q(start__lte=now()),
-            active=True,
-            end__gte=now(),
-        ).order_by('weight').first()
-
-        if product_disount and category_discount:
-            if category_discount.weight > product_disount.weight:
-                return category_discount
-            else:
-                return product_disount
-        else:
-            return product_disount or category_discount
-
     @property
     def average_price(self) -> Decimal:
         """ Средняя цена продукта. """
-        avg_price = self.sellers.aggregate(
-            avg=Avg('sellerproduct__price')
-        ).get('avg')
-        return round(avg_price, 2) if avg_price else 0.00
+        return product_utils.get_average_price(self)
 
     @property
-    def average_discounted_price(self) -> Decimal:
+    def discounted_average_price(self) -> Decimal:
         """ Средняя цены продукта со скидкой. """
-        avg_price = self.average_price
-
-        discount = self._get_discount()
-
-        if discount:
-            return round(discount.get_discounted_price(avg_price), 2)
-        return avg_price
+        return product_utils.discounted_average_price(self)
 
     @property
     def min_price(self) -> Decimal:
         """ Минимальная цена продукта. """
-        min_price = self.sellers.aggregate(
-            min=Min('sellerproduct__price')
-        ).get('min')
-        return round(min_price, 2) if min_price else 0.00
+        return product_utils.get_min_price(self)
 
     @property
     def discounted_min_price(self) -> Decimal:
         """ Минимальная цены продукта со скидкой. """
-        min_price = self.min_price
-
-        discount = self._get_discount()
-
-        if discount:
-            return round(discount.get_discounted_price(min_price), 2)
-        return min_price
-
-    def description_short(self, length: int=100) -> str:
-        if len(self.description) <= length:
-            return self.description
-        return self.description[:length] + '...'
-
-    def name_short(self, length: int=50) -> str:
-        if len(self.name) <= length:
-            return self.name
-        return self.name[:length] + '...'
+        return product_utils.get_discounted_min_price(self)
 
     def __str__(self):
         return f'{self.name}'
