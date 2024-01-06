@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from . import models
+from .forms import ComboDiscountAdminForm, DiscountAdminForm
 
 
 @admin.register(models.ProductDiscount)
@@ -19,6 +20,8 @@ class ProductDiscountAdmin(admin.ModelAdmin):
         'slug': ('name',),
     }
 
+    form = DiscountAdminForm
+
 
 @admin.register(models.CategoryDiscount)
 class CategoryDiscountAdmin(admin.ModelAdmin):
@@ -35,6 +38,8 @@ class CategoryDiscountAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug': ('name',),
     }
+
+    form = DiscountAdminForm
 
 
 @admin.register(models.BulkDiscount)
@@ -53,6 +58,8 @@ class BulkCategoryDiscountAdmin(admin.ModelAdmin):
         'slug': ('name',),
     }
 
+    form = DiscountAdminForm
+
 
 @admin.register(models.ComboDiscount)
 class ComboDiscountAdmin(admin.ModelAdmin):
@@ -69,6 +76,8 @@ class ComboDiscountAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug': ('name',),
     }
+
+    form = ComboDiscountAdminForm
 
 
 @admin.register(models.ComboSet)
