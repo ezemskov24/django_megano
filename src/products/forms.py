@@ -1,4 +1,7 @@
 from django import forms
+from django.core.exceptions import ValidationError
+
+from .models import Category
 
 
 class FilterForm(forms.Form):
@@ -50,3 +53,24 @@ class SearchForm(forms.Form):
             },
         ),
     )
+
+
+class CategoryAdminForm(forms.ModelForm):
+    class Meta:
+        models = Category
+
+    def clean(self):
+        cleaned_data = super().clean()
+        parent_category = cleaned_data.get('parent_category')
+        pk = cleaned_data.get('pk')
+        if parent_category:
+            if parent_category.pk == pk:
+                raise ValidationError(
+                    "Can't be a subcategory of itself",
+                )
+            if parent_category.parent_category:
+                raise ValidationError(
+                    "%(parent)s is a subcategory and can't be a parent",
+                    params={'parent': parent_category},
+                )
+        return cleaned_data

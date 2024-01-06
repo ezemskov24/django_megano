@@ -1,14 +1,11 @@
-from datetime import datetime
 from decimal import Decimal
 
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Avg, Min, Q
 from django.urls import reverse
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils.timezone import now
 
 from .services import product_utils
 from .validators import validate_not_subcategory
@@ -249,18 +246,6 @@ class Category(models.Model):
     def get_absolute_url(self) -> str:
         """ Получение абсолютной ссылки на категорию. """
         return reverse('products:products-by-category', args=[self.slug])
-
-    def clean(self):
-        if self.parent_category:
-            if self.parent_category.pk == self.pk:
-                raise ValidationError(
-                    "Can't be a subcategory of itself",
-                )
-            if self.parent_category.parent_category:
-                raise ValidationError(
-                    "%(parent)s is a subcategory and can't be a parent",
-                    params={'parent': self.parent_category},
-                )
 
 
 class Property(models.Model):
