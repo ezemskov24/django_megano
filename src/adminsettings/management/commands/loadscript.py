@@ -16,7 +16,7 @@ class Command(BaseCommand):
     help = 'Run all migrations and load fixtures'
 
     def add_arguments(self, parser) -> None:
-        parser.add_argument('with_clear',
+        parser.add_argument('--with_clear',
                             type=str,
                             help='Delete only migrations files. '
                                  'Set "no_clear" for cancel deleting')

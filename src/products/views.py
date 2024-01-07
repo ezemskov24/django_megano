@@ -17,9 +17,9 @@ from .forms import FilterForm, SearchForm
 from .models import Category, Picture, Product, SellerProduct, Tag
 from .services.compare_products import (
     add_product_to_compare_list,
-    get_compare_list,
     delete_all_compare_products,
     delete_product_to_compare_list,
+    get_compare_list_amt,
     get_compare_list,
 )
 from .utils import Banner, LimitedProduct, TopSellerProduct
@@ -339,7 +339,6 @@ class ProductDetailsView(DetailView):
 
             return redirect('products:product_details', pk=kwargs['pk'])
 
-        add_product_to_compare_list(request)
         return HttpResponseRedirect(
             reverse('products:product_details',
                     kwargs={'pk': kwargs.get('pk')}
@@ -359,37 +358,45 @@ class ProductsCompareView(ListView):
         ]
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        messages.success(self.request, 'Profile details updated.')
+        # messages.success(self.request, 'Profile details updated.')
         context = super().get_context_data()
 
         if not context['object_list']:
             return context
 
-        for product in context.get('object_list'):
-            context['properties'] = [
-                {
-                    'property_name': value.property
-                }
-                for value in product.product_property_value.select_related('property')
-            ]
-
-        for property_name in context['properties']:
-            property_name['property_values'] = [
-                property_name['property_name'].category_property_value.filter(product=product)
-                for product in context.get('object_list')
-            ]
+        context['properties'] = [
+            {
+                'product': product,
+                'price': product.min_price,
+                'img': product.images.first().image.url,
+                'slug': product.slug,
+                'property': [
+                    {
+                        'property_name': value.property,
+                        'property_value': value.value,
+                    }
+                    for value in product.product_property_value.select_related('property')
+                ]
+            }
+            for product in context['object_list']
+        ]
 
         diff_properties = dict()
         for product in context['properties']:
-            for product_property in product['product_properties']:
+            for product_property in product['property']:
                 if diff_properties.get(product_property['property_name']):
                     diff_properties[product_property['property_name']].append(product_property['property_value'])
                 else:
                     diff_properties[product_property['property_name']] = [product_property['property_value']]
-
+        for key, value in diff_properties.items():
+            print(len(set(map(lambda elem: elem.lower(), value))) == 1, len(context['properties']) > 1)
         context['not_dif_category'] = [
-            key for key, value in diff_properties.items() if len(set(value)) == 1 and len(context['properties']) > 1
+            key for key, value in diff_properties.items()
+            if len(set(map(lambda elem: elem.lower(), value))) == 1
+            and
+            len(context['properties']) > 1
         ]
+        print(context['not_dif_category'])
 
         for product in context['properties']:
             product['dif_properties'] = [
@@ -397,25 +404,46 @@ class ProductsCompareView(ListView):
                     'property_name': properties['property_name'],
                     'property_value': properties['property_value'],
                 }
-                for properties in product['product_properties']
+                for properties in product['property']
                 if properties['property_name'] not in context['not_dif_category']
             ]
 
         for product in context['properties']:
-            if len(product['dif_properties']) == len(product['product_properties']) and len(context['properties']) != 1:
+            if (len(product['dif_properties']) == len(product['property']) or len(product['dif_properties']) == 0) \
+                    and \
+                    len(context['properties']) != 1:
+                product['diff_category'] = True
                 context['diff_category'] = True
             else:
-                context['diff_category'] = False
+                product['diff_category'] = False
+
         return context
 
 
 def delete_all_compare_products_view(request):
     '''функция ajax запроса для доступа к сервису сравнения'''
-    delete_all_compare_products(request)
-    return HttpResponse()
+    if request.method == 'DELETE':
+        delete_all_compare_products(request)
+        return HttpResponse()
+    return HttpResponse('Нет доступа')
 
 
-def delete_product_to_compare_list_view(request, pk):
+def delete_product_to_compare_list_view(request, slug):
     '''функция ajax запроса для доступа к сервису сравнения'''
-    delete_product_to_compare_list(request, pk)
-    return HttpResponse()
+    if request.method == 'DELETE':
+        delete_product_to_compare_list(request, slug)
+        return HttpResponse()
+    return HttpResponse('Нет доступа')
+
+
+def add_product_to_compare_list_view(request, slug):
+    if request.method == 'POST':
+        add_product_to_compare_list(request, slug)
+        return HttpResponse()
+    return HttpResponse('Нет доступа')
+
+
+def get_compare_list_amt_view(request):
+    if request.method == 'GET':
+        return HttpResponse(get_compare_list_amt(request))
+    return HttpResponse('Нет доступа')
