@@ -91,6 +91,7 @@ class BulkDiscount(Discount):
 
 
 class ComboSet(models.Model):
+    name = models.CharField(max_length=50, null=True, blank=True)
     products = models.ManyToManyField(
         Product,
         related_name='combo_discounts',
@@ -103,7 +104,7 @@ class ComboSet(models.Model):
     )
 
     def __str__(self):
-        return f'Combo set #{self.pk}'
+        return self.name if self.name else f'Combo set #{self.pk}'
 
 
 class ComboDiscount(Discount):
