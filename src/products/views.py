@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Any, Dict
 
+from django.contrib import messages
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db.models import Count, Max, Min, Sum, QuerySet
 from django.core.cache import cache
@@ -10,11 +11,8 @@ from django.urls import reverse
 from django.views.generic import TemplateView, DetailView, ListView
 from django.utils import timezone
 
-from catalog.forms import ReviewForm
-from catalog.services import get_reviews_list, add_review, get_count_review
-
 from .forms import FilterForm, SearchForm
-from .models import Category, Picture, Product, SellerProduct, Tag
+from .models import Category, Picture, Product, SellerProduct, Tag, Value
 from .services.compare_products import (
     add_product_to_compare_list,
     get_compare_list,
@@ -317,12 +315,16 @@ class ProductDetailsView(DetailView):
             reviews = Review.objects.filter(
                 product=product,
             ).order_by('-created_at')
+            properties_and_values = Value.objects.filter(
+                product=product
+            ).select_related('property')
 
             context_data = {
                 'product': product,
                 'sellers': sellers,
                 'images': images,
                 'reviews': reviews,
+                'properties_and_values': properties_and_values,
                 'reviews_list': get_reviews_list(product.pk),
                 'get_count_review': get_count_review(product.pk)
             }

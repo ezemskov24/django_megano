@@ -1,5 +1,8 @@
 from django import forms
 
+from account.models import Seller
+from products.models import SellerProduct
+
 
 class FilterForm(forms.Form):
     price = forms.CharField(
@@ -50,3 +53,19 @@ class SearchForm(forms.Form):
             },
         ),
     )
+
+
+class SellerProductForm(forms.ModelForm):
+    """
+    Форма для создания SellerProduct через админ-панель.
+    Если пользователь является superuser, то может видеть и менять любой товар.
+    Продавец видит и меняет только свои.
+    """
+    class Meta:
+        model = SellerProduct
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.request.user.is_superuser:
+            self.fields['seller'].queryset = Seller.objects.filter(profile=self.request.user)

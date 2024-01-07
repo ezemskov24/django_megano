@@ -241,6 +241,16 @@ class SellerProduct(models.Model):
         return f'{self.product} by {self.seller.name}'
 
 
+@receiver(post_save, sender=SellerProduct)
+def clear_review_cache(sender, instance, **kwargs):
+    """
+    Очистка кеша при добавлении нового товара продавцом
+    """
+    product = instance.product
+    cache_key = f'product_details_{product.pk}'
+    cache.delete(cache_key)
+
+
 class Category(models.Model):
     """
     Модель категорий товаров.

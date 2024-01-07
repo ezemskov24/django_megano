@@ -3,6 +3,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 
 from . import admin_filters, models
+from .forms import SellerProductForm
 
 
 @admin.action(description="Archive selected products")
@@ -113,7 +114,21 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(models.SellerProduct)
 class SellerProductAdminModel(admin.ModelAdmin):
-    pass
+    list_display = ['product', 'seller', 'price']
+    form = SellerProductForm
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+
+        if request.user.is_superuser:
+            return queryset
+        else:
+            return queryset.filter(seller__profile=request.user)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.request = request
+        return form
 
 
 class SubcategoryInline(admin.TabularInline):

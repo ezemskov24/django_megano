@@ -1,11 +1,11 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
-from django.views.generic import TemplateView, DetailView
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login
+from django.contrib import messages
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, CreateView, UpdateView
-from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
+from django.views.generic import TemplateView, CreateView, UpdateView, DetailView
 
 from .forms import UserRegistrationForm
 from .models import Profile
@@ -16,7 +16,6 @@ from products.models import Product
 from .models import BrowsingHistory
 
 from .forms import ProfileForm
-from django.contrib import messages
 
 from cart.services.cart_actions import merge_cart_products
 
@@ -70,8 +69,6 @@ class RegisterView(CreateView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
-
-
 
 
 def UserLoginView(request: HttpRequest) -> HttpResponse:
