@@ -1,25 +1,20 @@
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
-from django.views.generic import TemplateView, DetailView
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
-from django.contrib.auth import authenticate, login
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, CreateView, UpdateView
-from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
+from django.views.generic import CreateView, DetailView, TemplateView, UpdateView
 
-from .forms import UserRegistrationForm
-from .models import Profile
-
-from .models import Seller
+from .forms import ProfileForm, UserRegistrationForm
+from .models import BrowsingHistory, Profile, Seller
 from adminsettings.models import SiteSettings
+from cart.services.cart_actions import merge_cart_products
 from products.models import Product
 from .models import BrowsingHistory
-
-from .forms import ProfileForm
 from django.contrib import messages
 
-from cart.services.cart_actions import merge_cart_products
 
 
 class ProfileUpdateView(UpdateView):
