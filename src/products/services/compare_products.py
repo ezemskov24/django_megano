@@ -20,7 +20,7 @@ def delete_product_to_compare_list(request, slug):
 def get_compare_list(request, product_amt=max_list_amt):
     '''
     Возвращает список товаров из списка сравнения
-    (по умолчанию первые 3 товара)
+    (по умолчанию первые 4 товара)
     '''
     return request.session.get(session_key, [])[:product_amt]
 

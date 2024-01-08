@@ -12,6 +12,9 @@ from .models import BrowsingHistory, Profile, Seller
 from adminsettings.models import SiteSettings
 from cart.services.cart_actions import merge_cart_products
 from products.models import Product
+from .models import BrowsingHistory
+from django.contrib import messages
+
 
 
 class ProfileUpdateView(UpdateView):
