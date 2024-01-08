@@ -9,7 +9,7 @@ from .views import (
     delete_all_compare_products_view,
     delete_product_to_compare_list_view,
     get_compare_list_amt_view,
-    add_product_to_compare_list_view,
+    add_product_to_compare_list_view
 )
 
 app_name = "products"
@@ -17,8 +17,6 @@ app_name = "products"
 routers = DefaultRouter()
 
 urlpatterns = [
-    # path("products/", ProductsListView, name="products_list"),
-    # path("<str:slug>/", ProductDetailsView.as_view(), name="product_details"),
     path('compare/', ProductsCompareView.as_view(), name='product_compare'),
     path('compare/delete_all/', delete_all_compare_products_view, name='delete_all_compare_products'),
     path('compare/delete/<str:slug>/', delete_product_to_compare_list_view, name='delete_product_to_compare_list'),
@@ -30,11 +28,6 @@ urlpatterns = [
         'category/<slug:category>',
         CatalogView.as_view(),
         name='products-by-category'
-    ),
-    path(
-        'sale/<slug:sale>',
-        CatalogView.as_view(),
-        name='products-on-sale'
     ),
     path("<slug:slug>/", ProductDetailsView.as_view(), name="product_details"),
     path('', CatalogView.as_view(), name='catalog'),

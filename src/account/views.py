@@ -7,17 +7,11 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView, UpdateView, DetailView
 
-from .forms import UserRegistrationForm
-from .models import Profile
-
-from .models import Seller
+from .forms import ProfileForm, UserRegistrationForm
+from .models import BrowsingHistory, Profile, Seller
 from adminsettings.models import SiteSettings
-from products.models import Product
-from .models import BrowsingHistory
-
-from .forms import ProfileForm
-
 from cart.services.cart_actions import merge_cart_products
+from products.models import Product
 
 
 class ProfileUpdateView(UpdateView):
