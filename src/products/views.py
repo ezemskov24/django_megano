@@ -2,8 +2,7 @@ from typing import Any, Dict
 
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db.models import QuerySet
-from django.core.cache import cache
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import TemplateView, DetailView, ListView
@@ -92,8 +91,37 @@ class CatalogView(ListView):
 
 class ProductDetailsView(DetailView):
     template_name = "products/product-details.jinja2"
-    queryset = Product.objects.prefetch_related("images")
+    model = Product
     context_object_name = "product"
+
+    def get_context_data(self, **kwargs):
+        """
+        Получение контекстных данных для представления деталей продукта.
+        """
+
+        product = self.object
+        sellers = SellerProduct.objects.filter(
+            product=product,
+        ).select_related('seller')
+        images = Picture.objects.filter(product=product)
+        reviews = Review.objects.filter(
+            product=product,
+        ).order_by('-created_at')
+        properties_and_values = Value.objects.filter(
+            product=product
+        ).select_related('property')
+
+        context_data = {
+            'product': product,
+            'sellers': sellers,
+            'images': images,
+            'reviews': reviews,
+            'properties_and_values': properties_and_values,
+            'reviews_list': get_reviews_list(product.pk),
+            'get_count_review': get_count_review(product.pk),
+        }
+
+        return context_data
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -111,53 +139,19 @@ class ProductDetailsView(DetailView):
 
         return self.render_to_response(context_data)
 
-    def get_context_data(self, **kwargs):
-        """
-        Получение контекстных данных для представления деталей продукта.
-        """
-        cache_key = f'product_details_{self.object.pk}'
-        context_data = cache.get(cache_key)
-
-        if context_data is None:
-            product = self.object
-            sellers = SellerProduct.objects.filter(
-                product=product,
-            ).select_related('seller')
-            images = Picture.objects.filter(product=product)
-            reviews = Review.objects.filter(
-                product=product,
-            ).order_by('-created_at')
-            properties_and_values = Value.objects.filter(
-                product=product
-            ).select_related('property')
-
-            context_data = {
-                'product': product,
-                'sellers': sellers,
-                'images': images,
-                'reviews': reviews,
-                'properties_and_values': properties_and_values,
-                'reviews_list': get_reviews_list(product.pk),
-                'get_count_review': get_count_review(product.pk)
-            }
-
-            cache.set(cache_key, context_data, 60 * 60 * 24)
-
-        return context_data
-
     def post(self, request, *args, **kwargs):
-        form = ReviewForm(request.POST)
+            form = ReviewForm(request.POST)
 
-        if form.is_valid():
-            add_review(post=request.POST, user_id=request.user.id, pk=kwargs['pk'])
+            if form.is_valid():
+                add_review(post=request.POST, user_id=request.user.id, slug=kwargs['slug'])
 
-            return redirect('products:product_details', pk=kwargs['pk'])
+                return redirect('products:product_details', slug=kwargs['slug'])
 
-        return HttpResponseRedirect(
-            reverse('products:product_details',
-                    kwargs={'pk': kwargs.get('pk')}
-                    )
-        )
+            return HttpResponseRedirect(
+                reverse('products:product_details',
+                        kwargs={'slug': kwargs.get('slug')}
+                        )
+            )
 
 
 class ProductsCompareView(ListView):

@@ -5,18 +5,23 @@ from ...models import Seller
 
 
 class Command(BaseCommand):
+    PERMISSIONS = [
+        "add_sellerproduct",
+        "change_sellerproduct",
+        "delete_sellerproduct",
+    ]
+
     def handle(self, *args, **options):
         group, crated = Group.objects.get_or_create(
             name="Sellers"
         )
-        permission_change_sellerproduct, created = Permission.objects.get_or_create(
-            codename="change_sellerproduct"
-        )
-        permission_add_sellerproduct, created = Permission.objects.get_or_create(
-            codename="add_sellerproduct"
-        )
-        group.permissions.add(permission_change_sellerproduct)
-        group.permissions.add(permission_add_sellerproduct)
+
+        for codename in self.PERMISSIONS:
+            permission, created = Permission.objects.get_or_create(
+                codename=codename
+            )
+            group.permissions.add(permission)
+
         group.save()
 
         for seller in Seller.objects.all():
