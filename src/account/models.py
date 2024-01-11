@@ -60,16 +60,3 @@ class Seller(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name}"
-
-
-@receiver(post_save, sender=Seller)
-def add_seller_to_stuff_group(sender, instance, created, **kwargs):
-    """
-    Сигнал для добавления новых продавцов в группу Sellers
-    и присвоения им статуса is_stuff
-    """
-    if created:
-        seller_group, created = Group.objects.get_or_create(name='Sellers')
-        instance.profile.groups.add(seller_group)
-        instance.profile.is_staff = True
-        instance.profile.save()

@@ -99,7 +99,8 @@ class ProductDetailsView(DetailView):
             'images',
             'sellerproduct_set__seller',
             'reviews',
-            'reviews__author'
+            'reviews__author',
+            'product_property_value__property'
         )
 
     def get_context_data(self, **kwargs):
@@ -107,6 +108,7 @@ class ProductDetailsView(DetailView):
 
         context_data['images'] = self.object.images.all()
         context_data['seller_products'] = self.object.sellerproduct_set.all()
+        context_data['properties'] = self.object.product_property_value.all()
         context_data['reviews'] = self.object.reviews.all()
         context_data['get_count_review'] = get_count_review(self.object.pk)
 
