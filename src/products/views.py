@@ -11,7 +11,6 @@ from django.views.generic import TemplateView, DetailView, ListView
 from django.utils import timezone
 
 from catalog.forms import ReviewForm
-from catalog.services import get_reviews_list, add_review, get_count_review
 
 from .models import Picture, Product, SellerProduct
 from .services.catalog_queryset import CatalogQuerySetProcessor
@@ -22,7 +21,7 @@ from .services.compare_products import (
     get_compare_list_amt,
     get_compare_list,
 )
-from .utils import Banner, LimitedProduct, TopSellerProduct
+from .services.banners import Banner, LimitedProduct, TopSellerProduct
 from account.models import BrowsingHistory
 from catalog.forms import ReviewForm
 from catalog.models import Review
