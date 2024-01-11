@@ -37,7 +37,7 @@
                                 <div class="ProductCard-info">
                                     <div class="ProductCard-cost">
                                         <div class="ProductCard-price">
-                                        ${{ sellers|map(attribute='price')|min }}
+                                        ${{ seller_products|map(attribute='price')|min }}
                                         </div>
                                     </div>
                                 </div>
@@ -140,7 +140,7 @@
 
                             <div class="Tabs-block" id="sellers">
                                 <div class="Section-content">
-                                {% for seller in sellers %}
+                                {% for seller in seller_products %}
                                     <div class="Orders">
                                         <div class="Order Order_anons">
 

@@ -90,36 +90,25 @@ class CatalogView(ListView):
 
 
 class ProductDetailsView(DetailView):
-    template_name = "products/product-details.jinja2"
     model = Product
+    template_name = "products/product-details.jinja2"
     context_object_name = "product"
 
+    def get_queryset(self):
+        return Product.objects.prefetch_related(
+            'images',
+            'sellerproduct_set__seller',
+            'reviews',
+            'reviews__author'
+        )
+
     def get_context_data(self, **kwargs):
-        """
-        Получение контекстных данных для представления деталей продукта.
-        """
+        context_data = super().get_context_data(**kwargs)
 
-        product = self.object
-        sellers = SellerProduct.objects.filter(
-            product=product,
-        ).select_related('seller')
-        images = Picture.objects.filter(product=product)
-        reviews = Review.objects.filter(
-            product=product,
-        ).order_by('-created_at')
-        properties_and_values = Value.objects.filter(
-            product=product
-        ).select_related('property')
-
-        context_data = {
-            'product': product,
-            'sellers': sellers,
-            'images': images,
-            'reviews': reviews,
-            'properties_and_values': properties_and_values,
-            'reviews_list': get_reviews_list(product.pk),
-            'get_count_review': get_count_review(product.pk),
-        }
+        context_data['images'] = self.object.images.all()
+        context_data['seller_products'] = self.object.sellerproduct_set.all()
+        context_data['reviews'] = self.object.reviews.all()
+        context_data['get_count_review'] = get_count_review(self.object.pk)
 
         return context_data
 
