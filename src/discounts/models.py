@@ -1,10 +1,8 @@
-import decimal
-
-from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, Q
+from django.urls import reverse
 from django.utils.timezone import now
 
+from .services.discount_utils import DiscountTypeEnum, get_discounted_price
 from products.models import Category, Product
 
 
@@ -38,11 +36,7 @@ class Discount(models.Model):
 
     discount_type = models.CharField(
         max_length=20,
-        choices=[
-            ('PRCNT', 'Percentage'),
-            ('FXVAL', 'Fixed value'),
-            ('PRC', 'Set price'),
-        ],
+        choices=DiscountTypeEnum.choices,
     )
     value = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -61,46 +55,17 @@ class Discount(models.Model):
             models.Index(fields=['slug'])
         ]
 
-    def clean(self, *args, **kwargs):
-        super().clean()
-        msg = None
-        if not self.discount_type or not self.value:
-            return
-
-        if self.discount_type == 'PRCNT':
-            if not 1 <= self.value <= 100:
-                msg = 'Discount value must be from 1 to 100 %'
-        elif self.value < 0.01:
-            if self.discount_type == 'FXVAL':
-                msg = f'Discount value can\'t be less than {self.MIN_VALUE}'
-            else:
-                msg = f'New price can\'t be less that {self.MIN_VALUE}'
-        if msg:
-            raise ValidationError({'value': msg})
+    def get_absolute_url(self):
+        return reverse(
+            'discounts:products-on-sale',
+            kwargs={'sale': self.slug},
+        )
 
     def get_discounted_price(self, price):
-        if self.discount_type == 'PRCNT':
-            return round(price * (100 - self.value) * decimal.Decimal(0.01), 2)
-        elif self.discount_type == 'FXVAL':
-            return max(price - self.value, self.MIN_VALUE)
-        else:
-            return self.value
+        return get_discounted_price(self, price)
 
     def __str__(self):
         return self.name
-
-    @classmethod
-    def get_active_count(cls):
-        count = 0
-        for subclass in cls.__subclasses__():
-            query = subclass.objects.aggregate(
-                active_count=Count(
-                    'active',
-                    filter=Q(active=True)
-                )
-            )
-            count += query['active_count']
-        return count
 
 
 class ProductDiscount(Discount):
@@ -121,8 +86,12 @@ class BulkDiscount(Discount):
     product_amount = models.PositiveIntegerField()
     total_sum = models.DecimalField(max_digits=10, decimal_places=2)
 
+    def get_absolute_url(self):
+        return reverse('products:catalog')
+
 
 class ComboSet(models.Model):
+    name = models.CharField(max_length=50, null=True, blank=True)
     products = models.ManyToManyField(
         Product,
         related_name='combo_discounts',
@@ -135,7 +104,7 @@ class ComboSet(models.Model):
     )
 
     def __str__(self):
-        return f'Combo set #{self.pk}'
+        return self.name if self.name else f'Combo set #{self.pk}'
 
 
 class ComboDiscount(Discount):
@@ -149,9 +118,3 @@ class ComboDiscount(Discount):
         on_delete=models.CASCADE,
         related_name='discounts_2',
     )
-
-    def clean(self, *args, **kwargs):
-        super().clean()
-
-        if self.set_1 == self.set_2:
-            raise ValidationError('Sets 1 and 2 can\'t be thee same set')

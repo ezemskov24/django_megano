@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_jinja',
     'django_cleanup.apps.CleanupConfig',
     'rest_framework',
+    'django_filters',
 
     'account.apps.AccountConfig',
     'adminsettings.apps.AdminsettingsConfig',
@@ -86,7 +87,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'products.context_processors.header_menu',
-                'products.context_processors.product_compare_list_amt',
             ],
         },
     },
@@ -164,7 +164,7 @@ else:
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# LOGIN_REDIRECT_URL = reverse_lazy("account:profile")
+LOGIN_REDIRECT_URL = reverse_lazy("account:profile")
 LOGIN_URL = reverse_lazy("account:login")
 
 # Default primary key field type

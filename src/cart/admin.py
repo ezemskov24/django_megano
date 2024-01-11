@@ -2,6 +2,17 @@ from django.contrib import admin
 
 from cart.models import Order, Cart
 
+from . import models
+
+
+@admin.register(models.Cart)
+class PropertyValueAdmin(admin.ModelAdmin):
+
+    list_display = [
+        'product_seller',
+        'count',
+    ]
+
 
 # class OrderInLine(admin.TabularInline):
 #     model = Order

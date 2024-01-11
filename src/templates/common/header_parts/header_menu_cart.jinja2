@@ -15,13 +15,7 @@
             <li class="menu-item">
                 <a class="menu-link" href="{{ url('products:product_compare') }}">
                     Сравнение
-                    <span class="CartBlock-amount">
-                        {% if compare_amt %}
-                            {{ compare_amt }}
-                        {% else %}
-                            0
-                        {% endif %}
-                    </span>
+                    <span class="CartBlock-amount" style="display: none" id='compare_amt'></span>
                 </a>
             </li>
         </ul>
@@ -43,27 +37,15 @@
                 </div>
             </div>
         {% endif %}
-        <a class="CartBlock-block" href="#">
+        <a class="CartBlock-block" href="{{ url('cart:cart_view') }}">
             <img class="CartBlock-img"
                  src="{{ static('assets/img/icons/cart.svg') }}"
                  alt="Корзина" />
-            <span class="CartBlock-amount">
-                {% if cart %}
-                    {{ cart.get_total_items }}
-                {% else %}
-                    0
-                {% endif %}
-            </span>
+            <span class="CartBlock-amount" id="cart_amt_header"></span>
         </a>
-        <div class="CartBlock-block">
-            <span class="CartBlock-price">
-                {% if cart %}
-                    {{ cart.get_total_price }}
-                {% else %}
-                    0.00
-                {% endif %}$
-            </span>
-        </div>
+{#        <div class="CartBlock-block">#}
+{#            <span class="CartBlock-price" id="cart_total_price"></span>#}
+{#        </div>#}
     </div>
 </div>
 <div class="row-block Header-trigger">

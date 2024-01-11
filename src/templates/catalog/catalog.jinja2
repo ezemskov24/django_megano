@@ -138,7 +138,7 @@ Sort-sortBy_dec
                                 </strong>
                                 <div class="Card-description">
                                     <div class="Card-cost">
-                                        {% with regular_price = product.average_price, discounted_price = product.average_discounted_price %}
+                                        {% with regular_price = product.average_price, discounted_price = product.discounted_average_price %}
                                         {% if regular_price != discounted_price %}
                                             <span class="Card-priceOld">${{ regular_price }}</span>
                                         {% endif %}
@@ -149,7 +149,7 @@ Sort-sortBy_dec
                                         {{ product.category.full_name }}
                                     </div>
                                     <div class="Card-hover">
-                                        <a class="Card-btn" href="{{ product.get_absolute_url() }}">
+                                        <a class="Card-btn" onclick="add_to_cart('{{ product.pk }}')">
                                             <img src="{{ static('assets/img/icons/card/cart.svg') }}" alt="cart.svg" />
                                         </a>
                                     </div>
