@@ -31,32 +31,16 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'registration/profile.jinja2'
     success_url = reverse_lazy('account:profile')
 
-    # def form_valid(self, form):
-    #     response = super().form_valid(form)
-    #     messages.success(self.request, "Данные успешно обновлены.")
-    #     return response
-
     def form_valid(self, form):
         response = super().form_valid(form)
 
         password1 = form.cleaned_data.get('new_password1')
         password2 = form.cleaned_data.get('new_password2')
-        # print('password_view = ', password, '!')
-        # # password2 = form.cleaned_data.get('password2')
 
         if password1 and password1 == password2:
             self.object.set_password(password1)
-            # self.object.save()
-        # if password:
-        #     print('пароль предоставлен!')
-        #     self.object.set_password(password)
-        #     self.object.save()
-        # else:
-        #     print('пароль not предоставлен!')
-        #
+
         messages.success(self.request, "Данные успешно обновлены.")
-        # else:
-        #     raise messages.error(self.request, "Ошибка обновления данных.")
         if self.object.save():
             print("Данные успешно обновлены.")
             messages.success(self.request, "Данные успешно обновлены.")
