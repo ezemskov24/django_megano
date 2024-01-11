@@ -76,7 +76,8 @@ class CartView(ListView):
                     'name': product_seller[0].product.name,
                     'price': product_seller[0].price,
                     'count': product_seller[1],
-                    'desc': product_seller[0].product.description_short()
+                    'desc': product_seller[0].product.description_short(),
+                    'max_product_amt': product_seller[0].count,
                 }
                 for product_seller in context['object_list']
             ]
@@ -90,7 +91,8 @@ class CartView(ListView):
                     'name': cart_product.product_seller.product.name,
                     'price': cart_product.product_seller.price,
                     'count': cart_product.count,
-                    'desc': cart_product.product_seller.product.description_short()
+                    'desc': cart_product.product_seller.product.description_short(),
+                    'max_product_amt': cart_product.product_seller.count,
                 }
                 for cart_product in context['object_list']
             ]

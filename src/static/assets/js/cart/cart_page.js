@@ -32,11 +32,13 @@ async function remove_product(pk, auth) {
     get_total_price(auth)
 }
 
-async function changing_product_amt(pk, term, auth) {
+async function changing_product_amt(pk, term, max_value, auth) {
     let value = Number(document.getElementById('input_'+pk).value) + term
     if (value === 0) {
         remove_product(pk, auth)
         return
+    } else if (value >= Number(max_value)) {
+        document.getElementById('input_'+pk).value = max_value - 1
     }
     await fetch('http://127.0.0.1:8000/cart/api/cart/'+ pk +'/', {
         method: 'PATCH',
@@ -50,10 +52,11 @@ async function changing_product_amt(pk, term, auth) {
             return response.json()
         })
         .then((data) => {
+            let product_price = 0
             if (auth === 'True') {
-                var product_price = data.count * data.product_seller.price
+                product_price = data.count * data.product_seller.price
             } else {
-                var product_price = data.count * data.price
+                product_price = data.count * data.price
             }
             document.getElementById('product_price_'+ pk).innerHTML = parseFloat(product_price).toFixed(2) + '$'
             get_total_price(auth)
