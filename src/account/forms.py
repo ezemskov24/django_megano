@@ -17,25 +17,6 @@ class ProfileForm(forms.ModelForm): #, SetPasswordForm
     new_password1 = forms.CharField(widget=forms.PasswordInput(), required=False)
     new_password2 = forms.CharField(widget=forms.PasswordInput(), required=False)
 
-    # def clean_password(self):
-    #     print('password_form = ', self.cleaned_data['new_password1'], '!')
-    #     new_password1 = self.cleaned_data['new_password1']
-    #     new_password2 = self.cleaned_data['new_password1']
-    #     if new_password1:
-    #         if len(new_password1) < 6:
-    #             raise forms.ValidationError('Пароль должен содержать не менее 6 символов.')
-    #     return new_password1, new_password2
-
-    # def clean_password(self):
-    #     password = self.cleaned_data['new_password1']
-    #     print('password_form = ', password, '!')
-    #     if password:
-    #         if len(password) < 6:
-    #             raise forms.ValidationError('Пароль должен содержать не менее 6 символов.')
-    #     else:
-    #         raise forms.ValidationError('Пароль должен содержать не менее 6 символов.')
-    #     return password
-
     def clean_phone(self):
         phone = self.cleaned_data['phone'][2:]
         cleaned_phone = re.sub(r'\D', '', phone[1:])
@@ -45,16 +26,5 @@ class ProfileForm(forms.ModelForm): #, SetPasswordForm
 
     class Meta:
         model = Profile
-        fields = ['phone', 'avatar', 'username', 'new_password1', 'new_password2']    #, 'password1', 'new_password2']    # , 'password'
+        fields = ['phone', 'avatar', 'username', 'new_password1', 'new_password2']    
 
-
-
-# class ChangePasswordForm(UserChangeForm):
-#     new_password = forms.CharField(label='New Password', widget=forms.PasswordInput)
-#
-#     def save(self, commit=True):
-#         user = super().save(commit=False)
-#         user.set_password(self.cleaned_data['new_password'])
-#         if commit:
-#             user.save()
-#         return user
