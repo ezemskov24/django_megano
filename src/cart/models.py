@@ -41,6 +41,7 @@ class Order(models.Model):
     phone = models.CharField(max_length=10, blank=True, null=True)
     email = models.EmailField(null=False, blank=False)
     cart = models.ForeignKey(Cart, on_delete=models.DO_NOTHING, related_name='order')
+    city = models.CharField(max_length=255, null=False, blank=False)
     delivery_address = models.CharField(max_length=255, null=False, blank=False)
     delivery_type = models.CharField(default='обычная доставка', max_length=20)
     payment_type = models.CharField(max_length=40)

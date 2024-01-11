@@ -1,17 +1,16 @@
 from django.http import HttpResponse, HttpRequest
-from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy, reverse
 from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import CreateOrderForm
-from .models import Order
+from .models import Order, Cart
 
 
-class CreateOrderView(View):
-    # model = Order
-    # template_name = 'cart/create_order.jinja2'
-    # fields = 'fio', 'phone', 'email', 'cart', 'delivery_address', 'delivery_type', 'payment_type', 'comment'
-    # success_url = reverse_lazy("account:account")
+class CreateOrderView(LoginRequiredMixin, View):
+    # login_url = reverse_lazy("account:login")
+    # redirect_field_name = reverse_lazy("cart:create_order")
 
     def get(self, request: HttpRequest) -> HttpResponse:
         if request.user.is_authenticated:
@@ -27,14 +26,17 @@ class CreateOrderView(View):
                 fio = request.user.username
 
             content = {
-                'form': CreateOrderForm(),
+                'form': CreateOrderForm,
                 'user_fio': fio,
                 'user_phone': request.user.phone,
                 'user_email': request.user.email,
+                'carts': Cart.objects.all(),
             }
         else:
             content = {}
 
+        print('============', content)
         return render(request, 'cart/create_order.jinja2', context=content)
 
-
+    # def post(self, request, *args, **kwargs):
+    #     print('============', request.POST)

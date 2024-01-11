@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView
 from django.http import HttpRequest, HttpResponse
@@ -71,6 +72,7 @@ class RegisterView(CreateView):
 
 def UserLoginView(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
+        # print('+++++', request.POST)
         if request.user.is_authenticated:
             return redirect('/account/profile/')
 
