@@ -16,22 +16,30 @@
       <div class="clear"></div>
       <form action="{{ request.path }}" method="post">
           {% csrf_token %}
-{#        {{ form.as_p() }}#}
             <div>
-                <input class="user-input" type="text" name="email" id="name" placeholder="E-mail" required />
+                <input class="user-input" type="text" name="username" id="id_username" placeholder="E-mail" required />
             </div>
             <div>
-
-                <input type="password" name="pass" id="name" placeholder="*********" required />
+                <input type="password" name="password" id="id_password" placeholder="*********" />
             </div>
             <div>
                 <input type="submit" value="Войти" />
             </div>
+            <div>
+                <input type="hidden" name="next" value="{{ next }}" />
+            </div>
             <a class="forgot-label" href="../e-mail">Забыли пароль?</a>
-{#            <a class="registr" href="registr.jinja2">#}
             <a class="registr" href="../registr">
                 Регистрация
             </a>
+
+          {% if form.errors %}
+            <div style="color: red">
+            <p>Неверное имя пользователя либо пароль.</p>
+{#              {{ form.errors }}#}
+            </div>
+          {% endif %}
+
       </form>
     </div>
 {% endblock %}
