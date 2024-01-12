@@ -1,0 +1,33 @@
+<div class="Section-column">
+    <div class="Section-columnSection">
+        <header class="Section-header">
+            <strong class="Section-title">Навигация
+            </strong>
+        </header>
+        <div class="Section-columnContent">
+            <div class="NavigateProfile">
+                <ul class="menu menu_vt">
+                    <li class="menu-item">
+                      <a class="menu-link" href="{{ url('account:account') }}">Личный кабинет</a>
+                    </li>
+                    <li class="menu-item_ACTIVE menu-item">
+                      <a class="menu-link" href="{{ url('account:profile') }}">Профиль</a>
+                    </li>
+                    <li class="menu-item">
+{#                                      <a class="menu-link" href="../historyorder.jinja2">История заказов</a>#}
+                      <a class="menu-link" href="{{ url('account:historyorder') }}">История заказов</a>
+                    </li>
+                    <li class="menu-item">
+{#                                      <a class="menu-link" href="browsing-history">История просмотров</a>#}
+                      <a class="menu-link" href="{{ url('account:browsing_history') }}">История просмотров</a>
+                    </li>
+                    <li class="menu-item">
+{#                                      <a class="menu-link" href="browsing-history">История просмотров</a>#}
+                      <a class="menu-link" href="{{ url('account:logout') }}">Выход</a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

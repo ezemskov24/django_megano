@@ -1,13 +1,8 @@
-from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
-from django.views.generic import TemplateView, DetailView
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, LoginView
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
     DetailView,

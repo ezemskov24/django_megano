@@ -12,7 +12,7 @@ class UserRegistrationForm(UserCreationForm):
         fields = ['email', 'password1', 'password2', 'username']
 
 
-class ProfileForm(forms.ModelForm): #, SetPasswordForm
+class ProfileForm(forms.ModelForm):
     phone = forms.CharField(max_length=17, required=False)
     new_password1 = forms.CharField(widget=forms.PasswordInput(), required=False)
     new_password2 = forms.CharField(widget=forms.PasswordInput(), required=False)
