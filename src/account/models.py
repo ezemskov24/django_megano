@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.urls import reverse
 
 from products.models import Product, SellerProduct
 
@@ -17,6 +18,21 @@ class Profile(AbstractUser):
     # Заменяем поле имени пользователя на электронную почту для аутентификации
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']  # 'username' требуется по умолчанию
+
+
+class BrowsingHistory(models.Model):
+    """
+    Модель истории просмотра товаров пользователем
+    """
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def get_absolute_url(self) -> str:
+        """
+        Получение абсолютной ссылки на продукт.
+        """
+        return reverse('products:product_details', kwargs={'slug': self.product.slug})
 
 
 class Seller(models.Model):

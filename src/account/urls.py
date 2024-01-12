@@ -29,7 +29,7 @@ urlpatterns = [
     path('profile/', ProfileUpdateView.as_view(), name='profile'),
     path('historyorder/', HistoryOrderView.as_view(), name='historyorder'),
     path(
-        'profile/browsing-history',
+        'browsing-history',
         UserBrowsingHistoryView.as_view(),
         name='browsing_history',
     ),

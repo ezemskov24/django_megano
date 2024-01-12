@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.core.cache import cache
+from django.db.models import Count, Q
 
+from .forms import SearchForm
 from .models import Category
 from .utils import CacheableContextCategory
-
 from .services.compare_products import get_compare_list_amt
-
+from discounts.models import Discount
 
 CATEGORIES_KEY = 'header_menu_categories'
 
@@ -23,7 +24,20 @@ class MenuCategory(CacheableContextCategory):
                               ).all()]
 
 
-def categories(request):
+def get_active_discounts_count():
+    count = 0
+    for subclass in Discount.__subclasses__():
+        query = subclass.objects.aggregate(
+            active_count=Count(
+                'active',
+                filter=Q(active=True)
+            )
+        )
+        count += query['active_count']
+    return count
+
+
+def header_menu(request):
     menu_categories = cache.get(CATEGORIES_KEY)
 
     if not menu_categories:
@@ -38,13 +52,10 @@ def categories(request):
 
         cache.set(CATEGORIES_KEY, menu_categories)
 
+    active_discounts = get_active_discounts_count()
+
     return {
         'categories': menu_categories,
-    }
-
-
-def product_compare_list_amt(request):
-    compare_list_amt = get_compare_list_amt(request)
-    return {
-        'compare_amt': compare_list_amt,
+        'search_form': SearchForm(),
+        'active_discounts': active_discounts,
     }

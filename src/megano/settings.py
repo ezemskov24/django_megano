@@ -41,14 +41,16 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'django_jinja',
     'django_cleanup.apps.CleanupConfig',
+    'rest_framework',
+    'django_filters',
 
     'account.apps.AccountConfig',
     'adminsettings.apps.AdminsettingsConfig',
     'payments.apps.PaymentsConfig',
     'products.apps.ProductsConfig',
     'catalog.apps.CatalogConfig',
-
-    # 'django.contrib.messages',
+    'discounts.apps.DiscountsConfig',
+    'cart.apps.CardConfig'
 ]
 
 MIDDLEWARE = [
@@ -82,8 +84,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'products.context_processors.categories',
-                'products.context_processors.product_compare_list_amt',
+                'products.context_processors.header_menu',
             ],
         },
     },
@@ -97,7 +98,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'products.context_processors.categories',
+                'products.context_processors.header_menu',
             ],
         },
     },
@@ -174,6 +175,12 @@ CACHES = {
         "LOCATION": "/var/tmp/django_cache",
         "TIMEOUT": 600,
     }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
 }
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'

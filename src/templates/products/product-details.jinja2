@@ -1,8 +1,11 @@
 {% extends 'base.jinja2' %}
-{% include 'common/header_full.jinja2' %}
 
 {% block title %}
     {{ product.name }}
+{% endblock %}
+
+{% block header %}
+    {% include 'common/header_full.jinja2' %}
 {% endblock %}
 
 {% block content %}
@@ -57,10 +60,13 @@
                                     </div>
                                 </div>
                                 <div class="ProductCard-cartElement">
-                                    <a class="btn btn_primary" href="#modal_open">
+                                    <a class="btn btn_primary" href="#modal_open" onclick="add_to_cart('{{ product.pk }}')">
                                         <img class="btn-icon" src="{{ static('assets/img/icons/card/cart_white.svg') }}" alt="cart_white.svg" />
                                         <span class="btn-content">Купить</span>
                                     </a>
+                                    <button type="submit" class="btn Compare-btn" onclick="add_to_compare('{{ product.slug }}')">
+                                        <img class="btn_icon" src="{{ static('assets/img/icons/link.svg') }}" alt="link.svg">
+                                    </button>
                                 </div>
                                 <div id="modal_open" class="my_modal">
                                     <div class="my_modal-dialog">
@@ -145,7 +151,7 @@
                                                                 {{ seller.seller.name }}
                                                             </a>
                                                             <div class="ProductCard-cartElement" style="margin-top: 10px;">
-                                                                <a class="btn btn_primary" href="#modal_open">
+                                                                <a class="btn btn_primary" href="#modal_open" onclick="add_to_cart('{{ product.pk }}', '{{ seller.seller.pk }}')">
                                                                     <img class="btn-icon" src="{{ static('assets/img/icons/card/cart_white.svg') }}" alt="cart_white.svg" />
                                                                     <span class="btn-content">Купить</span>
                                                                 </a>
@@ -182,22 +188,12 @@
 
                             <div class="Tabs-block" id="addit">
                                 <div class="Product-props">
-                                    <div class="Product-prop">
-                                        <strong>Производитель
-                                        </strong><span> {{ product.manufacturer }}</span>
-                                    </div>
-                                    <div class="Product-prop">
-                                        <strong>ipsum
-                                        </strong><span> Lorem ipsum dolor sit</span>
-                                    </div>
-                                    <div class="Product-prop">
-                                        <strong>dolor sit
-                                        </strong><span> 5 ans</span>
-                                    </div>
-                                    <div class="Product-prop">
-                                        <strong>psum dolo
-                                        </strong><span> 2–3 jours</span>
-                                    </div>
+                                    {% for property_value in properties_and_values %}
+                                        <div class="Product-prop">
+                                            <strong>{{ property_value.property.name }}
+                                            </strong><span> {{ property_value.value }}</span>
+                                        </div>
+                                    {% endfor %}
                                 </div>
                             </div>
                             <div class="Tabs-block" id="reviews">
@@ -265,4 +261,5 @@
             </div>
         </div>
     </div>
+<script src='{{ static('assets/js/compare/add_to_compare.js') }}'></script>
 {% endblock %}
