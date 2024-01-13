@@ -37,7 +37,7 @@
                                 <div class="ProductCard-info">
                                     <div class="ProductCard-cost">
                                         <div class="ProductCard-price">
-                                        ${{ seller_products|map(attribute='price')|min }}
+                                        ${{ product.min_price }}
                                         </div>
                                     </div>
                                 </div>
@@ -142,12 +142,18 @@
                                 <div class="Section-content">
                                 {% for seller in seller_products %}
                                     <div class="Orders">
-                                        <div class="Order Order_anons">
+                                        <div class="Order Order_anons"
+                                            style="margin-bottom:
+                                                {% if not loop.last %}
+                                                    40px
+                                                {% else %}
+                                                    0
+                                                {% endif %};">
 
                                                 <div class="Order-personal">
                                                     <div class="row">
                                                         <div class="row-block">
-                                                            <a class="Order-title" href="oneorder.html">
+                                                            <a class="Order-title" href="#">
                                                                 {{ seller.seller.name }}
                                                             </a>
                                                             <div class="ProductCard-cartElement" style="margin-top: 10px;">

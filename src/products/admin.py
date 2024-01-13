@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.db.models import QuerySet
+from django import forms
 from django.http import HttpRequest
 
 from . import admin_filters, models
-from .forms import SellerProductForm
 
 
 @admin.action(description="Archive selected products")
@@ -115,7 +115,6 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(models.SellerProduct)
 class SellerProductAdminModel(admin.ModelAdmin):
     list_display = ['product', 'seller', 'price']
-    form = SellerProductForm
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -127,7 +126,9 @@ class SellerProductAdminModel(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
-        form.request = request
+        if not request.user.is_superuser:
+            form.base_fields['seller'].widget = forms.HiddenInput()
+            form.base_fields['seller'].initial = request.user.seller_set.first()
         return form
 
 

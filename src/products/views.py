@@ -1,14 +1,15 @@
 from typing import Any, Dict
 
+from django.core.cache import cache
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db.models import QuerySet
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import TemplateView, DetailView, ListView
 from django.utils import timezone
 
-from .models import Picture, Product, SellerProduct, Value
+from .models import Product
 from .services.catalog_queryset import CatalogQuerySetProcessor
 from .services.compare_products import (
     add_product_to_compare_list,
@@ -20,8 +21,7 @@ from .services.compare_products import (
 from .utils import Banner, LimitedProduct, TopSellerProduct
 from account.models import BrowsingHistory
 from catalog.forms import ReviewForm
-from catalog.models import Review
-from catalog.services import get_reviews_list, add_review, get_count_review
+from catalog.services import add_review, get_count_review
 
 
 class IndexView(TemplateView):
@@ -95,13 +95,19 @@ class ProductDetailsView(DetailView):
     context_object_name = "product"
 
     def get_queryset(self):
-        return Product.objects.prefetch_related(
-            'images',
-            'sellerproduct_set__seller',
-            'reviews',
-            'reviews__author',
-            'product_property_value__property'
-        )
+        slug = self.kwargs.get('slug')
+        cache_key = f'product_details_{slug}'
+        queryset = cache.get(cache_key)
+
+        if queryset is None:
+            queryset = Product.objects.prefetch_related(
+                'images',
+                'sellerproduct_set__seller',
+                'product_property_value__property'
+            )
+            cache.set(cache_key, queryset, 60 * 60 * 24)
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)

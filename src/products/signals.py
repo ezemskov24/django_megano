@@ -15,9 +15,9 @@ def clear_product_cache(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=SellerProduct)
-def clear_review_cache(sender, instance, **kwargs):
+def clear_sellerproduct_cache(sender, instance, **kwargs):
     """
-    Очистка кеша при добавлении нового товара продавцом
+    Очистка кеша при добавлении/изменении товара продавцом
     """
     product = instance.product
     cache_key = f'product_details_{product.pk}'

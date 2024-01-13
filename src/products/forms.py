@@ -1,8 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Category, SellerProduct
-from account.models import Seller
+from .models import Category
 
 
 class FilterForm(forms.Form):
@@ -75,19 +74,3 @@ class CategoryAdminForm(forms.ModelForm):
                     params={'parent': parent_category},
                 )
         return cleaned_data
-
-
-class SellerProductForm(forms.ModelForm):
-    """
-    Форма для создания SellerProduct через админ-панель.
-    Если пользователь является superuser, то может видеть и менять любой товар.
-    Продавец видит и меняет только свои.
-    """
-    class Meta:
-        model = SellerProduct
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if not self.request.user.is_superuser:
-            self.fields['seller'].queryset = Seller.objects.filter(profile=self.request.user)
