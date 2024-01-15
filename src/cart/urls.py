@@ -5,21 +5,22 @@ from .views import (
     CartView,
     CartApiViewSet,
     SellerApiViewSet,
+    CreateOrderView,
+    OrderListView,
+    OrderDetailView,
 )
-
-
-from .views import CreateOrderView
 
 app_name = "cart"
 
 router = DefaultRouter()
 router.register(r'cart', CartApiViewSet, basename='cart_api')
 router.register(r'product-seller', SellerApiViewSet, basename='product_seller_api')
-print(DefaultRouter.routes)
 
 urlpatterns = [
     path('', CartView.as_view(), name='cart_view'),
     path('api/', include(router.urls)),
+    path('order_list/', OrderListView.as_view(), name='order_list'),
+    path('order_detail/<int:pk>/', OrderDetailView.as_view(), name='order_detail'),
     path('create_order/', CreateOrderView.as_view(), name='create_order'),
 ]
 

@@ -1,53 +1,89 @@
 from django.db.models import F
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.core.exceptions import ValidationError
 
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
+from account.models import Profile
 from cart.serializer import CartSerializer, ProductSellerSerializer, CartPostSerializer
 
 from products.models import SellerProduct
-from cart.models import Cart
 from django.http import HttpResponse, HttpRequest
-from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy, reverse
 from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import CreateOrderForm
-from .models import Order
+from .models import Order, Cart
+from .services.order_create import get_total_price, get_fio
 
 
-class CreateOrderView(View):
-    # model = Order
-    # template_name = 'cart/create_order.jinja2'
-    # fields = 'fio', 'phone', 'email', 'cart', 'delivery_address', 'delivery_type', 'payment_type', 'comment'
-    # success_url = reverse_lazy("account:account")
+class OrderListView(ListView):
+    template_name = "cart/order-list.jinja2"
+    context_object_name = "orders"
+
+    def get_queryset(self):
+        queryset = Order.objects.filter(archived=False).order_by('-created_at')
+        return queryset
+
+
+class OrderDetailView(DetailView):
+    template_name = "cart/order-details.jinja2"
+    queryset = Order.objects.prefetch_related("cart")
+    context_object_name = "order"
+
+
+class CreateOrderView(LoginRequiredMixin, View):
+    """
+    View-класс для создания заказов.
+    """
+    # login_url = reverse_lazy("account:login")
+    # redirect_field_name = reverse_lazy("cart:create_order")
 
     def get(self, request: HttpRequest) -> HttpResponse:
         if request.user.is_authenticated:
-            last_name = request.user.last_name
-            first_name = request.user.first_name
-            if last_name and first_name:
-                fio = f"{last_name} {first_name}"
-            elif last_name:
-                fio = last_name
-            elif first_name:
-                fio = first_name
-            else:
-                fio = request.user.username
+            fio = get_fio(request.user.last_name, request.user.first_name, request.user.username)
 
+            carts = Cart.objects.filter(profile=request.user.id)
             content = {
                 'form': CreateOrderForm(),
                 'user_fio': fio,
                 'user_phone': request.user.phone,
                 'user_email': request.user.email,
+                'carts': carts,
+                'total_price': get_total_price(carts),
             }
         else:
             content = {}
 
         return render(request, 'cart/create_order.jinja2', context=content)
+
+    def post(self, request, *args, **kwargs):
+        form = CreateOrderForm(request.POST)
+        if form.is_valid:
+            order = Order.objects.create(
+                profile=Profile.objects.get(id=request.user.id),
+                fio=request.POST['fio'],
+                phone=request.POST['phone'],
+                email=request.POST['mail'],
+                city=request.POST['city'],
+                delivery_address=request.POST['delivery_address'],
+                delivery_type=request.POST['delivery_type'],
+                payment_type=request.POST['payment_type'],
+                comment=request.POST['comment'],
+                total_price=request.POST['total_price'],
+            )
+            order.cart.set(Cart.objects.filter(profile=request.user.id))
+
+            order.save()
+
+        else:
+            redirect('cart:create_order')
+
+        return redirect('cart:order_list')
 
 
 class CartView(ListView):
