@@ -89,40 +89,29 @@ class UserLoginView(LoginView):
     form_class = AuthenticationForm
     template_name = 'registration/login.jinja2'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = self.get_form()
-        return context
 
-
-
-# Logout
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('account:login')
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        print(context['form'].as_p())
-        return context
 
 
-# @login_required(login_url='login')
+
 class UserProfileView(LoginRequiredMixin, TemplateView):
-    login_url = '/account/login/'
+    login_url = reverse_lazy('account:login')
     template_name = 'registration/profile.jinja2'
 
 
 class UserAccountView(LoginRequiredMixin, TemplateView):
-    login_url = '/account/login/'
+    login_url = reverse_lazy('account:login')
     template_name = 'registration/account.jinja2'
 
 
 class HistoryOrderView(LoginRequiredMixin, TemplateView):
-    login_url = '/account/login/'
+    login_url = reverse_lazy('account:login')
     template_name = 'registration/historyorder.jinja2'
+
 
 class UserEmailView(TemplateView):
     template_name = 'registration/e-mail.jinja2'
-    # template_name = 'registration/e-mail.jinja2'
 
 
 class SellerDetailView(DetailView):
