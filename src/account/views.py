@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, LoginView
 from django.urls import reverse_lazy
@@ -9,7 +10,8 @@ from django.views.generic import (
     UpdateView,
 )
 
-from .forms import UserRegistrationForm
+from adminsettings.models import SiteSettings
+from .forms import UserRegistrationForm, ProfileForm
 from .models import Profile, Seller
 from products.models import Product
 from .models import BrowsingHistory
