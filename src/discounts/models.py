@@ -2,7 +2,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils.timezone import now
 
-from .services.discount_utils import DiscountTypeEnum, get_discounted_price
 from products.models import Category, Product
 
 
@@ -21,6 +20,12 @@ def discount_images_directory_path(
         pk=instance.pk,
         filename=filename,
     )
+
+
+class DiscountTypeEnum(models.TextChoices):
+    PERCENTAGE = 'PRCNT', 'Percentage'
+    FIXED_VALUE = 'FXVAL', 'Fixed value'
+    SET_PRICE = 'PRC', 'Set price'
 
 
 class Discount(models.Model):
@@ -61,9 +66,6 @@ class Discount(models.Model):
             kwargs={'sale': self.slug},
         )
 
-    def get_discounted_price(self, price):
-        return get_discounted_price(self, price)
-
     def __str__(self):
         return self.name
 
@@ -85,6 +87,7 @@ class CategoryDiscount(Discount):
 class BulkDiscount(Discount):
     product_amount = models.PositiveIntegerField()
     total_sum = models.DecimalField(max_digits=10, decimal_places=2)
+    only_unique = models.BooleanField(default=True)
 
     def get_absolute_url(self):
         return reverse('products:catalog')

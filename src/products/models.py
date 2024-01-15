@@ -97,6 +97,11 @@ class Product(models.Model):
         """ Минимальная цены продукта со скидкой. """
         return product_utils.get_discounted_min_price(self)
 
+    @property
+    def max_price(self) -> Decimal:
+        """ Максимальная цена продукта. """
+        return product_utils.get_max_price(self)
+
     def __str__(self):
         return f'{self.name}'
 

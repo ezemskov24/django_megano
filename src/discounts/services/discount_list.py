@@ -8,7 +8,7 @@ from discounts.models import (
 )
 
 
-def get_discounts() -> List[Any]:
+def get_all_current_discounts() -> List[Any]:
     discounts = []
 
     discounts.extend(ProductDiscount.current.all())
