@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.db.models import QuerySet
+from django import forms
 from django.http import HttpRequest
 
 from . import admin_filters, models
@@ -113,7 +114,22 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(models.SellerProduct)
 class SellerProductAdminModel(admin.ModelAdmin):
-    pass
+    list_display = ['product', 'seller', 'price']
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+
+        if request.user.is_superuser:
+            return queryset
+        else:
+            return queryset.filter(seller__profile=request.user)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if not request.user.is_superuser:
+            form.base_fields['seller'].widget = forms.HiddenInput()
+            form.base_fields['seller'].initial = request.user.seller_set.first()
+        return form
 
 
 class SubcategoryInline(admin.TabularInline):

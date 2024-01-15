@@ -1,11 +1,7 @@
 from decimal import Decimal
 
-from django.core.cache import cache
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 from .services import product_utils
 from .validators import validate_not_subcategory
@@ -108,15 +104,6 @@ class Product(models.Model):
 
     def __str__(self):
         return f'{self.name}'
-
-
-@receiver(post_save, sender=Product)
-def clear_product_cache(sender, instance, **kwargs):
-    """
-    Очистка кеша модели Product при изменении товара в БД.
-    """
-    cache_key = f'product_details_{instance.pk}'
-    cache.delete(cache_key)
 
 
 def product_images_directory_path(
