@@ -1,8 +1,7 @@
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, LoginView
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
     DetailView,
@@ -11,15 +10,14 @@ from django.views.generic import (
 )
 
 from .forms import UserRegistrationForm
-from .models import BrowsingHistory, Profile, Seller
-from adminsettings.models import SiteSettings
+from .models import Profile, Seller
 from products.models import Product
-
-from .forms import ProfileForm
+from .models import BrowsingHistory
 from django.contrib import messages
 
 
-class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+
+class ProfileUpdateView(UpdateView):
     model = Profile
     form_class = ProfileForm
     template_name = 'registration/profile.jinja2'

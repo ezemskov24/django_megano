@@ -28,7 +28,7 @@ def add_review(*args, **kwargs):
         review = Review.objects.create(
             text=form.cleaned_data['text'],
             author=Profile.objects.get(pk=kwargs['user_id']),
-            product=Product.objects.get(pk=kwargs['pk']),
+            product=Product.objects.get(slug=kwargs['slug']),
         )
 
     context = {

@@ -1,20 +1,23 @@
+import datetime
 import random
 
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Count, Min, Q
 
-from .models import Category, Product
+from products.models import Category, Product
 
 
 FIXED_KEY = 'index_banners_fixed'
 SLIDER_KEY = 'index_banners_slider'
 TOP_SELLERS_KEY = 'index_top_sellers'
 LIMITED_OFFERS_KEY = 'index_limited_offer'
+TIMED_LIMITED_OFFER_KEY = 'index_timed_limited_offer'
 
 
 class CacheableContextProduct:
     def __init__(self, product: Product):
+        self.pk = product.pk
         self.name = product.name
         self.absolute_url = product.get_absolute_url()
         image = product.images.all()[0].image
@@ -128,7 +131,10 @@ class LimitedProduct(ProductPreviewCard):
     @staticmethod
     def get_limited_offers(amount=16):
         limited_offers = cache.get(LIMITED_OFFERS_KEY)
-        if not limited_offers:
+        timed_limited_offer = cache.get(TIMED_LIMITED_OFFER_KEY)
+
+        result = {}
+        if not limited_offers or not timed_limited_offer:
             products = Product.objects.annotate(
                 seller_count=Count('sellerproduct')
             ).filter(
@@ -136,11 +142,44 @@ class LimitedProduct(ProductPreviewCard):
                 category__is_active=True,
                 seller_count__gt=0,
                 limited=True,
-            ).select_related(
-                'category',
-            ).prefetch_related('images').all()[:amount]
-            limited_offers = [LimitedProduct(product)
-                              for product in products]
-            cache.set(LIMITED_OFFERS_KEY, limited_offers)
+            )
+            if timed_limited_offer and not limited_offers:
+                products = products.exclude(pk=timed_limited_offer.pk)
 
-        return limited_offers
+            products = products.select_related(
+                'category',
+            ).prefetch_related('images').all()
+
+            products = list(products)
+
+            if not timed_limited_offer and products:
+                product = random.choice(products)
+                products.remove(product)
+                timed_limited_offer = LimitedProduct(product)
+                cache.set(TIMED_LIMITED_OFFER_KEY, timed_limited_offer)
+
+            if products:
+                if len(products) > amount:
+                    products = random.choices(products, k=amount)
+                limited_offers = [LimitedProduct(product)
+                                  for product in products]
+                now = datetime.datetime.now()
+                midnight = datetime.datetime.combine(
+                    now + datetime.timedelta(days=1),
+                    datetime.time(),
+                )
+                seconds_until_midnight = (midnight - now).seconds
+                cache.set(
+                    LIMITED_OFFERS_KEY,
+                    limited_offers,
+                    timeout=seconds_until_midnight,
+                )
+
+        if limited_offers:
+            result['regular'] = limited_offers
+        if timed_limited_offer:
+            today = datetime.date.today()
+            end_time = today + datetime.timedelta(days=2)
+            timed_limited_offer.end_time = end_time
+            result['timed'] = timed_limited_offer
+        return result
