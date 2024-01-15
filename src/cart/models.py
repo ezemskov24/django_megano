@@ -40,7 +40,7 @@ class Order(models.Model):
     fio = models.CharField(max_length=255, null=False, blank=False)
     phone = models.CharField(max_length=10, blank=True, null=True)
     email = models.EmailField(null=False, blank=False)
-    cart = models.ForeignKey(Cart, on_delete=models.DO_NOTHING, related_name='order')
+    cart = models.ManyToManyField(Cart, related_name='order', null=False, blank=True)
     city = models.CharField(max_length=255, null=False, blank=False)
     delivery_address = models.CharField(max_length=255, null=False, blank=False)
     delivery_type = models.CharField(default='обычная доставка', max_length=20)

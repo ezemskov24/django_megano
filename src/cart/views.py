@@ -6,10 +6,10 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
+from account.models import Profile
 from cart.serializer import CartSerializer, ProductSellerSerializer, CartPostSerializer
 
 from products.models import SellerProduct
-from cart.models import Cart
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
@@ -18,40 +18,56 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import CreateOrderForm
 from .models import Order, Cart
+from .services.order_create import get_total_price, get_fio
 
 
 class CreateOrderView(LoginRequiredMixin, View):
+    """
+    View-класс для создания заказов.
+    """
     # login_url = reverse_lazy("account:login")
     # redirect_field_name = reverse_lazy("cart:create_order")
 
     def get(self, request: HttpRequest) -> HttpResponse:
         if request.user.is_authenticated:
-            last_name = request.user.last_name
-            first_name = request.user.first_name
-            if last_name and first_name:
-                fio = f"{last_name} {first_name}"
-            elif last_name:
-                fio = last_name
-            elif first_name:
-                fio = first_name
-            else:
-                fio = request.user.username
+            fio = get_fio(request.user.last_name, request.user.first_name, request.user.username)
 
+            carts = Cart.objects.filter(profile=request.user.id)
             content = {
-                'form': CreateOrderForm,
+                'form': CreateOrderForm(),
                 'user_fio': fio,
                 'user_phone': request.user.phone,
                 'user_email': request.user.email,
-                'carts': Cart.objects.all(),
+                'carts': carts,
+                'total_price': get_total_price(carts),
             }
         else:
             content = {}
 
-        print('============', content)
         return render(request, 'cart/create_order.jinja2', context=content)
 
-    # def post(self, request, *args, **kwargs):
-    #     print('============', request.POST)
+    def post(self, request, *args, **kwargs):
+        form = CreateOrderForm(request.POST)
+        if form.is_valid:
+            order = Order.objects.create(
+                profile=Profile.objects.get(id=request.user.id),
+                fio=request.POST['fio'],
+                phone=request.POST['phone'],
+                email=request.POST['mail'],
+                city=request.POST['city'],
+                delivery_address=request.POST['delivery_address'],
+                delivery_type=request.POST['delivery_type'],
+                payment_type=request.POST['payment_type'],
+                comment=request.POST['comment'],
+            )
+            order.cart.set(Cart.objects.filter(profile=request.user.id))
+
+            order.save()
+
+        else:
+            redirect('cart:create_order')
+
+        return redirect('cart:cart_view')
 
 
 class CartView(ListView):

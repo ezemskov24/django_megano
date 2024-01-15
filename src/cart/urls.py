@@ -15,7 +15,6 @@ app_name = "cart"
 router = DefaultRouter()
 router.register(r'cart', CartApiViewSet, basename='cart_api')
 router.register(r'product-seller', SellerApiViewSet, basename='product_seller_api')
-print(DefaultRouter.routes)
 
 urlpatterns = [
     path('', CartView.as_view(), name='cart_view'),
