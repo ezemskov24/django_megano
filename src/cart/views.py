@@ -1,5 +1,5 @@
 from django.db.models import F
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.core.exceptions import ValidationError
 
 from rest_framework.response import Response
@@ -19,6 +19,21 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import CreateOrderForm
 from .models import Order, Cart
 from .services.order_create import get_total_price, get_fio
+
+
+class OrderListView(ListView):
+    template_name = "cart/order-list.jinja2"
+    context_object_name = "orders"
+
+    def get_queryset(self):
+        queryset = Order.objects.filter(archived=False).order_by('-created_at')
+        return queryset
+
+
+class OrderDetailView(DetailView):
+    template_name = "cart/order-details.jinja2"
+    queryset = Order.objects.prefetch_related("cart")
+    context_object_name = "order"
 
 
 class CreateOrderView(LoginRequiredMixin, View):
@@ -59,6 +74,7 @@ class CreateOrderView(LoginRequiredMixin, View):
                 delivery_type=request.POST['delivery_type'],
                 payment_type=request.POST['payment_type'],
                 comment=request.POST['comment'],
+                total_price=request.POST['total_price'],
             )
             order.cart.set(Cart.objects.filter(profile=request.user.id))
 
@@ -67,7 +83,7 @@ class CreateOrderView(LoginRequiredMixin, View):
         else:
             redirect('cart:create_order')
 
-        return redirect('cart:cart_view')
+        return redirect('cart:order_list')
 
 
 class CartView(ListView):

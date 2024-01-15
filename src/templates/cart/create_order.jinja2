@@ -207,9 +207,10 @@
                                     {% endfor %}
                                     <div class="Cart-total">
                                         <div class="Cart-block Cart-block_total">
-                                            <strong class="Cart-title">Итого:
-                                            </strong><span class="Cart-price">${{ total_price }}</span>
+                                            <strong class="Cart-title">Итого:</strong>
+                                            <span class="Cart-price">${{ total_price }}</span>
                                         </div>
+                                        <input type="number" name="total_price" value="{{ total_price }}" hidden>
                                         <div class="Cart-block">
                                             <button class="btn btn_primary btn_lg" type="submit">Оплатить
                                             </button>
