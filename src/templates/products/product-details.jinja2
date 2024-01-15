@@ -37,7 +37,7 @@
                                 <div class="ProductCard-info">
                                     <div class="ProductCard-cost">
                                         <div class="ProductCard-price">
-                                        ${{ sellers|map(attribute='price')|min }}
+                                        ${{ product.min_price }}
                                         </div>
                                     </div>
                                 </div>
@@ -140,14 +140,20 @@
 
                             <div class="Tabs-block" id="sellers">
                                 <div class="Section-content">
-                                {% for seller in sellers %}
+                                {% for seller in seller_products %}
                                     <div class="Orders">
-                                        <div class="Order Order_anons">
+                                        <div class="Order Order_anons"
+                                            style="margin-bottom:
+                                                {% if not loop.last %}
+                                                    40px
+                                                {% else %}
+                                                    0
+                                                {% endif %};">
 
                                                 <div class="Order-personal">
                                                     <div class="row">
                                                         <div class="row-block">
-                                                            <a class="Order-title" href="oneorder.html">
+                                                            <a class="Order-title" href="#">
                                                                 {{ seller.seller.name }}
                                                             </a>
                                                             <div class="ProductCard-cartElement" style="margin-top: 10px;">
@@ -188,7 +194,7 @@
 
                             <div class="Tabs-block" id="addit">
                                 <div class="Product-props">
-                                    {% for property_value in properties_and_values %}
+                                    {% for property_value in properties %}
                                         <div class="Product-prop">
                                             <strong>{{ property_value.property.name }}
                                             </strong><span> {{ property_value.value }}</span>

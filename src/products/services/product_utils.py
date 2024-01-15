@@ -1,30 +1,6 @@
 from decimal import Decimal
 
-from django.db.models import Avg, Q, Min
-from django.utils.timezone import now
-
-
-def _get_discount(product: 'Product'):
-    """ Получение действующей на продукт скидки. """
-    product_disount = product.product_discounts.filter(
-        Q(start=None) | Q(start__lte=now()),
-        active=True,
-        end__gte=now(),
-    ).order_by('weight').first()
-
-    category_discount = product.category.category_discounts.filter(
-        Q(start=None) | Q(start__lte=now()),
-        active=True,
-        end__gte=now(),
-    ).order_by('weight').first()
-
-    if product_disount and category_discount:
-        if category_discount.weight > product_disount.weight:
-            return category_discount
-        else:
-            return product_disount
-    else:
-        return product_disount or category_discount
+from django.db.models import Avg, Max, Min
 
 
 def get_average_price(product: 'Product') -> Decimal:
@@ -37,13 +13,10 @@ def get_average_price(product: 'Product') -> Decimal:
 
 def discounted_average_price(product: 'Product') -> Decimal:
     """ Средняя цены продукта со скидкой. """
+    from discounts.services.discount_utils import get_discounted_price_for_product
     avg_price = get_average_price(product)
 
-    discount = _get_discount(product)
-
-    if discount:
-        return round(discount.get_discounted_price(avg_price), 2)
-    return avg_price
+    return round(get_discounted_price_for_product(product, avg_price), 2)
 
 
 def get_min_price(product: 'Product') -> Decimal:
@@ -56,10 +29,15 @@ def get_min_price(product: 'Product') -> Decimal:
 
 def get_discounted_min_price(product: 'Product') -> Decimal:
     """ Минимальная цены продукта со скидкой. """
-    min_price = product.min_price
+    from discounts.services.discount_utils import get_discounted_price_for_product
+    min_price = get_min_price(product)
 
-    discount = _get_discount(product)
+    return round(get_discounted_price_for_product(product, min_price), 2)
 
-    if discount:
-        return round(discount.get_discounted_price(min_price), 2)
-    return min_price
+
+def get_max_price(product: 'Product') -> Decimal:
+    """ Максимальнаяцена продукта. """
+    min_price = product.sellers.aggregate(
+        max=Max('sellerproduct__price')
+    ).get('max')
+    return round(min_price, 2) if min_price else 0.00

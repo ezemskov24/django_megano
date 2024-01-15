@@ -4,8 +4,7 @@ from django.db.models import Count, Q
 
 from .forms import SearchForm
 from .models import Category
-from .utils import CacheableContextCategory
-from .services.compare_products import get_compare_list_amt
+from .services.banners import CacheableContextCategory
 from discounts.models import Discount
 
 CATEGORIES_KEY = 'header_menu_categories'
