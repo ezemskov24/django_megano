@@ -26,5 +26,5 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ['phone', 'avatar', 'username', 'new_password1', 'new_password2']    
+        fields = ['phone', 'avatar', 'username', 'new_password1', 'new_password2']
 

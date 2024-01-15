@@ -1,8 +1,8 @@
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import authenticate, login, update_session_auth_hash
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, LoginView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     CreateView,
     DetailView,
@@ -10,7 +10,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from .forms import ProfileForm, UserRegistrationForm
+from .forms import UserRegistrationForm
 from .models import BrowsingHistory, Profile, Seller
 from adminsettings.models import SiteSettings
 from products.models import Product
@@ -20,7 +20,6 @@ from django.contrib import messages
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
-    login_url = '/account/login/'
     model = Profile
     form_class = ProfileForm
     template_name = 'registration/profile.jinja2'
@@ -37,7 +36,6 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
 
         messages.success(self.request, "Данные успешно обновлены.")
         if self.object.save():
-            print("Данные успешно обновлены.")
             messages.success(self.request, "Данные успешно обновлены.")
         return response
 
@@ -94,20 +92,12 @@ class UserLogoutView(LogoutView):
     next_page = reverse_lazy('account:login')
 
 
-
-class UserProfileView(LoginRequiredMixin, TemplateView):
-    login_url = reverse_lazy('account:login')
+class UserProfileView(TemplateView):
     template_name = 'registration/profile.jinja2'
 
 
-class UserAccountView(LoginRequiredMixin, TemplateView):
-    login_url = reverse_lazy('account:login')
+class UserAccountView(TemplateView):
     template_name = 'registration/account.jinja2'
-
-
-class HistoryOrderView(LoginRequiredMixin, TemplateView):
-    login_url = reverse_lazy('account:login')
-    template_name = 'registration/historyorder.jinja2'
 
 
 class UserEmailView(TemplateView):
@@ -127,6 +117,11 @@ class SellerDetailView(DetailView):
         )
 
         return context
+
+
+class HistoryOrderView(LoginRequiredMixin, TemplateView):
+    template_name = 'registration/historyorder.jinja2'
+    login_url = 'account:login'
 
 
 class UserBrowsingHistoryView(LoginRequiredMixin, TemplateView):

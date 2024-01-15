@@ -12,15 +12,14 @@
     <div class="Middle Middle_top">
         <div class="Section Section_column Section_columnLeft">
             <div class="wrap">
-                {% include 'navigation/navigation.jinja2' %}
-
+               {% include 'navigation/navigation.jinja2' %}
                 <div class="Section-content">
                     <div class="Account">
                         <div class="Account-group">
                             <div class="Account-column" style="display: flex">
                                 <div class="Account-avatar">
                                   {% if user.avatar %}
-                                    <img src='/media/{{ user.avatar }}' alt="card.jpg" style="background-size: contain"/>
+                                    <img src='{{ user.avatar }}' alt="card.jpg" style="background-size: contain"/>
                                   {% else %}
                                     <img src='/static/assets/img/icons/blankphoto.jpg' alt="card.jpg" style="background-size: contain"/>
                                   {% endif %}
