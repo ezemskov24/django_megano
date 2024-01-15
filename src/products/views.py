@@ -180,6 +180,7 @@ class ProductsCompareView(ListView):
 
         context['properties'] = [
             {
+                'pk': product.pk,
                 'product': product,
                 'price': product.min_price,
                 'img': product.images.first().image.url,
