@@ -29,11 +29,6 @@ class PictureInline(admin.StackedInline):
     extra = 1
 
 
-class SellerInline(admin.TabularInline):
-    model = models.SellerProduct
-    extra = 1
-
-
 @admin.register(models.Value)
 class PropertyValueAdmin(admin.ModelAdmin):
 
@@ -67,7 +62,7 @@ class ProductAdmin(admin.ModelAdmin):
         mark_archived,
         mark_unarchived
     ]
-    inlines = [PictureInline, SellerInline]
+    inlines = [PictureInline]
     list_display = [
         'name',
         'category',
@@ -164,13 +159,3 @@ class CategoryAdmin(admin.ModelAdmin):
             )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-
-@admin.register(models.Tag)
-class TagAdmin(admin.ModelAdmin):
-    list_display = [
-        'name',
-        'slug',
-    ]
-    prepopulated_fields = {
-        'slug': ('name',),
-    }

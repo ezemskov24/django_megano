@@ -1,7 +1,7 @@
 from enum import Enum
 
 from django.contrib import admin
-from django.db.models import Avg, Min
+from django.db.models import Avg, Min, Count
 
 
 class Prices(Enum):

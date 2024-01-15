@@ -23,14 +23,14 @@ new JustValidate('.contacts__form', {
     // }
   },
   messages: {
-    name: {
-      required: 'Как вас зовут?',
-    },
+      // name: {
+      //   required: 'Как вас зовут?',
+      // },
     tel: {
       required: 'Укажите ваш телефон',
     },
-    mail: {
-      required: 'Укажите ваш e-mail'
-    }
+    // mail: {
+    //   required: 'Укажите ваш e-mail'
+    // }
   }
 })

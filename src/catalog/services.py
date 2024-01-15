@@ -1,6 +1,6 @@
+from account.models import Profile
 from .forms import ReviewForm
 from .models import Review
-from account.models import Profile
 from products.models import Product
 
 
