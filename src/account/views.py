@@ -1,20 +1,22 @@
-from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect, render
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
+from django.contrib.auth.views import LogoutView, LoginView
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, CreateView, UpdateView, DetailView
+from django.views.generic import (
+    CreateView,
+    DetailView,
+    TemplateView,
+    UpdateView,
+)
 
-from .forms import ProfileForm, UserRegistrationForm
-from .models import BrowsingHistory, Profile, Seller
 from adminsettings.models import SiteSettings
-from cart.services.cart_actions import merge_cart_products
+from .forms import UserRegistrationForm, ProfileForm
+from .models import Profile, Seller
 from products.models import Product
+from .models import BrowsingHistory
+from django.contrib import messages
+
 
 
 class ProfileUpdateView(UpdateView):
@@ -25,7 +27,16 @@ class ProfileUpdateView(UpdateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
+
+        password1 = form.cleaned_data.get('new_password1')
+        password2 = form.cleaned_data.get('new_password2')
+
+        if password1 and password1 == password2:
+            self.object.set_password(password1)
+
         messages.success(self.request, "Данные успешно обновлены.")
+        if self.object.save():
+            messages.success(self.request, "Данные успешно обновлены.")
         return response
 
     def form_invalid(self, form):
@@ -45,6 +56,10 @@ class RegisterView(CreateView):
     def form_valid(self, form):
         form.save()
         response = super().form_valid(form)
+
+        if form.cleaned_data['password1'] != form.cleaned_data['password2']:
+            messages.error(self.request, 'Пароли не совпадают.')
+            return self.render_to_response(self.get_context_data(form=form))
 
         username = form.cleaned_data.get('email')
         password = form.cleaned_data.get('password1')
@@ -68,34 +83,13 @@ class RegisterView(CreateView):
             return self.form_invalid(form)
 
 
-def UserLoginView(request: HttpRequest) -> HttpResponse:
-    if request.method == "GET":
-        # print('+++++', request.POST)
-        if request.user.is_authenticated:
-            return redirect('/account/profile/')
-
-        return render(request, 'registration/login.jinja2')
-
-    email = request.POST.get('email')
-    password = request.POST.get('pass')
-
-    user = authenticate(request, email=email, password=password)
-    if user is not None:
-        merge_cart_products(user, request.session.get('cart'))
-        login(request, user)
-        return redirect('/account/profile/')
-
-    return render(request, 'registration/login.jinja2', {'error': 'Неверный логин или пароль'})
+class UserLoginView(LoginView):
+    form_class = AuthenticationForm
+    template_name = 'registration/login.jinja2'
 
 
-# Logout
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('account:login')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        print(context['form'].as_p())
-        return context
 
 
 class UserProfileView(TemplateView):
@@ -108,7 +102,6 @@ class UserAccountView(TemplateView):
 
 class UserEmailView(TemplateView):
     template_name = 'registration/e-mail.jinja2'
-    # template_name = 'registration/e-mail.jinja2'
 
 
 class SellerDetailView(DetailView):
@@ -124,6 +117,11 @@ class SellerDetailView(DetailView):
         )
 
         return context
+
+
+class HistoryOrderView(LoginRequiredMixin, TemplateView):
+    template_name = 'registration/historyorder.jinja2'
+    login_url = 'account:login'
 
 
 class UserBrowsingHistoryView(LoginRequiredMixin, TemplateView):

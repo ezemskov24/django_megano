@@ -6,25 +6,20 @@
     <div class="Tabs-block" id="reviews" style="">
         <header class="Section-header">
             <h3 class="Section-title">
-                {{ get_count_review.1 }}
+                {{ count_review }}
             </h3>
         </header>
         <div class="Comments">
             {% for review in reviews %}
                 <div class="Comment">
                     <div class="Comment-column Comment-column_pict">
-                        {% if review.author.avatar %}
-                            <img src="{{ review.author.avatar.url }}" alt="Avatar" class="Comment-avatar-image">
-                        {% else %}
-                        <div class="Comment-avatar">
-                        </div>
-                        {% endif %}
+                        <img class="Comment-avatar" src="{{ review.author.avatar }}" alt="аватар автора">
                     </div>
                     <div class="Comment-column">
                         <header class="Comment-header">
                             <div>
                                 <strong class="Comment-title">
-                                    {{ review.author.first_name + ' ' + review.author.last_name }}
+                                    {{ review.author.username }}
                                 </strong>
                                 <span class="Comment-date">
                                     {{ review.created_at.strftime('%d %B %Y / %H:%M') }}
