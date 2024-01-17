@@ -7,3 +7,4 @@ class ProductsConfig(AppConfig):
 
     def ready(self):
         from products import signals
+        from megano import celery

@@ -187,3 +187,9 @@ REST_FRAMEWORK = {
 }
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
+
+IMPORT_DIR = BASE_DIR / 'imports'
+IMPORT_PENDING_DIR = IMPORT_DIR / 'pending'
+IMPORT_SUCCESS_DIR = IMPORT_DIR / 'success'
+IMPORT_FAILURE_DIR = IMPORT_DIR / 'failure'
