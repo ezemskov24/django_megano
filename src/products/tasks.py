@@ -2,7 +2,7 @@ import json
 import io
 from os import path, PathLike
 import shutil
-from typing import Union, IO, Dict
+from typing import Union, Dict
 import zipfile
 
 from celery import shared_task
@@ -15,7 +15,7 @@ from products.models import Category, Product, Picture
 
 
 @shared_task
-def import_products(file: Union[str, PathLike[str], IO[bytes]]):
+def import_products(file: Union[str, PathLike[str], bytes]):
     original_path = None
     target_path = None
     filename = None
@@ -23,6 +23,10 @@ def import_products(file: Union[str, PathLike[str], IO[bytes]]):
         if path.exists(file) and path.isfile(file):
             original_path = file
             filename = path.basename(file)
+    elif isinstance(file, bytes):
+        file = io.BytesIO(file)
+    else:
+        return
 
     try:
         archive = zipfile.ZipFile(file)
@@ -31,7 +35,6 @@ def import_products(file: Union[str, PathLike[str], IO[bytes]]):
             print('There are corrupted files in the archive')
             return
 
-        print(archive.filename)
         file_names = _get_file_names_from_archive(archive)
 
         if not file_names.get('json'):
@@ -40,15 +43,17 @@ def import_products(file: Union[str, PathLike[str], IO[bytes]]):
 
         _add_products_from_archive_to_database(archive, file_names)
 
-        success_dir = settings.IMPORT_SUCCESS_DIR
-        target_path = success_dir.joinpath(filename)
+        if original_path and filename:
+            success_dir = settings.IMPORT_SUCCESS_DIR
+            target_path = success_dir.joinpath(filename)
 
     except Exception as e:
         print(f'{type(e)}: {e}')
-        failure_dir = settings.IMPORT_FAILURE_DIR
-        target_path = failure_dir.joinpath(filename)
+        if original_path and filename:
+            failure_dir = settings.IMPORT_FAILURE_DIR
+            target_path = failure_dir.joinpath(filename)
     finally:
-        if original_path:
+        if original_path and target_path:
             shutil.move(original_path, target_path)
 
 

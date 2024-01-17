@@ -2,8 +2,13 @@ from django.contrib import admin
 from django.db.models import QuerySet
 from django import forms
 from django.http import HttpRequest
+from django.shortcuts import redirect, render
+from django.urls import path
 
 from . import admin_filters, models
+from .forms import ProductsImportForm
+from .views import ProductImportFormView
+from .tasks import import_products
 
 
 @admin.action(description="Archive selected products")
@@ -62,6 +67,7 @@ class ProductAdmin(admin.ModelAdmin):
         mark_archived,
         mark_unarchived
     ]
+    change_list_template = 'admin/product_change_list.html'
     inlines = [PictureInline]
     list_display = [
         'name',
@@ -86,6 +92,17 @@ class ProductAdmin(admin.ModelAdmin):
     }
     readonly_fields = ['count_sells']
     search_fields = ['name']
+
+    def get_urls(self):
+        urls = super().get_urls()
+        new_urls = [
+            path(
+                'import-products/',
+                ProductImportFormView.as_view(),
+                name='import_products',
+            ),
+        ]
+        return new_urls + urls
 
     @admin.display(description='Sellers')
     def sellers_amount(self, obj: models.Product) -> int:
