@@ -18,8 +18,9 @@
         <div class="Middle-top">
             <div class="wrap">
                 <div class="Middle-header">
-                    <h1 class="Middle-title">Заказ №{{ order.pk }}
-                    </h1>
+                    <a href="{{ url('cart:order_list') }}">
+                        <h1 class="Middle-title">Заказ №{{ order.pk }}</h1>
+                    </a>
                 </div>
             </div>
         </div>
@@ -75,12 +76,12 @@
                                             <div class="Order-infoContent">Не оплачен
                                             </div>
                                         </div>
-{#                                        <div class="Order-info Order-info_error">#}
-{#                                            <div class="Order-infoType">Оплата не прошла:#}
-{#                                            </div>#}
-{#                                            <div class="Order-infoContent">Оплата не выполнена#}
-{#                                            </div>#}
-{#                                        </div>#}
+                                        <div class="Order-info Order-info_error">
+                                            <div class="Order-infoType">Оплата не прошла:
+                                            </div>
+                                            <div class="Order-infoContent">Оплата не выполнена
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

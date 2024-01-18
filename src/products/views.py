@@ -142,18 +142,18 @@ class ProductDetailsView(DetailView):
         return self.render_to_response(context_data)
 
     def post(self, request, *args, **kwargs):
-            form = ReviewForm(request.POST)
+        form = ReviewForm(request.POST)
 
-            if form.is_valid():
-                add_review(post=request.POST, user_id=request.user.id, slug=kwargs['slug'])
+        if form.is_valid():
+            add_review(text=request.POST['text'], user_id=request.user.id, slug=kwargs['slug'])
 
-                return redirect('products:product_details', slug=kwargs['slug'])
+            return redirect('products:product_details', slug=kwargs['slug'])
 
-            return HttpResponseRedirect(
-                reverse('products:product_details',
-                        kwargs={'slug': kwargs.get('slug')}
-                        )
-            )
+        return HttpResponseRedirect(
+            reverse('products:product_details',
+                    kwargs={'slug': kwargs.get('slug')}
+                    )
+        )
 
 
 class ProductsCompareView(ListView):
