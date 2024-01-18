@@ -23,16 +23,14 @@ def add_review(*args, **kwargs):
             - review_template: название шаблона добавления отзыва к товару для имрорта в шаблон страницы товара;
             - form: форма для добавления отзыва.
     """
-    form = ReviewForm(kwargs['post'])
-    if form.is_valid():
-        review = Review.objects.create(
-            text=form.cleaned_data['text'],
-            author=Profile.objects.get(pk=kwargs['user_id']),
-            product=Product.objects.get(slug=kwargs['slug']),
-        )
+
+    Review.objects.create(
+        text=kwargs['text'],
+        author=Profile.objects.get(pk=kwargs['user_id']),
+        product=Product.objects.get(slug=kwargs['slug']),
+    )
 
     context = {
-        'form': form,
         'review_template': 'catalog/review.jinja2',
     }
     return context
