@@ -2,8 +2,13 @@ from django.contrib import admin
 from django.db.models import QuerySet
 from django import forms
 from django.http import HttpRequest
+from django.shortcuts import redirect, render
+from django.urls import path
 
 from . import admin_filters, models
+from .forms import ProductsImportForm
+from .views import ProductImportFormView
+from .tasks import import_products
 
 
 @admin.action(description="Archive selected products")
@@ -62,6 +67,7 @@ class ProductAdmin(admin.ModelAdmin):
         mark_archived,
         mark_unarchived
     ]
+    change_list_template = 'admin/product_change_list.html'
     inlines = [PictureInline]
     list_display = [
         'name',
@@ -87,6 +93,17 @@ class ProductAdmin(admin.ModelAdmin):
     readonly_fields = ['count_sells']
     search_fields = ['name']
 
+    def get_urls(self):
+        urls = super().get_urls()
+        new_urls = [
+            path(
+                'import-products/',
+                ProductImportFormView.as_view(),
+                name='import_products',
+            ),
+        ]
+        return new_urls + urls
+
     @admin.display(description='Sellers')
     def sellers_amount(self, obj: models.Product) -> int:
         return obj.sellers.count()
@@ -109,6 +126,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(models.SellerProduct)
 class SellerProductAdminModel(admin.ModelAdmin):
+    change_list_template = 'admin/product_change_list.html'
     list_display = ['product', 'seller', 'price']
 
     def get_queryset(self, request):
@@ -125,6 +143,17 @@ class SellerProductAdminModel(admin.ModelAdmin):
             form.base_fields['seller'].widget = forms.HiddenInput()
             form.base_fields['seller'].initial = request.user.seller_set.first()
         return form
+
+    def get_urls(self):
+        urls = super().get_urls()
+        new_urls = [
+            path(
+                'import-products/',
+                ProductImportFormView.as_view(),
+                name='import_products',
+            ),
+        ]
+        return new_urls + urls
 
 
 class SubcategoryInline(admin.TabularInline):

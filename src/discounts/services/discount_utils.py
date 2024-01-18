@@ -208,6 +208,7 @@ def calculate_discounted_prices(
     products: List[Tuple[Product, Decimal, int]]
 ) -> List[Tuple[Product, Decimal, Decimal, int, bool]]:
     """
+    # TOP
     Вычисление цен со скидками для продуктов.
 
     Предназначается для вычисления цен на список товаров в корзине.

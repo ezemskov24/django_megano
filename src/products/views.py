@@ -1,16 +1,18 @@
 from typing import Any, Dict
 
+from django.contrib import messages
 from django.core.cache import cache
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db.models import QuerySet
 from django.shortcuts import redirect
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import TemplateView, DetailView, ListView
+from django.views.generic import DetailView, FormView, ListView, TemplateView
 from django.utils import timezone
 
 from catalog.forms import ReviewForm
 
+from .forms import ProductsImportForm
 from .models import Picture, Product, SellerProduct
 from .services.catalog_queryset import CatalogQuerySetProcessor
 from .services.compare_products import (
@@ -21,6 +23,7 @@ from .services.compare_products import (
     get_compare_list,
 )
 from .services.banners import Banner, LimitedProduct, TopSellerProduct
+from .tasks import import_products
 from account.models import BrowsingHistory
 from catalog.forms import ReviewForm
 from catalog.services import add_review, get_count_review
@@ -139,18 +142,18 @@ class ProductDetailsView(DetailView):
         return self.render_to_response(context_data)
 
     def post(self, request, *args, **kwargs):
-            form = ReviewForm(request.POST)
+        form = ReviewForm(request.POST)
 
-            if form.is_valid():
-                add_review(post=request.POST, user_id=request.user.id, slug=kwargs['slug'])
+        if form.is_valid():
+            add_review(text=request.POST['text'], user_id=request.user.id, slug=kwargs['slug'])
 
-                return redirect('products:product_details', slug=kwargs['slug'])
+            return redirect('products:product_details', slug=kwargs['slug'])
 
-            return HttpResponseRedirect(
-                reverse('products:product_details',
-                        kwargs={'slug': kwargs.get('slug')}
-                        )
-            )
+        return HttpResponseRedirect(
+            reverse('products:product_details',
+                    kwargs={'slug': kwargs.get('slug')}
+                    )
+        )
 
 
 class ProductsCompareView(ListView):
@@ -255,3 +258,17 @@ def get_compare_list_amt_view(request):
     if request.method == 'GET':
         return HttpResponse(get_compare_list_amt(request))
     return HttpResponse('Нет доступа')
+
+
+class ProductImportFormView(FormView):
+    template_name = 'admin/product_import_form.html'
+    form_class = ProductsImportForm
+    success_url = '..'
+
+    def form_valid(self, form):
+        import_products.delay(form.files['zip_file'].read())
+        messages.add_message(
+            self.request,
+            messages.INFO,
+            "Import task added to queue")
+        return super().form_valid(form)

@@ -74,3 +74,11 @@ class CategoryAdminForm(forms.ModelForm):
                     params={'parent': parent_category},
                 )
         return cleaned_data
+
+
+class ProductsImportForm(forms.Form):
+    zip_file = forms.FileField(
+        widget=forms.FileInput(
+            attrs={'accept': 'application/zip'},
+        ),
+    )
