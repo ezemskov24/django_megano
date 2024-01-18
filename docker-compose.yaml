@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      dockerfile: ./Dockerfile
+    command:
+      - "python"
+      - "manage.py"
+      - "runserver"
+      - "0.0.0.0:8080"
+    ports:
+      - "8000:8080"
+    environment:
+      - DB_HOST=database
+      - DB_NAME=django_diploma_db
+      - DB_USER=admin
+      - DB_PASS=admin
+    depends_on:
+      - database
+
+  database:
+    image: postgres:14.10-alpine
+    environment:
+      - POSTGRES_DB=django_diploma_db
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    ports:
+      - '5432:5432'
