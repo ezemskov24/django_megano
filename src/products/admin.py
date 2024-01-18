@@ -126,6 +126,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(models.SellerProduct)
 class SellerProductAdminModel(admin.ModelAdmin):
+    change_list_template = 'admin/product_change_list.html'
     list_display = ['product', 'seller', 'price']
 
     def get_queryset(self, request):
@@ -142,6 +143,17 @@ class SellerProductAdminModel(admin.ModelAdmin):
             form.base_fields['seller'].widget = forms.HiddenInput()
             form.base_fields['seller'].initial = request.user.seller_set.first()
         return form
+
+    def get_urls(self):
+        urls = super().get_urls()
+        new_urls = [
+            path(
+                'import-products/',
+                ProductImportFormView.as_view(),
+                name='import_products',
+            ),
+        ]
+        return new_urls + urls
 
 
 class SubcategoryInline(admin.TabularInline):
