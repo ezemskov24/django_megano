@@ -1,21 +1,9 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.db.models import QuerySet
 from django.http import HttpRequest
+from django.db.models import QuerySet
 
-from .models import Profile, Seller
-
-# admin.site.register(Profile, UserAdmin)
-
-
-@admin.register(Profile)
-class ProfileAdmin(UserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'phone', 'address', 'archived')
-    search_fields = ('username', 'email', 'first_name', 'last_name', 'phone', 'address')
-    fieldsets = (
-        ('Personal Info', {'fields': ('first_name', 'last_name', 'email', 'phone', 'avatar', 'address', 'archived')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-    )
+from .models import Seller
+from account.models import Profile
 
 
 class SellerInLine(admin.TabularInline):
@@ -50,4 +38,4 @@ class SellerAdmin(admin.ModelAdmin):
         return Seller.objects.select_related("profile")
 
     def user_verbose(self, obj: Seller) -> str:
-        return obj.name
+        return obj.profile.name
