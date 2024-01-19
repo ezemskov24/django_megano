@@ -20,7 +20,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import CreateOrderForm
 from .models import Order, Cart
-from .services.order_create import get_total_price, get_fio, get_cart_JSON
+from .services.order_create import get_total_price, get_fio, get_carts_list
 
 
 class OrderListView(LoginRequiredMixin, ListView):
@@ -34,9 +34,17 @@ class OrderListView(LoginRequiredMixin, ListView):
 
 class OrderDetailView(LoginRequiredMixin, DetailView):
     template_name = "cart/order-details.jinja2"
-    queryset = Order.objects.prefetch_related("cart")
     context_object_name = "order"
 
+    def get_queryset(self):
+        queryset = Order.objects.filter(archived=False, profile=self.request.user.id)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        print('====', context)
+
+        return context
 
 class CreateOrderView(LoginRequiredMixin, View):
     """
@@ -48,14 +56,13 @@ class CreateOrderView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest) -> HttpResponse:
         if request.user.is_authenticated:
             fio = get_fio(request.user.last_name, request.user.first_name, request.user.username)
-
-            carts = Cart.objects.filter(profile=request.user.id)
+            carts = get_carts_list(Cart.objects.filter(profile=request.user.id))
             content = {
                 'form': CreateOrderForm(),
                 'user_fio': fio,
                 'user_phone': request.user.phone,
                 'user_email': request.user.email,
-                'carts': get_cart_JSON(carts),
+                'carts': carts,
                 'total_price': get_total_price(carts),
             }
 
@@ -72,18 +79,13 @@ class CreateOrderView(LoginRequiredMixin, View):
                 phone=request.POST['phone'],
                 email=request.POST['mail'],
                 city=request.POST['city'],
+                cart=request.POST['carts'],
                 delivery_address=request.POST['delivery_address'],
                 delivery_type=request.POST['delivery_type'],
                 payment_type=request.POST['payment_type'],
                 comment=request.POST['comment'],
                 total_price=request.POST['total_price'],
-                product=Cart.objects.filter(profile=request.user.id),
             )
-            order.cart.set(Cart.objects.filter(profile=request.user.id))
-
-
-            # order.cart = calculate_discounted_prices([(order.cart, order.cart.product_seller.price, order.cart.count)])
-            order.save()
 
         else:
             redirect('cart:create_order')

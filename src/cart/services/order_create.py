@@ -2,11 +2,10 @@ from cart.models import Cart
 from discounts.services.discount_utils import calculate_discounted_prices
 
 
-def get_total_price(carts: Cart) -> int:
+def get_total_price(carts) -> int:
     total_price = 0
     for cart in carts:
-        total_price += cart.product_seller.price * cart.count
-
+        total_price += cart['price'] * cart['count']
     return total_price
 
 
@@ -23,7 +22,7 @@ def get_fio(first_name: str, last_name: str, username: str) -> str:
     return fio
 
 
-def get_cart_JSON(carts):
+def get_carts_list(carts):
     response = []
     carts_list = [
         (cart.product_seller.product, cart.product_seller.price, cart.count)
@@ -31,13 +30,12 @@ def get_cart_JSON(carts):
     ]
     # carts_list = calculate_discounted_prices(carts_list)
 
-    for cart in carts:
+    for cart in carts_list:
         response.append({
-            'image': cart.product_seller.product.images.first().image,
-            'name': cart.product_seller.product.name,
-            'description': cart.product_seller.product.description,
-            'price': cart.product_seller.price,
-            'count': cart.count,
+            'image': cart[0].images.first().image,
+            'name': cart[0].name,
+            'description': cart[0].description,
+            'price': cart[1],
+            'count': cart[2],
         })
-
     return response
