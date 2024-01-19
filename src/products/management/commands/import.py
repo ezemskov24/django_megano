@@ -15,11 +15,11 @@ class Command(BaseCommand):
             '--file',
             required=False,
             nargs='+',
-            help='Specify a zip-archive file to import',
+            help='Specify a zip-archive file to product_import',
         )
 
     def handle(self, *args, **options):
-        self.stdout.write('Begin product import')
+        self.stdout.write('Begin product product_import')
 
         files = options.get('file')
         pending_imports_dir = settings.IMPORT_PENDING_DIR
@@ -41,6 +41,6 @@ class Command(BaseCommand):
         if files:
             for file in files:
                 import_products.delay(file.as_posix())
-            self.stdout.write(f'{len(files)} file(s) added to import query')
+            self.stdout.write(f'{len(files)} file(s) added to product_import query')
         else:
-            self.stdout.write(self.style.WARNING('No files to import'))
+            self.stdout.write(self.style.WARNING('No files to product_import'))

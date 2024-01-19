@@ -97,7 +97,7 @@ class ProductAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         new_urls = [
             path(
-                'import-products/',
+                'product_import-products/',
                 ProductImportFormView.as_view(),
                 name='import_products',
             ),
@@ -148,7 +148,7 @@ class SellerProductAdminModel(admin.ModelAdmin):
         urls = super().get_urls()
         new_urls = [
             path(
-                'import-products/',
+                'product_import-products/',
                 ProductImportFormView.as_view(),
                 name='import_products',
             ),
