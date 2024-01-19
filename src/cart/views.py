@@ -1,3 +1,4 @@
+import self as self
 from django.db.models import F
 from django.views.generic import ListView, DetailView
 from django.core.exceptions import ValidationError
@@ -8,6 +9,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from account.models import Profile
 from cart.serializer import CartSerializer, ProductSellerSerializer, CartPostSerializer
+from discounts.services.discount_utils import calculate_discounted_prices
 
 from products.models import SellerProduct
 from django.http import HttpResponse, HttpRequest
@@ -18,10 +20,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import CreateOrderForm
 from .models import Order, Cart
-from .services.order_create import get_total_price, get_fio
+from .services.order_create import get_total_price, get_fio, get_cart_JSON
 
 
-class OrderListView(ListView):
+class OrderListView(LoginRequiredMixin, ListView):
     template_name = "cart/order-list.jinja2"
     context_object_name = "orders"
 
@@ -30,7 +32,7 @@ class OrderListView(ListView):
         return queryset
 
 
-class OrderDetailView(DetailView):
+class OrderDetailView(LoginRequiredMixin, DetailView):
     template_name = "cart/order-details.jinja2"
     queryset = Order.objects.prefetch_related("cart")
     context_object_name = "order"
@@ -53,12 +55,12 @@ class CreateOrderView(LoginRequiredMixin, View):
                 'user_fio': fio,
                 'user_phone': request.user.phone,
                 'user_email': request.user.email,
-                'carts': carts,
+                'carts': get_cart_JSON(carts),
                 'total_price': get_total_price(carts),
             }
+
         else:
             content = {}
-
         return render(request, 'cart/create_order.jinja2', context=content)
 
     def post(self, request, *args, **kwargs):
@@ -75,9 +77,12 @@ class CreateOrderView(LoginRequiredMixin, View):
                 payment_type=request.POST['payment_type'],
                 comment=request.POST['comment'],
                 total_price=request.POST['total_price'],
+                product=Cart.objects.filter(profile=request.user.id),
             )
             order.cart.set(Cart.objects.filter(profile=request.user.id))
 
+
+            # order.cart = calculate_discounted_prices([(order.cart, order.cart.product_seller.price, order.cart.count)])
             order.save()
 
         else:
