@@ -6,6 +6,7 @@ from .forms import ReviewForm
 from .services import add_review, get_count_review, get_reviews_list
 
 
+<<<<<<<<< Temporary merge branch 1
 # def show_review(request: HttpRequest, *args, **kwargs):
 #     """
 #     Пример view-функции для внедрения кода страницы для добавленя отзыва к товару.
@@ -21,7 +22,7 @@ from .services import add_review, get_count_review, get_reviews_list
 #     context['reviews_list'] = get_reviews_list(kwargs['pk'])
 #
 #     return render(request, 'catalog/review_pass.jinja2', context=context)
-
+=========
 
 def add_to_comparison(request, product_id):
     # добавить продукт для сравнения
