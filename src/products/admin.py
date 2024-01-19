@@ -2,13 +2,10 @@ from django.contrib import admin
 from django.db.models import QuerySet
 from django import forms
 from django.http import HttpRequest
-from django.shortcuts import redirect, render
 from django.urls import path
 
 from . import admin_filters, models
-from .forms import ProductsImportForm
 from .views import ProductImportFormView
-from .tasks import import_products
 
 
 @admin.action(description="Archive selected products")
@@ -120,8 +117,8 @@ class ProductAdmin(admin.ModelAdmin):
     def avg_disc_price(self, obj: models.Product) -> int:
         return obj.discounted_average_price
 
-    def delete_queryset(self, request: HttpRequest, queryset: QuerySet):
-        queryset.update(archived=True)
+    # def delete_queryset(self, request: HttpRequest, queryset: QuerySet):
+    #     queryset.update(archived=True)
 
 
 @admin.register(models.SellerProduct)
@@ -188,3 +185,24 @@ class CategoryAdmin(admin.ModelAdmin):
             )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+
+@admin.register(models.ProductImportLog)
+class ProductImportLogAdmin(admin.ModelAdmin):
+    change_list_template = 'admin/product_import_log_change_list.html'
+    list_display = [
+        'id',
+        'status',
+        'items_imported',
+        'start',
+        'end',
+        'file_name',
+    ]
+    readonly_fields = [
+        'status',
+        'items_imported',
+        'start',
+        'end',
+        'file_name',
+        'message_log',
+    ]
+    list_display_links = ['id', 'status']

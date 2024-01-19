@@ -11,88 +11,93 @@ from django.utils.text import slugify
 
 from .import_utils import ImportLogger, FileManager
 from account.models import Seller
-from products.models import Category, Product, Picture, SellerProduct
+from products.models import (
+    Category,
+    ImportStatusEnum,
+    Picture,
+    Product,
+    SellerProduct,
+)
 
 
 class ProductImporter:
     def __init__(self, file: Union[str, PathLike[str], bytes]):
-        self.original_path = None
-        self.target_path = None
-        self.filename = None
-        self.json = None
-        self.start = datetime.now()
-        self.file_manager = FileManager(self.start)
-        self.logger = ImportLogger(self.start, self.file_manager)
-        self.product_imports = 0
-        self.successful_product_imports = 0
-        self.image_imports = 0
-        self.successful_image_imports = 0
-        self.seller_product_imports = 0
-        self.successful_seller_product_imports = 0
+        self.__original_path = None
+        self.__target_path = None
+        self.__filename = None
+        self.__json = None
+        self.__start = datetime.now()
+        self.__file_manager = FileManager(self.__start)
+        self.__logger = ImportLogger(self.__start, self.__file_manager)
+        self.__product_imports = 0
+        self.__successful_product_imports = 0
+        self.__image_imports = 0
+        self.__successful_image_imports = 0
+        self.__seller_product_imports = 0
+        self.__successful_seller_product_imports = 0
+        self.__total_imports = 0
+        self.__successful_imports = 0
 
-        self._import_products(file)
+        self.__import_products(file)
 
-    def _import_products(self, file: Union[str, PathLike[str], bytes]):
+    def __import_products(self, file: Union[str, PathLike[str], bytes]):
         try:
-            self.logger.log(f'Begin product_import')
-            self._check_file(file)
-            self._check_archive()
-            self._add_entries_from_archive_to_database()
-            self.logger.log('Import finished')
+            self.__logger.log(f'Begin product_import')
+            self.__check_file(file)
+            self.__check_archive()
+            self.__add_entries_from_archive_to_database()
+            self.__logger.log('Import finished')
 
-            self.successful_imports = sum(
-                (
-                    self.successful_product_imports,
-                    self.successful_product_imports,
-                    self.successful_seller_product_imports,
-                )
-            )
-            if self.successful_imports:
-                self.logger.log_result(
-                    self.successful_imports,
-                    self.product_imports,
-                    self.successful_product_imports,
-                    self.image_imports,
-                    self.successful_image_imports,
-                    self.seller_product_imports,
-                    self.successful_seller_product_imports,
+            self.__calculate_successful_imports()
+            if self.__successful_imports:
+                self.__logger.log_result(
+                    self.__successful_imports,
+                    self.__product_imports,
+                    self.__successful_product_imports,
+                    self.__image_imports,
+                    self.__successful_image_imports,
+                    self.__seller_product_imports,
+                    self.__successful_seller_product_imports,
                 )
         except Exception as e:
-            self.logger.log(f'Import failed due to {type(e).__name__}: {e}')
-            self.successful_imports = 0
+            self.__logger.log(f'Import failed due to {type(e).__name__}: {e}')
+            self.__successful_imports = 0
         finally:
-            self.logger.finalize_log()
-            success = self.successful_imports > 0
-            if self.json:
-                file_path = self.file_manager.get_json_path(success)
-                file = self.archive.read(self.json)
-                self.file_manager.save_file(file, file_path)
-            if self.original_path:
-                self.file_manager.remove_file(self.original_path)
+            self.__calculate_total_imports()
+            status = self.__get_status()
+            self.__logger.finalize_log(status, self.__successful_imports)
 
-    def _check_file(self, file: Union[str, PathLike[str], bytes]):
+            success = self.__successful_imports > 0
+            if self.__json:
+                file_path = self.__file_manager.get_json_path(success)
+                file = self.archive.read(self.__json)
+                self.__file_manager.save_file(file, file_path)
+            if self.__original_path:
+                self.__file_manager.remove_file(self.__original_path)
+
+    def __check_file(self, file: Union[str, PathLike[str], bytes]):
         if isinstance(file, PathLike) or isinstance(file, str):
             if path.exists(file) and path.isfile(file):
                 self.file = file
-                self.original_path = file
+                self.__original_path = file
         elif isinstance(file, bytes):
             self.file = io.BytesIO(file)
         else:
             raise ValueError('Not a viable file provided')
 
-    def _check_archive(self):
+    def __check_archive(self):
         self.archive = zipfile.ZipFile(self.file)
 
         if self.archive.testzip():
             raise ImportError('There are corrupted files in the archive')
 
-        self._get_file_names_from_archive()
+        self.__get_file_names_from_archive()
 
-        self.json = self.file_names.get('json')
-        if not self.json:
+        self.__json = self.file_names.get('json')
+        if not self.__json:
             raise FileNotFoundError('There is no json file in the archive')
 
-    def _get_file_names_from_archive(self):
+    def __get_file_names_from_archive(self):
         self.file_names = {}
         for info in self.archive.infolist():
             if not info.is_dir():
@@ -110,29 +115,29 @@ class ProductImporter:
                     )
         print(self.file_names)
 
-    def _add_entries_from_archive_to_database(self):
-        json_file = json.loads(self.archive.read(self.json))
+    def __add_entries_from_archive_to_database(self):
+        json_file = json.loads(self.archive.read(self.__json))
         self.products = json_file.get('products')
         self.seller_products = json_file.get('seller_products')
 
         with transaction.atomic():
             if self.products:
-                self._add_products_to_database()
+                self.__add_products_to_database()
             if self.seller_products:
-                self._add_seller_products_to_database()
+                self.__add_seller_products_to_database()
 
-    def _add_products_to_database(self):
-        self.logger.log(f'Importing products')
+    def __add_products_to_database(self):
+        self.__logger.log(f'Importing products')
         self.new_products = {}
 
         for prod_name, prod_content in self.products.items():
-            self.add_product_to_database(prod_content, prod_name)
+            self.__add_product_to_database(prod_content, prod_name)
 
-        if self.successful_product_imports:
-            self.logger.log(f'Imported {self.successful_product_imports} products')
+        if self.__successful_product_imports:
+            self.__logger.log(f'Imported {self.__successful_product_imports} products')
 
-    def add_product_to_database(self, prod_content, prod_name):
-        self.product_imports += 1
+    def __add_product_to_database(self, prod_content, prod_name):
+        self.__product_imports += 1
         try:
             with transaction.atomic():
                 prod_content['category'] = Category.objects.filter(
@@ -142,29 +147,29 @@ class ProductImporter:
                     prod_content['slug'] = slugify(prod_content['name'])
                 new_product = Product(**prod_content)
                 new_product.save()
-                self.successful_product_imports += 1
+                self.__successful_product_imports += 1
                 self.new_products[prod_name] = new_product
 
                 prod_images = self.file_names.get(prod_name)
                 if prod_images:
-                    self._add_pictures_to_database(
+                    self.__add_pictures_to_database(
                         prod_images,
                         new_product
                     )
-                self.logger.log(f'Product imported successfully')
+                self.__logger.log(f'Product imported successfully')
         except Exception as e:
-            self.logger.log(
+            self.__logger.log(
                 f'Product product_import failed due to {type(e).__name__}: {e}'
             )
 
-    def _add_pictures_to_database(
+    def __add_pictures_to_database(
         self,
         prod_images,
         product
     ):
-        self.logger.log(f'Importing product images')
+        self.__logger.log(f'Importing product images')
         for image_name in prod_images:
-            self.image_imports += 1
+            self.__image_imports += 1
             try:
                 with transaction.atomic():
                     name = path.basename(image_name)
@@ -177,38 +182,38 @@ class ProductImporter:
                         image=image,
                     )
                     new_image.save()
-                    self.successful_image_imports += 1
-                    self.logger.log(f'Image imported successfully')
+                    self.__successful_image_imports += 1
+                    self.__logger.log(f'Image imported successfully')
             except Exception as e:
-                self.logger.log(
+                self.__logger.log(
                     f'Image product_import failed due to {type(e).__name__}: {e}'
                 )
 
-    def _add_seller_products_to_database(self):
-        self.logger.log(f'Importing seller products')
+    def __add_seller_products_to_database(self):
+        self.__logger.log(f'Importing seller products')
 
         for sell_prod in self.seller_products.values():
-            self._add_seller_product_to_database(sell_prod)
-        if self.successful_seller_product_imports:
-            self.logger.log(
-                f'Imported {self.successful_seller_product_imports} seller products'
+            self.__add_seller_product_to_database(sell_prod)
+        if self.__successful_seller_product_imports:
+            self.__logger.log(
+                f'Imported {self.__successful_seller_product_imports} seller products'
             )
 
-    def _add_seller_product_to_database(self, sell_prod):
-        self.seller_product_imports += 1
+    def __add_seller_product_to_database(self, sell_prod):
+        self.__seller_product_imports += 1
         try:
             with transaction.atomic():
-                self._process_seller_product_params(sell_prod)
+                self.__process_seller_product_params(sell_prod)
                 new_seller_product = SellerProduct(**sell_prod)
                 new_seller_product.save()
-                self.successful_seller_product_imports += 1
-                self.logger.log(f'SellerProduct imported successfully')
+                self.__successful_seller_product_imports += 1
+                self.__logger.log(f'SellerProduct imported successfully')
         except Exception as e:
-            self.logger.log(
+            self.__logger.log(
                 f'SellerProduct product_import failed due to {type(e).__name__}: {e}',
             )
 
-    def _process_seller_product_params(self, sell_prod):
+    def __process_seller_product_params(self, sell_prod):
         sell_prod['seller'] = Seller.objects.filter(
             pk=sell_prod['seller'],
         ).first()
@@ -222,3 +227,29 @@ class ProductImporter:
 
         if isinstance(sell_prod.get('new'), int):
             del sell_prod['new']
+
+    def __calculate_successful_imports(self):
+        self.__successful_imports = sum(
+            (
+                self.__successful_product_imports,
+                self.__successful_image_imports,
+                self.__successful_seller_product_imports,
+            )
+        )
+
+    def __calculate_total_imports(self):
+        self.__total_imports = sum(
+            (
+                self.__product_imports,
+                self.__image_imports,
+                self.__seller_product_imports,
+            )
+        )
+
+    def __get_status(self):
+        if not self.__successful_imports:
+            return ImportStatusEnum.FAILURE
+        if self.__successful_imports == self.__total_imports:
+            return ImportStatusEnum.SUCCESS
+        else:
+            return ImportStatusEnum.PARTIAL_SUCCESS

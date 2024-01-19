@@ -4,17 +4,29 @@ import os
 import celery
 from django.conf import settings
 
+from products.models import ProductImportLog
+
 
 class ImportLogger:
     def __init__(self, start, file_manager):
-        self.log_messages = []
-        self.start = start
-        self.file_manager = file_manager
+        self.__log_messages = []
+        self.__start = start
+        self.__file_manager = file_manager
+        self.__import_log = ProductImportLog(start=self.__start)
+        self.__import_log.save()
 
     def log(self, message):
         print(message)
         now = datetime.now()
-        self.log_messages.append(f'[{now.time()}] {message}')
+        message = f'[{now.time()}] {message}'
+        self.__log_messages.append(message)
+
+        message_log = self.__import_log.message_log
+        if not message_log:
+            message_log = ''
+        message_log = message_log + message + '\n'
+        self.__import_log.message_log = message_log
+        self.__import_log.save()
 
     def log_result(
         self,
@@ -53,18 +65,24 @@ class ImportLogger:
 
         self.log(message)
 
-    def finalize_log(self):
-        log = '\n'.join(self.log_messages)
+    def finalize_log(self, status, import_count):
+        self.__import_log.end = datetime.now()
+        self.__import_log.status = status
+        self.__import_log.items_imported = import_count
+        self.__import_log.file_name = self.__file_manager.get_filename()
+        self.__import_log.save()
+
+        log = '\n'.join(self.__log_messages)
         print(log)
 
-        log_path = self.file_manager.get_log_path()
-        self.file_manager.save_file(log, log_path)
+        log_path = self.__file_manager.get_log_path()
+        self.__file_manager.save_file(log, log_path)
 
 
 class FileManager:
     def __init__(self, start):
-        self.start = start
-        self.filename = None
+        self.__start = start
+        self.__filename = None
 
     @staticmethod
     def save_file(content, save_path):
@@ -81,7 +99,7 @@ class FileManager:
     def get_log_path(self):
         logs_dir = settings.IMPORT_LOGS_DIR
 
-        return self._get_file_path(logs_dir, 'log')
+        return self.__get_file_path(logs_dir, 'log')
 
     def get_json_path(self, success):
         if success:
@@ -89,9 +107,9 @@ class FileManager:
         else:
             target_dir = settings.IMPORT_FAILURE_DIR
 
-        return self._get_file_path(target_dir, 'json')
+        return self.__get_file_path(target_dir, 'json')
 
-    def _get_file_path(self, target_dir, file_extension):
+    def __get_file_path(self, target_dir, file_extension):
         import_dir = settings.IMPORT_DIR
         if not os.path.exists(import_dir):
             os.mkdir(import_dir)
@@ -103,13 +121,13 @@ class FileManager:
         if not os.path.exists(today_dir):
             os.mkdir(today_dir)
 
-        filename = self._get_filename(file_extension)
+        filename = self.get_filename(file_extension)
         return today_dir.joinpath(filename)
 
-    def _get_filename(self, extension=''):
-        if not self.filename:
-            self.filename = self.start.strftime(
+    def get_filename(self, extension=''):
+        if not self.__filename:
+            self.__filename = self.__start.strftime(
                 '%H:%M:%S - ',
             ) + celery.uuid()
 
-        return self.filename + '.' + extension if extension else self.filename
+        return self.__filename + '.' + extension if extension else self.__filename
