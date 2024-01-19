@@ -19,7 +19,7 @@
                             <div class="Account-column" style="display: flex">
                                 <div class="Account-avatar">
                                   {% if user.avatar %}
-                                    <img src='{{ user.avatar }}' alt="card.jpg" style="background-size: contain"/>
+                                    <img src='{{ user.avatar.url }}' alt="card.jpg" style="background-size: contain"/>
                                   {% else %}
                                     <img src='/static/assets/img/icons/blankphoto.jpg' alt="card.jpg" style="background-size: contain"/>
                                   {% endif %}
