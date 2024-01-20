@@ -87,17 +87,16 @@
                             </div>
                             <div class="Cart Cart_order">
 
-                                 {% for cart in order.cart|list %}
-
+                                {% for cart in order.cart.values() %}
                                 <div class="Cart-product">
                                     <div class="Cart-block Cart-block_row">
                                         <div class="Cart-block Cart-block_pict">
-                                            <a class="Cart-pict" href="#">
-                                                <img class="Cart-img" src="/media/{{ cart['image'] }}" alt="card.jpg">
+                                            <a class="Cart-pict" href="{{ url('products:product_details', cart['slug']) }}">
+                                                <img class="Cart-img" src="{{ cart['image'] }}" alt="card.jpg">
                                             </a>
                                         </div>
                                         <div class="Cart-block Cart-block_info">
-                                            <a class="Cart-title" href="#">{{ cart['name'] }}</a>
+                                            <a class="Cart-title" href="{{ url('products:product_details', cart['slug']) }}">{{ cart['name'] }}</a>
                                             {% if (cart['description'])|length > 250 %}
                                                 {% set description = (cart['description'][:250] + '...') %}
                                             {% else %}
@@ -106,7 +105,7 @@
                                             <div class="Cart-desc">{{ description }}</div>
                                         </div>
                                         <div class="Cart-block Cart-block_price">
-{#                                            <div class="Cart-price">${{ cart['price']|int * cart['count']|int }}</div>#}
+                                            <div class="Cart-price">${{ cart['price']|float * cart['count'] }}</div>
                                         </div>
                                     </div>
                                     <div class="Cart-block Cart-block_row">

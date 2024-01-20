@@ -178,12 +178,12 @@
                                     </div>
                                 </div>
                                 <div class="Cart Cart_order">
-                                    {% for cart in carts %}
+                                    {% for cart in carts.values() %}
                                         <div class="Cart-product">
                                             <div class="Cart-block Cart-block_row">
                                                 <div class="Cart-block Cart-block_pict">
                                                     <a class="Cart-pict" href="#">
-                                                        <img class="Cart-img" src="/media/{{ cart['image'] }}" alt="card.jpg" />
+                                                        <img class="Cart-img" src="{{ cart['image'] }}" alt="card.jpg" />
                                                     </a>
                                                 </div>
                                                 <div class="Cart-block Cart-block_info">
@@ -210,7 +210,7 @@
                                             <span class="Cart-price">${{ total_price }}</span>
                                         </div>
                                         <input type="number" name="total_price" value="{{ total_price }}" hidden>
-                                        <input type="text" name="carts" value="{{ carts }}" style="display: None">
+                                        <input type="text" name="carts" value="{{ json_carts }}" style="display: None">
                                         <div class="Cart-block">
                                             <button class="btn btn_primary btn_lg" type="submit">Оплатить
                                             </button>

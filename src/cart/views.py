@@ -1,4 +1,7 @@
+import json
+
 import self as self
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import F
 from django.views.generic import ListView, DetailView
 from django.core.exceptions import ValidationError
@@ -20,7 +23,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import CreateOrderForm
 from .models import Order, Cart
-from .services.order_create import get_total_price, get_fio, get_carts_list
+from .services.order_create import get_total_price, get_fio, get_carts_JSON
 
 
 class OrderListView(LoginRequiredMixin, ListView):
@@ -42,33 +45,34 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        print('====', context)
-
+        context['order'].cart = json.loads(context['order'].cart)
         return context
+
 
 class CreateOrderView(LoginRequiredMixin, View):
     """
     View-класс для создания заказов.
     """
-    # login_url = reverse_lazy("account:login")
-    # redirect_field_name = reverse_lazy("cart:create_order")
 
     def get(self, request: HttpRequest) -> HttpResponse:
         if request.user.is_authenticated:
             fio = get_fio(request.user.last_name, request.user.first_name, request.user.username)
-            carts = get_carts_list(Cart.objects.filter(profile=request.user.id))
-            content = {
+            carts = (get_carts_JSON(Cart.objects.filter(profile=request.user.id)))
+
+            context = {
                 'form': CreateOrderForm(),
                 'user_fio': fio,
                 'user_phone': request.user.phone,
                 'user_email': request.user.email,
                 'carts': carts,
+                'json_carts': json.dumps(carts, cls=DjangoJSONEncoder),
                 'total_price': get_total_price(carts),
             }
 
         else:
-            content = {}
-        return render(request, 'cart/create_order.jinja2', context=content)
+            context = {}
+
+        return render(request, 'cart/create_order.jinja2', context=context)
 
     def post(self, request, *args, **kwargs):
         form = CreateOrderForm(request.POST)

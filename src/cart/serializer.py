@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from products.models import SellerProduct
+from products.models import SellerProduct, Picture
 from cart.models import Cart, Order
 
 
@@ -38,16 +38,3 @@ class CartPostSerializer(serializers.ModelSerializer):
             'profile',
             'count',
         )
-
-
-# class OrderSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Cart
-#         fields = (
-#             'product_seller.product',
-#             'product_seller.product.name',
-#             'product_seller.price',
-#             'count',
-#         )
-
-
