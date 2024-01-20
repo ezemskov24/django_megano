@@ -123,6 +123,19 @@ class HistoryOrderView(LoginRequiredMixin, TemplateView):
     template_name = 'registration/historyorder.jinja2'
     login_url = 'account:login'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        history = Order.objects.filter(profile=self.request.user).order_by('-created_at')[:20]
+
+        # for item in history:
+        #     product = item.product
+        #     first_image = product.images.first()
+        #
+        #     item.image_url = first_image.image.url if first_image else None
+
+        context['history'] = history
+
+        return context
 
 class UserBrowsingHistoryView(LoginRequiredMixin, TemplateView):
     template_name = 'registration/browsing-history.jinja2'

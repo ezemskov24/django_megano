@@ -1,0 +1,39 @@
+{% extends 'base.jinja2' %}
+
+{% block title %}
+  Profile
+{% endblock %}
+
+{% block header %}
+  {% include 'common/header_min.jinja2' %}
+{% endblock %}
+
+{% block content %}
+
+<body class="Site">
+    <div class="Middle Middle_top">
+        <div class="Section Section_column Section_columnLeft">
+            <div class="wrap">
+                {% include 'navigation/navigation.jinja2' %}
+                <div class="Section-content">
+                <h1 style="text-align: center;">Заказы:</h1>
+                    <ul>
+                        <div class="Cards-browsing-history">
+                            {% for order in history %}
+                              <ul>
+                                <li>{{ order.created_at }}</li>
+                                <li>{{ order.status }}</li>
+                                <li>{{ order.total_price }}</li>
+                              </ul>
+{#                            {% empty %}#}
+{#                                <li>У вас нет заказов.</li>#}
+                            {% endfor %}
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+{% endblock %}
