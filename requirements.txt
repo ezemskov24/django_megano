@@ -6,3 +6,4 @@ django-cleanup==8.0.0
 djangorestframework~=3.14.0
 django-filter~=23.3
 celery==5.3.6
+redis==5.0.1

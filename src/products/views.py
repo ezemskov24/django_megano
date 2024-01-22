@@ -1,6 +1,8 @@
 from typing import Any, Dict
 
+from celery.result import AsyncResult
 from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.cache import cache
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db.models import QuerySet
@@ -13,7 +15,7 @@ from django.utils import timezone
 from catalog.forms import ReviewForm
 
 from .forms import ProductsImportForm
-from .models import Picture, Product, SellerProduct
+from .models import Product
 from .services.catalog_queryset import CatalogQuerySetProcessor
 from .services.compare_products import (
     add_product_to_compare_list,
@@ -260,15 +262,35 @@ def get_compare_list_amt_view(request):
     return HttpResponse('Нет доступа')
 
 
-class ProductImportFormView(FormView):
+class ProductImportFormView(PermissionRequiredMixin, FormView):
     template_name = 'admin/product_import_form.html'
     form_class = ProductsImportForm
     success_url = '..'
+    permission_required = [
+        "products.add_product",
+        "products.add_seller_product",
+    ]
 
     def form_valid(self, form):
-        import_products.delay(form.files['zip_file'].read())
+        task = import_products.delay(
+            form.files['zip_file'].read(),
+            self.request.user.pk,
+        )
+
+        self.request.session['import_task'] = task.id
         messages.add_message(
             self.request,
             messages.INFO,
             "Import task added to queue")
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        task_id = self.request.session.get('import_task')
+        if task_id:
+            task = AsyncResult(task_id)
+            if task.successful() or task.failed():
+                del self.request.session['import_task']
+            else:
+                context['status'] = task.status
+        return context

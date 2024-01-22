@@ -7,5 +7,5 @@ from .services.product_import.product_importer import ProductImporter
 
 
 @shared_task
-def import_products(file: Union[str, PathLike[str], bytes]):
-    ProductImporter(file)
+def import_products(file: Union[str, PathLike[str], bytes], user_id: int=0):
+    ProductImporter(file, user_id)

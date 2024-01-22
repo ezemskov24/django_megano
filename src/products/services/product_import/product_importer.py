@@ -5,6 +5,7 @@ from os import path, PathLike
 from typing import Union
 import zipfile
 
+from django.core.exceptions import PermissionDenied
 from django.core.files.images import ImageFile
 from django.db import transaction
 from django.utils.text import slugify
@@ -21,7 +22,8 @@ from products.models import (
 
 
 class ProductImporter:
-    def __init__(self, file: Union[str, PathLike[str], bytes]):
+    def __init__(self, file: Union[str, PathLike[str], bytes], user_id: int):
+        self.__user_id = user_id
         self.__original_path = None
         self.__target_path = None
         self.__filename = None
@@ -216,7 +218,12 @@ class ProductImporter:
     def __process_seller_product_params(self, sell_prod):
         sell_prod['seller'] = Seller.objects.filter(
             pk=sell_prod['seller'],
-        ).first()
+        ).select_related('profile').first()
+        seller_owner = sell_prod['seller']
+        if self.__user_id and not (seller_owner.pk == self.__user_id or
+                                   seller_owner.is_admin or
+                                   seller_owner.is_staff):
+            raise PermissionDenied('Can\'t add products for someone else\'s seller')
         if sell_prod.get('new'):
             sell_prod['product'] = self.new_products[
                 str(sell_prod['product'])]
