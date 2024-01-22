@@ -27,17 +27,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-ew#o(-glp(5b906c3k1o&syu&e+*-k-hvke=3*x)icr%@u-h&o"
-# SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-ew#o(-glp(5b906c3k1o&syu&e+*-k-hvke=3*x)icr%@u-h&o",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# DEBUG = os.getenv('DEBUG')
+DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
 
 ALLOWED_HOSTS = [
-    "0.0.0.0",
     "127.0.0.1",
-]
+    "0.0.0.0",
+] + os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",")
 
 
 AUTH_USER_MODEL = 'account.Profile'
@@ -73,6 +74,25 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+if DEBUG:
+    INSTALLED_APPS += [
+        'debug_toolbar',
+    ]
+
+    MIDDLEWARE += [
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    ]
+
+    INTERNAL_IPS = [
+        '127.0.0.1',
+    ]
+    import socket
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS.append("10.0.2.2")
+    INTERNAL_IPS.extend(
+        [ip[: ip.rfind(".")] + ".1" for ip in ips]
+    )
 
 ROOT_URLCONF = "megano.urls"
 

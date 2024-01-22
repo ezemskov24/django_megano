@@ -43,3 +43,6 @@ if settings.DEBUG:
             document_root=settings.STATIC_ROOT
         )
     )
+    urlpatterns.append(
+        path("__debug__/", include("debug_toolbar.urls")),
+    )

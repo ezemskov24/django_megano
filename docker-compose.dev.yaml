@@ -1,17 +1,17 @@
-version: '3.9'
+version: '3.8'
 
 services:
   app:
     build:
       dockerfile: ./Dockerfile
     command:
-      - gunicorn
-      - megano.wsgi:application
-      - --bind
-      - 0.0.0.0:8000
+      - "python"
+      - "manage.py"
+      - "runserver"
+      - "0.0.0.0:8080"
     ports:
-      - "8000:8000"
-
+      - "8000:8080"
+    restart: always
     env_file:
       - .env
 
@@ -27,14 +27,3 @@ services:
       - POSTGRES_PASSWORD=${DB_PASS}
     ports:
       - '5432:5432'
-
-  nginx:
-    image: nginx:1.24-alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./src/static:/static
-      - ./src/media:/media
-    depends_on:
-      - app
