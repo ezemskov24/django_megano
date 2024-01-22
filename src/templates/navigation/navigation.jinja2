@@ -36,16 +36,27 @@
 </div>
 
 <script>
-  path = window.location.pathname;
-    console.log('path = ', path)
-    if (path.includes("profile")) {
-        console.log('path_2 = ', path)
-      document.getElementById("profile").classList.add("active");
-      } else if (path.includes("historyorder")) {
-      document.getElementById("historyorder").classList.add("active")
-      } else if (path.includes("account/account")) {
-      document.getElementById("account").classList.add("active")
-      } else if (path.includes("browsing-history")) {
-      document.getElementById("browsing_history").classList.add("active");
-  }
+  const path = window.location.pathname;
+  const elements = {
+    "profile": "profile",
+    "historyorder": "historyorder",
+    "account/account": "account",
+    "browsing-history": "browsing_history"
+  };
+
+  for (const key in elements) {
+    if (path.includes(key)) {
+      document.getElementById(elements[key]).classList.add("active");
+      break;
+    }
+}
+  {#path = window.location.pathname;#}
+  {#  if (path.includes("profile")) {#}
+  {#    document.getElementById("profile").classList.add("active");#}
+  {#    } else if (path.includes("historyorder")) {#}
+  {#    document.getElementById("historyorder").classList.add("active")#}
+  {#    } else if (path.includes("account/account")) {#}
+  {#    document.getElementById("account").classList.add("active")#}
+  {#    } else if (path.includes("browsing-history")) {#}
+  {#    document.getElementById("browsing_history").classList.add("active");}#}
 </script>
