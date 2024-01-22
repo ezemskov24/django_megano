@@ -23,3 +23,7 @@ def merge_cart_products(user, cart_list_session):
             except ValidationError:
                 product.count = product.product_seller.count
                 product.save()
+
+
+def clear_cart(profile):
+    Cart.objects.filter(profile=profile).delete()
