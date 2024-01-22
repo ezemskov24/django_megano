@@ -4357,6 +4357,16 @@ a.Cart-title {
     margin-left: 10px;
 }
 
+.ProductCard-priceOutOfStock {
+    line-height: 1em;
+    font-size: 15px;
+    color: #999;
+    font-weight: 400;
+    display: inline-block;
+    padding-bottom: 3px;
+    margin-left: 10px;
+}
+
 .ProductCard-text {
     visibility: visible;
     margin-top: 26px;
