@@ -282,3 +282,21 @@ class Value(models.Model):
     def __str__(self):
         return str(self.value)
 
+
+class ImportStatusEnum(models.IntegerChoices):
+    IN_PROGRESS = 0, 'In progress'
+    SUCCESS = 1, 'Success'
+    PARTIAL_SUCCESS = 2, 'Partial success'
+    FAILURE = 3, 'Failure'
+
+
+class ProductImportLog(models.Model):
+    start = models.DateTimeField(null=True, blank=True)
+    end = models.DateTimeField(null=True, blank=True)
+    status = models.PositiveIntegerField(
+        choices=ImportStatusEnum.choices,
+        default=ImportStatusEnum.IN_PROGRESS,
+    )
+    items_imported = models.PositiveIntegerField(default=0)
+    file_name = models.CharField(null=True, blank=True, max_length=200)
+    message_log = models.TextField(null=True, blank=True)
