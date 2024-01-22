@@ -122,9 +122,12 @@
                                         </strong>
                                     </div>
                                     {% if not order.status %}
-                                    <div class="Cart-block">
-                                        <a class="btn btn_primary btn_lg" href="#">Оплатить</a>
-                                    </div>
+                                        <form method="post">
+                                        {% csrf_token %}
+                                    <button type="submit" class="Cart-block">
+                                        <a class="btn btn_primary btn_lg">Оплатить</a>
+                                    </button>
+                                        </form>
                                     {% endif %}
                                 </div>
                             </div>
