@@ -40,7 +40,7 @@ class Order(models.Model):
     fio = models.CharField(max_length=255, null=False, blank=False)
     phone = models.CharField(max_length=10, blank=True, null=True)
     email = models.EmailField(null=False, blank=False)
-    cart = models.ManyToManyField(Cart, related_name='order', blank=True)
+    cart = models.JSONField()
     city = models.CharField(max_length=255, null=False, blank=False)
     delivery_address = models.CharField(max_length=255, null=False, blank=False)
     delivery_type = models.CharField(default='обычная доставка', max_length=20)
@@ -50,3 +50,4 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_id = models.SlugField(max_length=200, unique=True, null=True)

@@ -178,29 +178,29 @@
                                     </div>
                                 </div>
                                 <div class="Cart Cart_order">
-                                    {% for cart in carts %}
+                                    {% for cart in carts.values() %}
                                         <div class="Cart-product">
                                             <div class="Cart-block Cart-block_row">
                                                 <div class="Cart-block Cart-block_pict">
                                                     <a class="Cart-pict" href="#">
-                                                        <img class="Cart-img" src="/media/{{ cart.product_seller.product.images.first().image }}" alt="card.jpg" />
+                                                        <img class="Cart-img" src="{{ cart['image'] }}" alt="card.jpg" />
                                                     </a>
                                                 </div>
                                                 <div class="Cart-block Cart-block_info">
-                                                    <a class="Cart-title" href="#">{{ cart.product_seller.product.name }}</a>
-                                                    {% if (cart.product_seller.product.description)|length > 250 %}
-                                                        {% set description = (cart.product_seller.product.description[:250] + '...') %}
+                                                    <a class="Cart-title" href="#">{{ cart['name'] }}</a>
+                                                    {% if (cart['description'])|length > 250 %}
+                                                        {% set description = (cart['description'][:250] + '...') %}
                                                     {% else %}
-                                                        {% set description = cart.product_seller.product.description  %}
+                                                        {% set description = cart['description']  %}
                                                     {% endif %}
                                                     <div class="Cart-desc">{{ description }}</div>
                                                 </div>
                                                 <div class="Cart-block Cart-block_price">
-                                                    <div class="Cart-price">${{ cart.product_seller.price * cart.count }}</div>
+                                                    <div class="Cart-price">${{ cart['price'] * cart['count'] }}</div>
                                                 </div>
                                             </div>
                                             <div class="Cart-block Cart-block_row">
-                                                <div class="Cart-block Cart-block_amount">{{ cart.count }} шт.</div>
+                                                <div class="Cart-block Cart-block_amount">{{ cart['count'] }} шт.</div>
                                             </div>
                                         </div>
                                     {% endfor %}
@@ -210,6 +210,7 @@
                                             <span class="Cart-price">${{ total_price }}</span>
                                         </div>
                                         <input type="number" name="total_price" value="{{ total_price }}" hidden>
+                                        <input type="text" name="carts" value="{{ json_carts }}" style="display: None">
                                         <div class="Cart-block">
                                             <button class="btn btn_primary btn_lg" type="submit">Оплатить
                                             </button>

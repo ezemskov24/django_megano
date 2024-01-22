@@ -1,3 +1,7 @@
+import json
+
+import self as self
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import F
 from django.views.generic import ListView, DetailView
 from django.core.exceptions import ValidationError
@@ -8,6 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from account.models import Profile
 from cart.serializer import CartSerializer, ProductSellerSerializer, CartPostSerializer
+from discounts.services.discount_utils import calculate_discounted_prices
 
 from products.models import SellerProduct
 from django.http import HttpResponse, HttpRequest
@@ -18,10 +23,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import CreateOrderForm
 from .models import Order, Cart
-from .services.order_create import get_total_price, get_fio
+from .services.order_create import get_total_price, get_fio, get_carts_JSON
 
 
-class OrderListView(ListView):
+class OrderListView(LoginRequiredMixin, ListView):
     template_name = "cart/order-list.jinja2"
     context_object_name = "orders"
 
@@ -30,36 +35,44 @@ class OrderListView(ListView):
         return queryset
 
 
-class OrderDetailView(DetailView):
+class OrderDetailView(LoginRequiredMixin, DetailView):
     template_name = "cart/order-details.jinja2"
-    queryset = Order.objects.prefetch_related("cart")
     context_object_name = "order"
+
+    def get_queryset(self):
+        queryset = Order.objects.filter(archived=False, profile=self.request.user.id)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['order'].cart = json.loads(context['order'].cart)
+        return context
 
 
 class CreateOrderView(LoginRequiredMixin, View):
     """
     View-класс для создания заказов.
     """
-    # login_url = reverse_lazy("account:login")
-    # redirect_field_name = reverse_lazy("cart:create_order")
 
     def get(self, request: HttpRequest) -> HttpResponse:
         if request.user.is_authenticated:
             fio = get_fio(request.user.last_name, request.user.first_name, request.user.username)
+            carts = (get_carts_JSON(Cart.objects.filter(profile=request.user.id)))
 
-            carts = Cart.objects.filter(profile=request.user.id)
-            content = {
+            context = {
                 'form': CreateOrderForm(),
                 'user_fio': fio,
                 'user_phone': request.user.phone,
                 'user_email': request.user.email,
                 'carts': carts,
+                'json_carts': json.dumps(carts, cls=DjangoJSONEncoder),
                 'total_price': get_total_price(carts),
             }
-        else:
-            content = {}
 
-        return render(request, 'cart/create_order.jinja2', context=content)
+        else:
+            context = {}
+
+        return render(request, 'cart/create_order.jinja2', context=context)
 
     def post(self, request, *args, **kwargs):
         form = CreateOrderForm(request.POST)
@@ -70,15 +83,13 @@ class CreateOrderView(LoginRequiredMixin, View):
                 phone=request.POST['phone'],
                 email=request.POST['mail'],
                 city=request.POST['city'],
+                cart=request.POST['carts'],
                 delivery_address=request.POST['delivery_address'],
                 delivery_type=request.POST['delivery_type'],
                 payment_type=request.POST['payment_type'],
                 comment=request.POST['comment'],
                 total_price=request.POST['total_price'],
             )
-            order.cart.set(Cart.objects.filter(profile=request.user.id))
-
-            order.save()
 
         else:
             redirect('cart:create_order')

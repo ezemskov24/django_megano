@@ -160,6 +160,7 @@ if sys.argv[1] != 'runserver':
 else:
     STATICFILES_DIRS = [BASE_DIR / 'static']
 
+FOLDER_FIXTURES = BASE_DIR / 'fixtures'
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'

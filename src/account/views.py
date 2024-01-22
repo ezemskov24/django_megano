@@ -1,8 +1,9 @@
-from django.contrib.auth import authenticate, login
+from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, LoginView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     CreateView,
     DetailView,
@@ -10,16 +11,16 @@ from django.views.generic import (
     UpdateView,
 )
 
-from adminsettings.models import SiteSettings
 from .forms import UserRegistrationForm, ProfileForm
-from .models import Profile, Seller
+from .models import BrowsingHistory, Profile, Seller
+from adminsettings.models import SiteSettings
+from cart.models import Order
 from products.models import Product
-from .models import BrowsingHistory
-from django.contrib import messages
 
 
 
-class ProfileUpdateView(UpdateView):
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    login_url = 'account:login'
     model = Profile
     form_class = ProfileForm
     template_name = 'registration/profile.jinja2'
@@ -31,12 +32,13 @@ class ProfileUpdateView(UpdateView):
         password1 = form.cleaned_data.get('new_password1')
         password2 = form.cleaned_data.get('new_password2')
 
-        if password1 and password1 == password2:
-            self.object.set_password(password1)
-
+        if password1:
+            if password1 == password2:
+                if self.object.set_password(password1):
+                    messages.success(self.request, "Пароль успешно обновлён.")
+            else:
+                messages.error(self.request, 'Пароли не совпадают.')
         messages.success(self.request, "Данные успешно обновлены.")
-        if self.object.save():
-            messages.success(self.request, "Данные успешно обновлены.")
         return response
 
     def form_invalid(self, form):
@@ -92,15 +94,13 @@ class UserLogoutView(LogoutView):
     next_page = reverse_lazy('account:login')
 
 
-class UserProfileView(TemplateView):
-    template_name = 'registration/profile.jinja2'
-
-
-class UserAccountView(TemplateView):
+class UserAccountView(LoginRequiredMixin, TemplateView):
+    login_url = 'account:login'
     template_name = 'registration/account.jinja2'
 
 
-class UserEmailView(TemplateView):
+class UserEmailView(LoginRequiredMixin, TemplateView):
+    login_url = 'account:login'
     template_name = 'registration/e-mail.jinja2'
 
 
@@ -123,6 +123,19 @@ class HistoryOrderView(LoginRequiredMixin, TemplateView):
     template_name = 'registration/historyorder.jinja2'
     login_url = 'account:login'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        history = Order.objects.filter(profile=self.request.user).order_by('-created_at')[:20]
+
+        # for item in history:
+        #     product = item.product
+        #     first_image = product.images.first()
+        #
+        #     item.image_url = first_image.image.url if first_image else None
+
+        context['history'] = history
+
+        return context
 
 class UserBrowsingHistoryView(LoginRequiredMixin, TemplateView):
     template_name = 'registration/browsing-history.jinja2'
