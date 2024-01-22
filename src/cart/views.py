@@ -26,7 +26,7 @@ class OrderListView(ListView):
     context_object_name = "orders"
 
     def get_queryset(self):
-        queryset = Order.objects.filter(archived=False).order_by('-created_at')
+        queryset = Order.objects.filter(archived=False, profile=self.request.user.id).order_by('-created_at')
         return queryset
 
 
