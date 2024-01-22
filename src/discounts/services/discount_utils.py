@@ -195,8 +195,7 @@ def get_bulk_discount(products: List[Tuple[Product, Decimal, int]]) -> Any:
     unique_amount = len(products)
     total_amount = sum([prod[2] for prod in products])
     total_price = sum([prod[1] * prod[2] for prod in products])
-    print(total_amount, unique_amount)
-    print(total_price)
+
     discount = BulkDiscount.current.filter(
         Q(product_amount__lte=unique_amount, only_unique=True) | Q(product_amount__lte=total_amount, only_unique=False),
         total_sum__lte=total_price,
@@ -229,8 +228,12 @@ def calculate_discounted_prices(
     )
     bulk_discount = get_bulk_discount(products)
 
-    discounts = [*product_discounts, *combo_discounts, bulk_discount]
-    discounts.sort(key=__get_sort_params, reverse=True)
+    discounts = [*product_discounts, *combo_discounts]
+    if bulk_discount:
+        discounts.append(bulk_discount)
+
+    if discounts:
+        discounts.sort(key=__get_sort_params, reverse=True)
 
     if bulk_discount and discounts[0] is bulk_discount:
         return _process_multiproduct_discount(products, bulk_discount)
@@ -273,7 +276,7 @@ def _process_discounts(
 
     if products:
         result.extend(
-            [(product[0], product[1], product[1], product[2], False)]
+            (product[0], product[1], product[1], product[2], False)
             for product in products
         )
 
