@@ -32,16 +32,17 @@ class CatalogQuerySetProcessor:
         self.filter_name = None
         self.filter_in_stock = None
         self.search_query = None
+        self.after_post = None
 
     def get_queryset(self, request: HttpRequest) -> QuerySet:
-        products_list = self._get_base_queryset(request)
-        products_list = self._get_filtered_queryset(products_list)
-        sort = self._get_selected_sort_type(request)
-        products_list = self._get_sorted_queryset(products_list, sort)
+        products_list = self.__get_base_queryset(request)
+        products_list = self.__get_filtered_queryset(products_list)
+        sort = self.__get_selected_sort_type(request)
+        products_list = self.__get_sorted_queryset(products_list, sort)
 
         return products_list
 
-    def _get_base_queryset(self, request) -> QuerySet:
+    def __get_base_queryset(self, request) -> QuerySet:
         """ Получение базового queryset для дальнейшей работы. """
         search_query = request.session.get('search_query')
         # base_filter = {'seller_count__gt': 0}
@@ -73,14 +74,21 @@ class CatalogQuerySetProcessor:
 
         self.filter_prices['min'] = str(min_pr)
         self.filter_prices['max'] = str(max_pr)
-        if not self.filter_prices.get('selected_min'):
+        selected_min_pr = self.filter_prices.get('selected_min')
+
+        if not selected_min_pr:
             self.filter_prices['selected_min'] = str(min_pr)
-        if not self.filter_prices.get('selected_max'):
+        elif selected_min_pr == str(round(min_pr, 2)) and self.filter_params.get('price__gte'):
+            del self.filter_params['price__gte']
+        selected_max_pr = self.filter_prices.get('selected_max')
+        if not selected_max_pr:
             self.filter_prices['selected_max'] = str(max_pr)
+        elif selected_max_pr == str(round(max_pr, 2)) and self.filter_params.get('price__lte'):
+            del self.filter_params['price__lte']
 
         return products_list
 
-    def _get_filtered_queryset(self, queryset: QuerySet) -> QuerySet:
+    def __get_filtered_queryset(self, queryset: QuerySet) -> QuerySet:
         """
         Получение отфильтрованного queryset.
 
@@ -98,7 +106,7 @@ class CatalogQuerySetProcessor:
         return queryset
 
     @staticmethod
-    def _get_selected_sort_type(request: HttpRequest) -> str:
+    def __get_selected_sort_type(request: HttpRequest) -> str:
         """ Получение выбранного типа сортировки из запроса. """
         sort = request.GET.get('sort')
         if sort:
@@ -113,7 +121,7 @@ class CatalogQuerySetProcessor:
         return sort
 
     @staticmethod
-    def _get_sorted_queryset(queryset: QuerySet, sort: str) -> QuerySet:
+    def __get_sorted_queryset(queryset: QuerySet, sort: str) -> QuerySet:
         """
         Получение отсортированного queryset.
 
@@ -191,55 +199,64 @@ class CatalogQuerySetProcessor:
 
         return context
 
-    def process_get_params(self, request: HttpRequest, **kwargs):
-        self._process_path_params(**kwargs)
-        print(1)
-        if self.filter_params:
-            print(2)
-            request.session['filter_params'] = self.filter_params
-        else:
-            filter_params = request.session.get('filter_params')
-            if filter_params:
-                if not request.GET.get('p'):
-                    print(3)
-                    del request.session['filter_params']
-                else:
-                    print(4)
-                    self.filter_params = filter_params
+    def process_get_params(self, request: HttpRequest, **kwargs,):
+        self.__process_path_params(**kwargs)
+        change_page = request.GET.get('p')
+        if not change_page and not self.after_post:
+            self.__clean_session_filter(request)
+            self.__clean_session_search(request)
 
+        self.filter_in_stock = request.session.get('filter_in_stock')
+        self.filter_params = request.session.get('filter_params', {})
+        self.filter_name = request.session.get('filter_name')
+        self.filter_prices = request.session.get('filter_prices', {})
+        self.search_query = request.session.get('search_query')
         if self.search_query:
             request.session['search_query'] = self.search_query
-        elif (
-                request.session.get('search_query')
-                and not request.GET.get('p')
-                and not self.filter_params
-        ):
-            del request.session['search_query']
+        else:
+            search_query = request.session.get('search_query')
+            if search_query:
+                if not change_page:
+                    del request.session['search_query']
+                else:
+                    self.search_query = search_query
 
     def process_post_params(self, request: HttpRequest, **kwargs):
-        self._process_path_params(**kwargs)
+        self.__process_path_params(**kwargs)
         filter_form = FilterForm(request.POST)
         search_form = SearchForm(request.POST)
         if filter_form.is_valid():
+            self.__clean_session_filter(request)
+
             cd = filter_form.cleaned_data
+            filter_params = {}
+            filter_prices = {}
             if cd['price']:
                 price = cd['price'].split(';')
-                self.filter_params['price__gte'] = price[0]
-                self.filter_params['price__lte'] = price[1]
-                self.filter_prices['selected_min'] = price[0]
-                self.filter_prices['selected_max'] = price[1]
+                filter_params['price__gte'] = price[0]
+                filter_params['price__lte'] = price[1]
+                filter_prices['selected_min'] = price[0]
+                filter_prices['selected_max'] = price[1]
             if cd['title']:
-                self.filter_params['name__icontains'] = cd['title']
-                self.filter_name = cd['title']
+                filter_params['name__icontains'] = cd['title']
+                request.session['filter_name'] = cd['title']
             if cd['in_stock']:
-                self.filter_params['amount__gt'] = 0
-                self.filter_params['seller_count__gt'] = 0
-                self.filter_in_stock = True
+                filter_params['amount__gt'] = 0
+                filter_params['seller_count__gt'] = 0
+                request.session['filter_in_stock'] = True
+
+            if filter_params:
+                request.session['filter_params'] = filter_params
+            if filter_prices:
+                request.session['filter_prices'] = filter_prices
 
         if search_form.is_valid():
-            self.search_query = search_form.cleaned_data['query']
+            self.__clean_session_search(request)
+            request.session['search_query'] = search_form.cleaned_data['query']
 
-    def _process_path_params(self, **kwargs):
+        self.after_post = True
+
+    def __process_path_params(self, **kwargs):
         """ Обработка параметров из пути запроса. """
         tag_slug = kwargs.get('tag')
         if tag_slug:
@@ -259,9 +276,9 @@ class CatalogQuerySetProcessor:
 
         discount_slug = kwargs.get('sale')
         if discount_slug:
-            self._process_discount_slug(discount_slug)
+            self.__process_discount_slug(discount_slug)
 
-    def _process_discount_slug(self, discount_slug: str):
+    def __process_discount_slug(self, discount_slug: str):
         product_discount = ProductDiscount.current.filter(
                 slug=discount_slug,
             ).prefetch_related('products').first()
@@ -325,3 +342,31 @@ class CatalogQuerySetProcessor:
             self.products = products
         if categories:
             self.categories = categories
+
+    @staticmethod
+    def __clean_session_filter(request):
+        if request.session.get('filter_in_stock'):
+            del request.session['filter_in_stock']
+        if request.session.get('filter_params'):
+            del request.session['filter_params']
+        if request.session.get('filter_prices'):
+            del request.session['filter_prices']
+        if request.session.get('filter_name'):
+            del request.session['filter_name']
+
+    @staticmethod
+    def __clean_session_search(request):
+        if request.session.get('search_query'):
+            del request.session['search_query']
+
+
+
+
+
+
+
+
+
+
+
+
