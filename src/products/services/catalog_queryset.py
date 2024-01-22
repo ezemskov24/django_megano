@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any, Dict
 
-from django.db.models import QuerySet, Count, Min, Max, Sum
+from django.db.models import QuerySet, Count, Min, Max, Sum, BooleanField, ExpressionWrapper, Q
 from django.http import HttpRequest
 
 from ..forms import FilterForm, SearchForm
@@ -44,7 +44,8 @@ class CatalogQuerySetProcessor:
     def _get_base_queryset(self, request) -> QuerySet:
         """ Получение базового queryset для дальнейшей работы. """
         search_query = request.session.get('search_query')
-        base_filter = {'seller_count__gt': 0}
+        # base_filter = {'seller_count__gt': 0}
+        base_filter = {}
         if self.tag or self.categories or self.products or search_query:
             if self.tag:
                 base_filter['tags'] = self.tag
@@ -120,39 +121,45 @@ class CatalogQuerySetProcessor:
             - queryset: queryset, подлежащего сортировке.
             - sort: тип сортировки.
         """
+        annotate_params = {
+            'in_stock': ExpressionWrapper(
+                Q(seller_count__gt=0),
+                output_field=BooleanField()
+            )
+        }
+        sort_params = ['-in_stock']
         if sort == SortEnum.CRE_ASC.value:
-            return queryset.order_by('created_at').all()
+            sort_params.append('created_at')
 
         if sort == SortEnum.CRE_DEC.value:
-            return queryset.order_by('-created_at').all()
+            sort_params.append('-created_at')
 
         if sort == SortEnum.POP_ASC.value:
-            return queryset.order_by('-count_sells').all()
+            sort_params.append('-count_sells')
 
         if sort == SortEnum.POP_DEC.value:
-            return queryset.order_by('count_sells').all()
+            sort_params.append('count_sells')
 
         if sort == SortEnum.PRI_ASC.value:
-            return queryset.annotate(
-                price=Min('sellerproduct__price')
-            ).order_by('-price').all()
+            annotate_params['price'] = Min('sellerproduct__price')
+            sort_params.append('-price')
 
         if sort == SortEnum.PRI_DEC.value:
-            return queryset.annotate(
-                price=Min('sellerproduct__price')
-            ).order_by('price').all()
+            annotate_params['price'] = Min('sellerproduct__price')
+            sort_params.append('price')
 
         if sort == SortEnum.REV_ASC.value:
-            return queryset.annotate(
-                rev_count=Count('reviews')
-            ).order_by('-rev_count').all()
+            annotate_params['rev_count'] = Count('reviews')
+            sort_params.append('-rev_count')
 
         if sort == SortEnum.REV_DEC.value:
-            return queryset.annotate(
-                rev_count=Count('reviews')
-            ).order_by('rev_count').all()
+            annotate_params['rev_count'] = Count('reviews')
+            sort_params.append('rev_count')
 
-        return queryset.order_by('sort_index').all()
+        sort_params.append('sort_index')
+        return queryset.annotate(
+            **annotate_params,
+        ).order_by(*sort_params).all()
 
     def get_context_data(
             self,
@@ -186,6 +193,20 @@ class CatalogQuerySetProcessor:
 
     def process_get_params(self, request: HttpRequest, **kwargs):
         self._process_path_params(**kwargs)
+        print(1)
+        if self.filter_params:
+            print(2)
+            request.session['filter_params'] = self.filter_params
+        else:
+            filter_params = request.session.get('filter_params')
+            if filter_params:
+                if not request.GET.get('p'):
+                    print(3)
+                    del request.session['filter_params']
+                else:
+                    print(4)
+                    self.filter_params = filter_params
+
         if self.search_query:
             request.session['search_query'] = self.search_query
         elif (
@@ -212,6 +233,7 @@ class CatalogQuerySetProcessor:
                 self.filter_name = cd['title']
             if cd['in_stock']:
                 self.filter_params['amount__gt'] = 0
+                self.filter_params['seller_count__gt'] = 0
                 self.filter_in_stock = True
 
         if search_form.is_valid():
