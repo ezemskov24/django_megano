@@ -102,6 +102,16 @@ class Product(models.Model):
         """ Максимальная цена продукта. """
         return product_utils.get_max_price(self)
 
+    def description_short(self, length: int = 100) -> str:
+        if len(self.description) <= length:
+            return self.description
+        return self.description[:length] + '...'
+
+    def name_short(self, length: int = 50) -> str:
+        if len(self.name) <= length:
+            return self.name
+        return self.name[:length] + '...'
+
     def __str__(self):
         return f'{self.name}'
 
