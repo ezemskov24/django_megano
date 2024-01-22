@@ -5,15 +5,7 @@
 {% endblock %}
 
 {% block header %}
-  {% include 'common/header_min.jinja2' %}
-{% endblock %}
-
-{% block navigation %}
-  {% include 'navigation/navigation.jinja2' %}
-{% endblock %}
-
-{% block custom_css %}
-    <link rel="stylesheet" href="/static/assets/css/profile_style.css">
+  {% include 'common/header_full.jinja2' %}
 {% endblock %}
 
 {% block content %}
@@ -44,14 +36,20 @@
                                             {% if profile.avatar %}
                                             <div style="width: 100%; height: 100%;
                                                 background: url('{{ profile.avatar.url }}') no-repeat center;
-                                                background-size: contain">
+                                                background-size: contain" id="coverPreview">
                                             {% else %}
                                             <div style="width: 100%; height: 100%;
                                                 background: url('/static/assets/img/icons/blankphoto.jpg') no-repeat center;
                                                 background-size: contain">
                                             {% endif %}
-                                                <input type="file" name="avatar" accept="image/*" id="id_avatar"
+                                                <input type="file" name="avatar" accept="image/*" id="cover"
                                                      style="height: 100%; opacity: 0;">
+
+
+{#                                        <img src="https://www.freeiconspng.com/uploads/no-image-icon-13.png" id="coverPreview" alt="">#}
+{#                                        <input type="file" id="cover" />#}
+
+
                                               </div>
                                             </label>
 
@@ -60,6 +58,8 @@
                                     <div class="form-group">
                                         <label class="form-label" for="username">ФИО
                                         <input class="form-input" id="name" name="username" type="text" value={{ user.username }} data-validate="require" />
+
+
                                         </label>
                                     </div>
                                      {% if form.errors %}
@@ -128,6 +128,32 @@
             </div>
         </div>
     </div>
+
+<script>
+    let coverPreview = document.getElementById('coverPreview');
+    let cover = document.getElementById('cover');
+
+    coverPreview.addEventListener('click',_=>cover.click());
+
+    cover.addEventListener("change",_=>{
+        console.log(coverPreview.files[0].mozFullPath);
+        {#console.log('dfdhslfdsf =', this.files[0].mozFullPath);#}
+        {#window.getComputedStyle(coverPreview, false),#}
+        {#bi = style.backgroundImage.slice(4, -1).replace(/"/g, "");#}
+        {#console.log('********', bi)#}
+            let file = cover.files[0];
+            console.log(file.mozFullPath);
+            let reader = new FileReader();
+            {#console.log('********', file)#}
+            reader.onload = function (){
+                coverPreview.src = reader.result; }
+                {#console.log(coverPreview.src)#}
+            {#console.log('********', file.webkitRelativePath+file.name);#}
+            {#reader.readAsDataURL(file);#}
+            file.name;
+    });
+</script>
+
 <script src="{{ static('admin/js/vendor/jquery/jquery.min.js') }}"></script>
 {#<script src="{{ static('assets/js/form_validation.js') }}"></script>#}
 <script src="{{ static('assets/js/inputmask.min.js') }}"></script>

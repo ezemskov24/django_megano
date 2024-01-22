@@ -43,3 +43,30 @@
     color: green;
     border-color: greenyellow;
 }
+.error, .error_text {
+    color: red;
+}
+
+.success {
+    color: green;
+}
+
+.error_text {
+    animation: fade-out 10s;
+    opacity: 0;
+}
+
+.messages li {
+    animation: fade-out 4s;
+    opacity: 0;
+    text-align: end;
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}

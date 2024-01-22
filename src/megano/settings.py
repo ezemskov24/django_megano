@@ -199,6 +199,7 @@ if sys.argv[1] != 'runserver':
 else:
     STATICFILES_DIRS = [BASE_DIR / 'static']
 
+FOLDER_FIXTURES = BASE_DIR / 'fixtures'
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -233,3 +234,7 @@ IMPORT_PENDING_DIR = IMPORT_DIR / 'pending'
 IMPORT_SUCCESS_DIR = IMPORT_DIR / 'success'
 IMPORT_FAILURE_DIR = IMPORT_DIR / 'failure'
 IMPORT_LOGS_DIR = IMPORT_DIR / 'logs'
+
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 1
