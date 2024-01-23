@@ -28,16 +28,15 @@ def get_carts_JSON(carts):
         (cart.product_seller.product, cart.product_seller.price, cart.count)
         for cart in carts
     ]
-    # carts_list = calculate_discounted_prices(carts_list)
-
+    carts_list = calculate_discounted_prices(carts_list)
     for cart in carts_list:
         response[cart[0].id] = {
             'image': cart[0].images.first().image.url,
             'name': cart[0].name,
             'slug': cart[0].slug,
             'description': cart[0].description,
-            'price': cart[1],
-            'count': cart[2],
+            'price': float(cart[2]),
+            'count': cart[3],
         }
 
     return response

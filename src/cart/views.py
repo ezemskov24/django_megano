@@ -45,7 +45,8 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['order'].cart = json.loads(context['order'].cart)
+        print('context=', context['order'].cart)
+        # context['order'].cart = json.loads(context['order'].cart)
         return context
 
 
@@ -60,12 +61,10 @@ class CreateOrderView(LoginRequiredMixin, View):
             carts = (get_carts_JSON(Cart.objects.filter(profile=request.user.id)))
 
             context = {
-                'form': CreateOrderForm(),
+                'form': CreateOrderForm(initial={"cart": carts}),
                 'user_fio': fio,
                 'user_phone': request.user.phone,
                 'user_email': request.user.email,
-                'carts': carts,
-                'json_carts': json.dumps(carts, cls=DjangoJSONEncoder),
                 'total_price': get_total_price(carts),
             }
 
@@ -77,19 +76,23 @@ class CreateOrderView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = CreateOrderForm(request.POST)
         if form.is_valid:
+            print(type(form.cleaned_data['cart']))
+
+            # перейти к оплате, в случае успешной оплаты создать заказ
             order = Order.objects.create(
                 profile=Profile.objects.get(id=request.user.id),
                 fio=request.POST['fio'],
                 phone=request.POST['phone'],
                 email=request.POST['mail'],
                 city=request.POST['city'],
-                cart=request.POST['carts'],
+                cart=form.data['cart'],
                 delivery_address=request.POST['delivery_address'],
                 delivery_type=request.POST['delivery_type'],
                 payment_type=request.POST['payment_type'],
                 comment=request.POST['comment'],
                 total_price=request.POST['total_price'],
             )
+        #     удалить товары из корзины
 
         else:
             redirect('cart:create_order')

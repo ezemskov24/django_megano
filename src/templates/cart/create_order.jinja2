@@ -47,7 +47,7 @@
                 </div>
 
                 <div class="Section-content">
-                    <form class="form" action="#" method="post">
+                    <form class="form" action="#" method="post" >
                     {% csrf_token %}
                         <div class="Order-block Order-block_OPEN" id="step1" data-target="one">
                             <header class="Section-header Section-header_sm">
@@ -131,8 +131,7 @@
                         </div>
                         <div class="Order-block" id="step4" data-target="four">
                             <header class="Section-header Section-header_sm">
-                                <h2 class="Section-title">Шаг 4. Подтверждение заказа
-                                </h2>
+                                <h2 class="Section-title">Шаг 4. Подтверждение заказа</h2>
                             </header>
                             <!--+div.Order.-confirmation-->
                             <div class="Order-infoBlock">
@@ -168,7 +167,6 @@
                                             <div class="Order-info Order-info_pay">
                                                 <div class="Order-infoType">Оплата:</div>
                                                 <div class="Order-infoContent" id="user_payment_type"></div>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -178,7 +176,7 @@
                                     </div>
                                 </div>
                                 <div class="Cart Cart_order">
-                                    {% for cart in carts.values() %}
+                                    {% for cart in form.initial.cart.values() %}
                                         <div class="Cart-product">
                                             <div class="Cart-block Cart-block_row">
                                                 <div class="Cart-block Cart-block_pict">
@@ -210,15 +208,14 @@
                                             <span class="Cart-price">${{ total_price }}</span>
                                         </div>
                                         <input type="number" name="total_price" value="{{ total_price }}" hidden>
-                                        <input type="text" name="carts" value="{{ json_carts }}" style="display: None">
                                         <div class="Cart-block">
-                                            <button class="btn btn_primary btn_lg" type="submit">Оплатить
-                                            </button>
+                                            <button class="btn btn_primary btn_lg" type="submit">Оплатить</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    {{ form.cart }}
                     </form>
                 </div>
             </div>
