@@ -20,6 +20,9 @@ services:
 
   database:
     image: postgres:14.10-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
     environment:
       - DB_HOST=${DB_HOST}
       - POSTGRES_DB=${DB_NAME}
@@ -39,7 +42,7 @@ services:
     depends_on:
       - app
 
-
 volumes:
+  postgres_data:
   static:
   media:
