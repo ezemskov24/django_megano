@@ -34,7 +34,12 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./src/static:/static
-      - ./src/media:/media
+      - static:/static
+      - media:/media
     depends_on:
       - app
+
+
+volumes:
+  static:
+  media:
