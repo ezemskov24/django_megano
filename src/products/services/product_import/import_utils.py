@@ -78,6 +78,8 @@ class ImportLogger:
         log_path = self.__file_manager.get_log_path()
         self.__file_manager.save_file(log, log_path)
 
+        return log
+
 
 class FileManager:
     def __init__(self, start):

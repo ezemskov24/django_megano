@@ -11,7 +11,8 @@ from django.db import transaction
 from django.utils.text import slugify
 
 from .import_utils import ImportLogger, FileManager
-from account.models import Seller
+from .mailer import send_email
+from account.models import Profile, Seller
 from products.models import (
     Category,
     ImportStatusEnum,
@@ -22,8 +23,14 @@ from products.models import (
 
 
 class ProductImporter:
-    def __init__(self, file: Union[str, PathLike[str], bytes], user_id: int):
+    def __init__(
+            self,
+            file: Union[str, PathLike[str], bytes],
+            user_id: int = None,
+            email: str = None,
+    ):
         self.__user_id = user_id
+        self.__email = email
         self.__original_path = None
         self.__target_path = None
         self.__filename = None
@@ -44,7 +51,19 @@ class ProductImporter:
 
     def __import_products(self, file: Union[str, PathLike[str], bytes]):
         try:
-            self.__logger.log(f'Begin product_import')
+            if self.__user_id:
+                self.__initiating_user = Profile.objects.filter(
+                    pk=self.__user_id
+                ).first()
+                self.__logger.log(
+                    'Begin product import initiated by user {pk} | {username} | {email}'.format(
+                        pk=self.__initiating_user.pk,
+                        username=self.__initiating_user.username,
+                        email=self.__initiating_user.email,
+                    )
+                )
+            else:
+                self.__logger.log('Begin product_import initiated by admin')
             self.__check_file(file)
             self.__check_archive()
             self.__add_entries_from_archive_to_database()
@@ -67,7 +86,7 @@ class ProductImporter:
         finally:
             self.__calculate_total_imports()
             status = self.__get_status()
-            self.__logger.finalize_log(status, self.__successful_imports)
+            log = self.__logger.finalize_log(status, self.__successful_imports)
 
             success = self.__successful_imports > 0
             if self.__json:
@@ -76,6 +95,8 @@ class ProductImporter:
                 self.__file_manager.save_file(file, file_path)
             if self.__original_path:
                 self.__file_manager.remove_file(self.__original_path)
+
+            self.__notify_admin(status, log)
 
     def __check_file(self, file: Union[str, PathLike[str], bytes]):
         if isinstance(file, PathLike) or isinstance(file, str):
@@ -260,3 +281,25 @@ class ProductImporter:
             return ImportStatusEnum.SUCCESS
         else:
             return ImportStatusEnum.PARTIAL_SUCCESS
+
+    def __notify_admin(self, status, log):
+        if self.__user_id:
+            subject = 'Product import initiated by user {pk} | {username}'.format(
+                pk=self.__initiating_user.pk,
+                username=self.__initiating_user.username,
+                email=self.__initiating_user.email,
+            )
+            message = """
+Product import by user {pk} | {username} | {email} has been performed.
+Import result: {status}.
+Here's the log:
+{log}
+            """.format(
+                pk=self.__initiating_user.pk,
+                username=self.__initiating_user.username,
+                email=self.__initiating_user.email,
+                status=status.name,
+                log=log
+            )
+
+            send_email(subject, message, self.__email)
