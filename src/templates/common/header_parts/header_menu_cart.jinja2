@@ -32,7 +32,9 @@
                 </button>
                 <div class="dropdown-content">
                     <a class="dropdown-content-a" href="{{ url('account:account') }}">Личный кабинет</a>
-                    <a class="dropdown-content-a" href="#">Административный раздел</a>
+                    {% if user.is_staff %}
+                        <a class="dropdown-content-a" href="{{ url('admin:index') }}">Административный раздел</a>
+                    {% endif %}
                     <a class="dropdown-content-a" href="{{ url('account:logout') }}">Выход</a>
                 </div>
             </div>
