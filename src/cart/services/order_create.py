@@ -1,11 +1,19 @@
 from cart.models import Cart
 from discounts.services.discount_utils import calculate_discounted_prices
 
+from adminsettings.models import SiteSettings
+
 
 def get_total_price(carts) -> int:
     total_price = 0
+    min_price = SiteSettings.objects.first().min_price_for_free_delivery
+    delivery_price = SiteSettings.objects.first().delivery_cost
     for cart in carts.values():
         total_price += cart['price'] * cart['count']
+
+    sellers = [cart['seller'] for cart in carts.values()]
+    if not ((len(sellers) > 1 and (all(seller == sellers[0] for seller in sellers))) and total_price >= min_price):
+        total_price += delivery_price
     return total_price
 
 
@@ -37,6 +45,7 @@ def get_carts_JSON(carts):
             'description': cart[0].description,
             'price': float(cart[2]),
             'count': cart[3],
+            'seller': cart[0].sellerproduct_set.get(product=cart[0]).seller.name,
         }
 
     return response

@@ -1,4 +1,5 @@
 import json
+import logging
 
 import self as self
 from django.core.serializers.json import DjangoJSONEncoder
@@ -11,6 +12,7 @@ from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
 from account.models import Profile
+from adminsettings.models import SiteSettings
 from cart.serializer import CartSerializer, ProductSellerSerializer, CartPostSerializer
 from discounts.services.discount_utils import calculate_discounted_prices
 
@@ -45,8 +47,7 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        print('context=', context['order'].cart)
-        # context['order'].cart = json.loads(context['order'].cart)
+        print('context=', type(context['order'].cart))
         return context
 
 
@@ -66,6 +67,7 @@ class CreateOrderView(LoginRequiredMixin, View):
                 'user_phone': request.user.phone,
                 'user_email': request.user.email,
                 'total_price': get_total_price(carts),
+                'express': SiteSettings.objects.first().express_delivery_cost,
             }
 
         else:
@@ -75,9 +77,8 @@ class CreateOrderView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = CreateOrderForm(request.POST)
-        if form.is_valid:
-            print(type(form.cleaned_data['cart']))
 
+        if form.is_valid():
             # перейти к оплате, в случае успешной оплаты создать заказ
             order = Order.objects.create(
                 profile=Profile.objects.get(id=request.user.id),
@@ -85,7 +86,7 @@ class CreateOrderView(LoginRequiredMixin, View):
                 phone=request.POST['phone'],
                 email=request.POST['mail'],
                 city=request.POST['city'],
-                cart=form.data['cart'],
+                cart=form.cleaned_data['cart'],
                 delivery_address=request.POST['delivery_address'],
                 delivery_type=request.POST['delivery_type'],
                 payment_type=request.POST['payment_type'],
@@ -93,10 +94,9 @@ class CreateOrderView(LoginRequiredMixin, View):
                 total_price=request.POST['total_price'],
             )
         #     удалить товары из корзины
-
         else:
-            redirect('cart:create_order')
-
+            # return redirect('cart:create_order')
+            return self.get(request)
         return redirect('cart:order_list')
 
 

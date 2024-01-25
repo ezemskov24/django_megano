@@ -85,12 +85,12 @@
                             <div class="form-group">
                                 <div>
                                     <label class="toggle">
-                                        <input id="delivery_type_1" type="radio" name="delivery_type" value="Обычная доставка" checked="checked" /><span class="toggle-box"></span><span class="toggle-text">Обычная доставка</span>
+                                        <input class="delivery_type" id="delivery_type_1" type="radio" name="delivery_type" value="Обычная доставка" checked="checked" /><span class="toggle-box"></span><span class="toggle-text">Обычная доставка</span>
                                     </label>
                                 </div>
                                 <div>
                                     <label class="toggle">
-                                        <input id="delivery_type_2" type="radio" name="delivery_type" value="Экспресс доставка" /><span class="toggle-box"></span><span class="toggle-text">Экспресс доставка</span>
+                                        <input class="delivery_type" id="delivery_type_2" type="radio" name="delivery_type" value="Экспресс доставка" data-price="{{ express }}"/><span class="toggle-box"></span><span class="toggle-text">Экспресс доставка</span>
                                     </label>
                                 </div>
                             </div>
@@ -205,9 +205,9 @@
                                     <div class="Cart-total">
                                         <div class="Cart-block Cart-block_total">
                                             <strong class="Cart-title">Итого:</strong>
-                                            <span class="Cart-price">${{ total_price }}</span>
+                                            <span id="Cart-price" class="Cart-price">${{ total_price }}</span>
                                         </div>
-                                        <input type="number" name="total_price" value="{{ total_price }}" hidden>
+                                        <input id="total-price" type="number" name="total_price" value="{{ total_price }}" hidden>
                                         <div class="Cart-block">
                                             <button class="btn btn_primary btn_lg" type="submit">Оплатить</button>
                                         </div>

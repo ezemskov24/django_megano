@@ -7,6 +7,7 @@ mask_phone.mask(phone);
 
 
 // Функция для заполнения последней страницы заказа
+const total_price = parseFloat(document.getElementById('total-price').value)
 
 function makeDataOrderCreate() {
     let delivery_type = '';
@@ -42,8 +43,17 @@ function makeDataOrderCreate() {
     document.getElementById('user_city').innerText = city;
     document.getElementById('user_delivery_address').innerText = delivery_address;
     document.getElementById('user_payment_type').innerText = payment_type;
-}
 
+    if (delivery_type === "Экспресс доставка") {
+        document.getElementById('total-price').value =
+            total_price + parseFloat(document.getElementById('delivery_type_2').dataset['price']);
+        document.getElementById('Cart-price').innerText =
+            "$" + document.getElementById('total-price').value;
+    } else {
+        document.getElementById('total-price').value = total_price
+        document.getElementById('Cart-price').innerText = "$" + total_price;
+    }
+}
 
 // Перемещение по страницам создания заказа
 
@@ -93,3 +103,11 @@ order_next.forEach(function (btn_next) {
 });
 
 
+// Проверка экспресс заказа и добавление стоимости
+
+// const del_type = document.querySelector('.delivery_type')
+// const total_price = document.getElementById('total-price')
+//
+// del_type.addEventListener('click', function () {
+//     total_price.innerText = total_price.innerText + express
+// })
