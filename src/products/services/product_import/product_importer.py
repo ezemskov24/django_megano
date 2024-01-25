@@ -158,10 +158,10 @@ class ProductImporter:
                         prod_images,
                         new_product
                     )
-                self.__logger.log(f'Product imported successfully')
+                self.__logger.log(f'Product {prod_name} imported successfully')
         except Exception as e:
             self.__logger.log(
-                f'Product product_import failed due to {type(e).__name__}: {e}'
+                f'Product ({prod_name}) product_import failed due to {type(e).__name__}: {e}'
             )
 
     def __add_pictures_to_database(
@@ -185,34 +185,34 @@ class ProductImporter:
                     )
                     new_image.save()
                     self.__successful_image_imports += 1
-                    self.__logger.log(f'Image imported successfully')
+                    self.__logger.log(f'Image {image_name} imported successfully')
             except Exception as e:
                 self.__logger.log(
-                    f'Image product_import failed due to {type(e).__name__}: {e}'
+                    f'Image ({image_name}) product_import failed due to {type(e).__name__}: {e}'
                 )
 
     def __add_seller_products_to_database(self):
         self.__logger.log(f'Importing seller products')
 
-        for sell_prod in self.seller_products.values():
-            self.__add_seller_product_to_database(sell_prod)
+        for sell_prod_name, sell_prod_data in self.seller_products.items():
+            self.__add_seller_product_to_database(sell_prod_data, sell_prod_name)
         if self.__successful_seller_product_imports:
             self.__logger.log(
                 f'Imported {self.__successful_seller_product_imports} seller products'
             )
 
-    def __add_seller_product_to_database(self, sell_prod):
+    def __add_seller_product_to_database(self, sell_prod_data, sell_prod_name):
         self.__seller_product_imports += 1
         try:
             with transaction.atomic():
-                self.__process_seller_product_params(sell_prod)
-                new_seller_product = SellerProduct(**sell_prod)
+                self.__process_seller_product_params(sell_prod_data)
+                new_seller_product = SellerProduct(**sell_prod_data)
                 new_seller_product.save()
                 self.__successful_seller_product_imports += 1
-                self.__logger.log(f'SellerProduct imported successfully')
+                self.__logger.log(f'Seller product {sell_prod_name} imported successfully')
         except Exception as e:
             self.__logger.log(
-                f'SellerProduct product_import failed due to {type(e).__name__}: {e}',
+                f'Seller product ({sell_prod_name}) import failed due to {type(e).__name__}: {e}',
             )
 
     def __process_seller_product_params(self, sell_prod):

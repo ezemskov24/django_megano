@@ -127,7 +127,7 @@ class FileManager:
     def get_filename(self, extension=''):
         if not self.__filename:
             self.__filename = self.__start.strftime(
-                '%H:%M:%S - ',
+                '[%Y-%m-%d %H:%M:%S] - ',
             ) + celery.uuid()
 
         return self.__filename + '.' + extension if extension else self.__filename

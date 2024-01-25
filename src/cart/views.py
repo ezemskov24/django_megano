@@ -1,6 +1,5 @@
 import json
 
-import self as self
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import F
 from django.views.generic import ListView, DetailView
