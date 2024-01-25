@@ -28,5 +28,5 @@ class OrderAdmin(admin.ModelAdmin):
     #         OrderInLine,
     #     ]
 
-    def get_queryset(self, request):
-        return Order.objects.select_related("cart")
+    # def get_queryset(self, request):
+    #     return Order.objects.select_related("cart")
