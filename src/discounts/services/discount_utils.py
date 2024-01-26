@@ -358,7 +358,7 @@ def _process_individual_discount(
     for prod in viable_products:
         product, price, amount = prod
         discounted_price = get_discounted_price(discount, price)
-        processed_product = (product, price, amount, discounted_price, True)
+        processed_product = (product, price, discounted_price, amount, True)
         result.append(processed_product)
         products.remove(prod)
 

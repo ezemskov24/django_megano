@@ -29,7 +29,7 @@ class CatalogQuerySetProcessor:
         self.products = None
         self.filter_params = {}
         self.filter_prices = {}
-        self.filter_name = None
+        self.filter_name = ''
         self.filter_in_stock = None
         self.search_query = None
         self.after_post = None
@@ -45,7 +45,7 @@ class CatalogQuerySetProcessor:
     def __get_base_queryset(self, request) -> QuerySet:
         """ Получение базового queryset для дальнейшей работы. """
         search_query = request.session.get('search_query')
-        # base_filter = {'seller_count__gt': 0}
+
         base_filter = {}
         if self.tag or self.categories or self.products or search_query:
             if self.tag:
@@ -182,20 +182,21 @@ class CatalogQuerySetProcessor:
             prod_count=Count('products')
         ).order_by('-prod_count').all()[:10]
 
-        widget_attrs = FilterForm.declared_fields['price'].widget.attrs
+        form = FilterForm()
+
+        widget_attrs = form.fields['price'].widget.attrs
         widget_attrs['data-min'] = self.filter_prices['min']
         widget_attrs['data-max'] = self.filter_prices['max']
         widget_attrs['data-from'] = self.filter_prices['selected_min']
         widget_attrs['data-to'] = self.filter_prices['selected_max']
-
-        FilterForm.declared_fields['title'].widget.attrs['value'] = (
+        form.fields['title'].widget.attrs['value'] = (
             self.filter_name
         ) if self.filter_name else ''
-        FilterForm.declared_fields['in_stock'].widget.attrs['checked'] = (
+        form.fields['in_stock'].widget.attrs['checked'] = (
             True
         ) if self.filter_in_stock else False
 
-        context['filter_form'] = FilterForm()
+        context['filter_form'] = form
 
         return context
 
