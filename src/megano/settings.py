@@ -238,3 +238,7 @@ IMPORT_LOGS_DIR = IMPORT_DIR / 'logs'
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_DB = 1
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_ADMIN_EMAIL = 'admin@megano.com'
+DEFAULT_FROM_EMAIL = 'admin@megano.com'

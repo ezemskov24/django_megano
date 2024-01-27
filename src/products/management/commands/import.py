@@ -17,6 +17,13 @@ class Command(BaseCommand):
             nargs='+',
             help='Specify a zip-archive file to product_import',
         )
+        parser.add_argument(
+            '-e',
+            '--email',
+            required=False,
+            nargs='?',
+            help='Specify an admin email to send a notification',
+        )
 
     def handle(self, *args, **options):
         self.stdout.write('Begin product product_import')
@@ -38,9 +45,11 @@ class Command(BaseCommand):
                 )
                 return
 
+        email = options.get('email')
+
         if files:
             for file in files:
-                import_products.delay(file.as_posix())
+                import_products.delay(file.as_posix(), email)
             self.stdout.write(f'{len(files)} file(s) added to product_import query')
         else:
             self.stdout.write(self.style.WARNING('No files to product_import'))
