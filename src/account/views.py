@@ -94,9 +94,9 @@ class UserLogoutView(LogoutView):
     next_page = reverse_lazy('account:login')
 
 
-class UserAccountView(LoginRequiredMixin, TemplateView):
-    login_url = 'account:login'
-    template_name = 'registration/account.jinja2'
+# class UserAccountView(LoginRequiredMixin, TemplateView):
+#     login_url = 'account:login'
+#     template_name = 'registration/account.jinja2'
 
 
 class UserEmailView(LoginRequiredMixin, TemplateView):
@@ -127,15 +127,15 @@ class HistoryOrderView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         history = Order.objects.filter(profile=self.request.user).order_by('-created_at')[:20]
 
-        # for item in history:
-        #     product = item.product
-        #     first_image = product.images.first()
-        #
-        #     item.image_url = first_image.image.url if first_image else None
-
         context['history'] = history
 
         return context
+
+
+class UserAccountView(HistoryOrderView):
+    login_url = 'account:login'
+    template_name = 'registration/account.jinja2'
+
 
 class UserBrowsingHistoryView(LoginRequiredMixin, TemplateView):
     template_name = 'registration/browsing-history.jinja2'
