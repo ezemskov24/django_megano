@@ -17,12 +17,12 @@
                 <h1 style="text-align: center;">История просмотров</h1>
                     <h2>Просмотрено товаров: {{ history|length }}</h2>
                     {% if history %}
-                        <div class="Cards-browsing-history">
+                        <div class="Cards-browsing-history" style="display: flex; flex-wrap: wrap;">
                             {% for item in history %}
-                                <div class="Card"><a class="Card-picture" href="{{ item.get_absolute_url() }}"><<img src="{{ item.image_url }}" alt="{{ item.product.name }}">></a>
+                                <div class="Card">
+                                    <a class="Card-picture" href="{{ item.get_absolute_url() }}"><img src="{{ item.image_url }}" alt="{{ item.product.name }}"></a>
                                     <div class="Card-content">
-                                        <strong class="Card-title"><a href="{{ item.get_absolute_url() }}">{{ item.product.name }}</a>
-                                        </strong>
+                                        <strong class="Card-title"><a href="{{ item.get_absolute_url() }}">{{ item.product.name }}</a></strong>
                                     </div>
                                 </div>
                             {% endfor %}
