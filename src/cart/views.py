@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 
@@ -45,11 +46,6 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         queryset = Order.objects.filter(archived=False, profile=self.request.user.id)
         return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        print('context=', type(context['order'].cart))
-        return context
-
 
 class CreateOrderView(LoginRequiredMixin, View):
     """
@@ -62,7 +58,7 @@ class CreateOrderView(LoginRequiredMixin, View):
             carts = (get_carts_JSON(Cart.objects.filter(profile=request.user.id)))
 
             context = {
-                'form': CreateOrderForm(initial={"cart": carts}),
+                'form': CreateOrderForm(initial={"cart": carts, "profile": request.user.id}),
                 'user_fio': fio,
                 'user_phone': request.user.phone,
                 'user_email': request.user.email,
@@ -77,27 +73,15 @@ class CreateOrderView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = CreateOrderForm(request.POST)
-
         if form.is_valid():
+            form.save()
             # перейти к оплате, в случае успешной оплаты создать заказ
-            order = Order.objects.create(
-                profile=Profile.objects.get(id=request.user.id),
-                fio=request.POST['fio'],
-                phone=request.POST['phone'],
-                email=request.POST['mail'],
-                city=request.POST['city'],
-                cart=form.cleaned_data['cart'],
-                delivery_address=request.POST['delivery_address'],
-                delivery_type=request.POST['delivery_type'],
-                payment_type=request.POST['payment_type'],
-                comment=request.POST['comment'],
-                total_price=request.POST['total_price'],
-            )
-        #     удалить товары из корзины
+
+            # удалить товары из корзины
+            return redirect('cart:order_list')
+
         else:
-            # return redirect('cart:create_order')
             return self.get(request)
-        return redirect('cart:order_list')
 
 
 class CartView(ListView):

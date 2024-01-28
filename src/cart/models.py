@@ -24,7 +24,7 @@ class Order(models.Model):
     """
     Модель для описания заказа покупателя.
 
-    profile - связь с пользователем;
+    profile - id пользователя;
     fio - фамилия, имя и отчество покупателя;
     phone - телефон покупателя;
     email - адрес электронной почты покупателя;
@@ -34,9 +34,11 @@ class Order(models.Model):
     payment_type - способ оплаты;
     comment - коментарий к заказу;
     archived - метка для мягкого удаления;
-    created_at - дата и время создания заказа.
+    created_at - дата и время создания заказа;
+    status - статус заказа;
+    total_price - итоговая стоимость заказа;
     """
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=False, blank=False, related_name='order')
+    profile = models.CharField(max_length=4, null=False, blank=False)
     fio = models.CharField(max_length=255, null=False, blank=False)
     phone = models.CharField(max_length=10, blank=True, null=True)
     email = models.EmailField(null=False, blank=False)
@@ -50,4 +52,4 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_id = models.SlugField(max_length=200, unique=True, null=True)
+    # payment_id = models.SlugField(max_length=200, unique=True, null=True)

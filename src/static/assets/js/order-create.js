@@ -103,11 +103,33 @@ order_next.forEach(function (btn_next) {
 });
 
 
-// Проверка экспресс заказа и добавление стоимости
+// form validate
 
-// const del_type = document.querySelector('.delivery_type')
-// const total_price = document.getElementById('total-price')
-//
-// del_type.addEventListener('click', function () {
-//     total_price.innerText = total_price.innerText + express
-// })
+const createOrderValidate = new window.JustValidate('#form-validate');
+
+createOrderValidate
+    .addField(document.querySelector('.tel_validate'), [
+        {
+            rule: 'phone',
+            errorMessage: 'Телефон введен неверно',
+        },
+    ])
+    .addField(document.querySelector('.email_validate'), [
+        {
+            rule: 'required',
+            errorMessage: 'Вы не ввели пароль',
+        },
+        {
+            rule: 'email',
+            errorMessage: 'Почта указана неверно',
+        },
+    ])
+
+
+//   .addField('#agree', [
+//     {
+//       rule: 'required',
+//       errorMessage: 'Вы не согласились на обработку персональных данных'
+//     }
+//   ]);
+
