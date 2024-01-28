@@ -275,6 +275,7 @@ class ProductImportFormView(PermissionRequiredMixin, FormView):
         task = import_products.delay(
             form.files['zip_file'].read(),
             self.request.user.pk,
+            form.cleaned_data['email'],
         )
 
         self.request.session['import_task'] = task.id

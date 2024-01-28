@@ -82,3 +82,4 @@ class ProductsImportForm(forms.Form):
             attrs={'accept': 'application/zip'},
         ),
     )
+    email = forms.EmailField(required=False)
