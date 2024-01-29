@@ -1,9 +1,6 @@
 //Маска ввода номера телефона при оформлении заказа
 
-const phone = document.querySelector('.mask_phone')
-const mask_phone = new Inputmask("+7 (999) 999-99-99")
-
-mask_phone.mask(phone);
+mask_phone = new Inputmask("+7 (999) 999-99-99").mask(document.querySelector('.mask_phone'));
 
 
 // Функция для заполнения последней страницы заказа
@@ -15,7 +12,7 @@ function makeDataOrderCreate() {
 
     let user_name = document.getElementById('fio').value;
     let user_phone = document.getElementById('phone').value;
-    let user_email = document.getElementById('mail').value;
+    let user_email = document.getElementById('email').value;
 
     let delivery_type_1 = document.getElementById('delivery_type_1');
     let delivery_type_2 = document.getElementById('delivery_type_2');
@@ -105,31 +102,52 @@ order_next.forEach(function (btn_next) {
 
 // form validate
 
-const createOrderValidate = new window.JustValidate('#form-validate');
+let createOrderValidate = new window.JustValidate('#form-validate');
 
-createOrderValidate
-    .addField(document.querySelector('.tel_validate'), [
-        {
-            rule: 'phone',
-            errorMessage: 'Телефон введен неверно',
+createOrderValidate.addField('#fio', [
+    {
+        rule: 'required',
+        errorMessage: 'Введите имя',
+    },
+    {
+        rule: 'minLength',
+        value: 2,
+        errorMessage: 'Минимум 2 символа',
+    }
+])
+.addField('#phone', [
+    {
+        rule: 'required',
+        errorMessage: 'Введите номер телефона!'
+    },
+    {
+        validator: (value) => {
+            const phone = mask_phone.unmaskedvalue();
+            return Boolean(Number(phone) && phone.length === 10)
         },
-    ])
-    .addField(document.querySelector('.email_validate'), [
-        {
-            rule: 'required',
-            errorMessage: 'Вы не ввели пароль',
-        },
-        {
-            rule: 'email',
-            errorMessage: 'Почта указана неверно',
-        },
-    ])
-
-
-//   .addField('#agree', [
-//     {
-//       rule: 'required',
-//       errorMessage: 'Вы не согласились на обработку персональных данных'
-//     }
-//   ]);
+        errorMessage: 'Телефон введен не верно!'
+    },
+])
+.addField('#email', [
+    {
+        rule: 'required',
+        errorMessage: 'Введите почту!'
+    },
+    {
+        rule: 'email',
+        errorMessage: 'Почта введена неверно!'
+    }
+])
+.addField('#city', [
+    {
+        rule: 'required',
+        errorMessage: 'Введите город!'
+    }
+])
+.addField('#address', [
+    {
+        rule: 'required',
+        errorMessage: 'Введите адрес!'
+    }
+])
 
