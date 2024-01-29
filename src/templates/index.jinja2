@@ -167,7 +167,7 @@
                                                 {{ card.category }}
                                             </div>
                                             <div class="Card-hover">
-                                                <a class="Card-btn" href="{{ card.absolute_url }}">
+                                                <a class="Card-btn" onclick="add_to_cart('{{ card.pk }}')">
                                                     <img src="{{ static('assets/img/icons/card/cart.svg') }}" alt="cart.svg" />
                                                 </a>
                                             </div>

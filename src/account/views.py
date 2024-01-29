@@ -3,6 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, LoginView
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     CreateView,
@@ -17,6 +18,7 @@ from adminsettings.models import SiteSettings
 from cart.models import Order
 from products.models import Product
 
+from cart.services.cart_actions import merge_cart_products
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
@@ -89,6 +91,15 @@ class UserLoginView(LoginView):
     form_class = AuthenticationForm
     template_name = 'registration/login.jinja2'
 
+    def post(self, request, *args, **kwargs):
+        super(UserLoginView, self).post(self, request, *args, **kwargs)
+        user = authenticate(request, email=request.POST.get('username'), password=request.POST.get('password'))
+        if user is not None:
+            merge_cart_products(user, request.session.get('cart'))
+            login(request, user)
+            return redirect('account:profile')
+        return render(request, 'registration/login.jinja2', context={'errors': 'Неверный логин или пароль'})
+
 
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('account:login')
@@ -136,6 +147,7 @@ class HistoryOrderView(LoginRequiredMixin, TemplateView):
         context['history'] = history
 
         return context
+
 
 class UserBrowsingHistoryView(LoginRequiredMixin, TemplateView):
     template_name = 'registration/browsing-history.jinja2'
