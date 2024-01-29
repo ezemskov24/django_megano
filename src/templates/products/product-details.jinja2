@@ -31,56 +31,71 @@
 
                         </div>
                         <div class="ProductCard-desc">
+                            {% with regular_price = product.min_price, discounted_price = product.discounted_min_price %}
                             <div class="ProductCard-header">
-                                <h2 class="ProductCard-title">{{ product.name }}
+                                <h2 class="ProductCard-title">
+                                    {{ product.name }}
                                 </h2>
                                 <div class="ProductCard-info">
                                     <div class="ProductCard-cost">
-                                        <div class="ProductCard-price">
-                                        ${{ product.min_price }}
-                                        </div>
+                                        {% if discounted_price > 0 %}
+                                            {% if discounted_price != regular_price %}
+                                                <div class="ProductCard-priceOld">
+                                                    ${{ regular_price }}
+                                                </div>
+                                            {% endif %}
+                                            <div class="ProductCard-price">
+                                                ${{ discounted_price }}
+                                            </div>
+                                        {% else %}
+                                            <div class="ProductCard-priceOutOfStock">
+                                                Нет в наличии.
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
                             <div class="ProductCard-text">
                                 {% for paragraph in product.description.split('\n')[:3] %}
                                 <ul>
-                                    <li>{{ paragraph[:100] + '...' }}</li>
+                                    <li>{{ paragraph|truncate(100) }}</li>
                                 </ul>
                                 {% endfor %}
                             </div>
                             <div class="ProductCard-cart">
-                                <div class="ProductCard-cartElement ProductCard-cartElement_amount">
-                                    <div class="Amount Amount_product">
-                                        <button class="Amount-remove" type="button">
-                                        </button>
-                                        <input class="Amount-input form-input" name="amount" type="text" value="1" />
-                                        <button class="Amount-add" type="button">
+                                {% if discounted_price > 0 %}
+                                    <div class="ProductCard-cartElement ProductCard-cartElement_amount">
+                                        <div class="Amount Amount_product">
+                                            <button class="Amount-remove" type="button">
+                                            </button>
+                                            <input class="Amount-input form-input" name="amount" type="text" value="1" />
+                                            <button class="Amount-add" type="button">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="ProductCard-cartElement">
+                                        <a class="btn btn_primary" href="#modal_open" onclick="add_to_cart('{{ product.pk }}')">
+                                            <img class="btn-icon" src="{{ static('assets/img/icons/card/cart_white.svg') }}" alt="cart_white.svg" />
+                                            <span class="btn-content">Купить</span>
+                                        </a>
+                                        <button type="submit" class="btn Compare-btn" onclick="add_to_compare('{{ product.slug }}')">
+                                            <img class="btn_icon" src="{{ static('assets/img/icons/link.svg') }}" alt="link.svg">
                                         </button>
                                     </div>
-                                </div>
-                                <div class="ProductCard-cartElement">
-                                    <a class="btn btn_primary" href="#modal_open" onclick="add_to_cart('{{ product.pk }}')">
-                                        <img class="btn-icon" src="{{ static('assets/img/icons/card/cart_white.svg') }}" alt="cart_white.svg" />
-                                        <span class="btn-content">Купить</span>
-                                    </a>
-                                    <button type="submit" class="btn Compare-btn" onclick="add_to_compare('{{ product.slug }}')">
-                                        <img class="btn_icon" src="{{ static('assets/img/icons/link.svg') }}" alt="link.svg">
-                                    </button>
-                                </div>
-                                <div id="modal_open" class="my_modal">
-                                    <div class="my_modal-dialog">
-                                        <div class="my_modal-content">
-                                            <div class="my_modal-header">
-                                                <p class="my_modal-title">Поздравляем!</p>
-                                                <a href="#" title="Закрыть модальное окно" class="close">×</a>
-                                            </div>
-                                            <div class="my_modal-body">
-                                                <p>Товар успешно добавлен в корзину!</p>
+                                    <div id="modal_open" class="my_modal">
+                                        <div class="my_modal-dialog">
+                                            <div class="my_modal-content">
+                                                <div class="my_modal-header">
+                                                    <p class="my_modal-title">Поздравляем!</p>
+                                                    <a href="#" title="Закрыть модальное окно" class="close">×</a>
+                                                </div>
+                                                <div class="my_modal-body">
+                                                    <p>Товар успешно добавлен в корзину!</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                {% endif %}
                             </div>
                             <div class="ProductCard-footer">
                                 <div class="ProductCard-tags">
@@ -88,6 +103,7 @@
                                     </strong><a href="#">{{ product.category }}</a>
                                 </div>
                             </div>
+                            {% endwith %}
                         </div>
                     </div>
                     <div class="Tabs Tabs_default">
@@ -141,53 +157,55 @@
                             <div class="Tabs-block" id="sellers">
                                 <div class="Section-content">
                                 {% for seller in seller_products %}
-                                    <div class="Orders">
-                                        <div class="Order Order_anons"
-                                            style="margin-bottom:
-                                                {% if not loop.last %}
-                                                    40px
-                                                {% else %}
-                                                    0
-                                                {% endif %};">
+                                    {% if seller.count %}
+                                        <div class="Orders">
+                                            <div class="Order Order_anons"
+                                                style="margin-bottom:
+                                                    {% if not loop.last %}
+                                                        40px
+                                                    {% else %}
+                                                        0
+                                                    {% endif %};">
 
-                                                <div class="Order-personal">
-                                                    <div class="row">
-                                                        <div class="row-block">
-                                                            <a class="Order-title" href="#">
-                                                                {{ seller.seller.name }}
-                                                            </a>
-                                                            <div class="ProductCard-cartElement" style="margin-top: 10px;">
-                                                                <a class="btn btn_primary" href="#modal_open" onclick="add_to_cart('{{ product.pk }}', '{{ seller.seller.pk }}')">
-                                                                    <img class="btn-icon" src="{{ static('assets/img/icons/card/cart_white.svg') }}" alt="cart_white.svg" />
-                                                                    <span class="btn-content">Купить</span>
+                                                    <div class="Order-personal">
+                                                        <div class="row">
+                                                            <div class="row-block">
+                                                                <a class="Order-title" href="#">
+                                                                    {{ seller.seller.name }}
                                                                 </a>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row-block">
-                                                            <div class="Order-info Order-info_delivery">
-                                                                <div class="Order-infoType">Тип доставки:
-                                                                </div>
-                                                                <div class="Order-infoContent">Обычная доставка
+                                                                <div class="ProductCard-cartElement" style="margin-top: 10px;">
+                                                                    <a class="btn btn_primary" href="#modal_open" onclick="add_to_cart('{{ product.pk }}', '{{ seller.seller.pk }}')">
+                                                                        <img class="btn-icon" src="{{ static('assets/img/icons/card/cart_white.svg') }}" alt="cart_white.svg" />
+                                                                        <span class="btn-content">Купить</span>
+                                                                    </a>
                                                                 </div>
                                                             </div>
-                                                            <div class="Order-info Order-info_pay">
-                                                                <div class="Order-infoType">Оплата:
+                                                            <div class="row-block">
+                                                                <div class="Order-info Order-info_delivery">
+                                                                    <div class="Order-infoType">Тип доставки:
+                                                                    </div>
+                                                                    <div class="Order-infoContent">Обычная доставка
+                                                                    </div>
                                                                 </div>
-                                                                <div class="Order-infoContent">Онлайн картой
+                                                                <div class="Order-info Order-info_pay">
+                                                                    <div class="Order-infoType">Оплата:
+                                                                    </div>
+                                                                    <div class="Order-infoContent">Онлайн картой
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="Order-info">
-                                                                <div class="Order-infoType">Стоимость:
-                                                                </div>
-                                                                <div class="Order-infoContent">
-                                                                        <span class="Order-price">{{ seller.price }}$</span>
+                                                                <div class="Order-info">
+                                                                    <div class="Order-infoType">Стоимость:
+                                                                    </div>
+                                                                    <div class="Order-infoContent">
+                                                                            <span class="Order-price">{{ seller.price }}$</span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                 {% endfor %}
                                 </div>
                             </div>
@@ -202,68 +220,10 @@
                                     {% endfor %}
                                 </div>
                             </div>
-                            <div class="Tabs-block" id="reviews">
-                                <header class="Section-header">
-                                    <h3 class="Section-title">
-                                    {{ reviews|length }} отзыв{{
-                                        '' if reviews|length % 10 == 1 and reviews|length % 100 != 11
-                                        else 'а' if reviews|length % 10 in [2, 3, 4] and reviews|length % 100 not in [12, 13, 14]
-                                        else 'ов'
-                                    }}
-                                    </h3>
-                                </header>
-                                <div class="Comments">
-                                    {% for review in reviews %}
-                                        <div class="Comment">
-                                            <div class="Comment-column Comment-column_pict">
-                                                {% if review.author.avatar %}
-                                                    <img src="{{ review.author.avatar.url }}" alt="Avatar" class="Comment-avatar-image">
-                                                {% else %}
-                                                <div class="Comment-avatar">
-                                                </div>
-                                                {% endif %}
-                                            </div>
-                                            <div class="Comment-column">
-                                                <header class="Comment-header">
-                                                    <div>
-                                                        <strong class="Comment-title">{{ review.author.first_name + ' ' + review.author.last_name }}
-                                                        </strong><span class="Comment-date">
-                                                            {% set russian_months = {
-                                                                1: 'ЯНВАРЬ', 2: 'ФЕВРАЛЬ', 3: 'МАРТ', 4: 'АПРЕЛЬ',
-                                                                5: 'МАЙ', 6: 'ИЮНЬ', 7: 'ИЮЛЬ', 8: 'АВГУСТ',
-                                                                9: 'СЕНТЯБРЬ', 10: 'ОКТЯБРЬ', 11: 'НОЯБРЬ', 12: 'ДЕКАБРЬ'
-                                                            } %}
-                                                            {{ russian_months[review.created_at.month] }} {{ review.created_at.day }} / {{ review.created_at.year }} / {{ review.created_at.hour }}:{{ review.created_at.minute }}
-                                                        </span>
-                                                    </div>
-                                                </header>
-                                                <div class="Comment-content">{{ review.text }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                <header class="Section-header Section-header_product">
-                                    <h3 class="Section-title">Добавить отзыв
-                                    </h3>
-                                </header>
-                                <div class="Tabs-addComment">
-                                    <form class="form" action="#" method="post">
-                                        <div class="form-group">
-                                            <textarea class="form-textarea" name="review" id="review" placeholder="Отзыв"></textarea>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <button class="btn btn_muted" type="submit">Отправить отзыв
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
+                            {% include 'catalog/review.jinja2' %}
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
