@@ -28,7 +28,7 @@ class ProfileForm(forms.ModelForm):
     def clean_phone(self):
         phone = self.cleaned_data['phone']
         cleaned_phone = re.sub(r'\D', '', phone[2:])
-        if len(cleaned_phone) < 10:
+        if 0 != len(cleaned_phone) < 10:
             raise forms.ValidationError(f'Телефон должен содержать 10 символов, у вас - {len(cleaned_phone)}')
         return cleaned_phone
 
