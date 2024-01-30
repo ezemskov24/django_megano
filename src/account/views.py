@@ -27,17 +27,21 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('account:profile')
 
     def form_valid(self, form):
+        form.save()
         response = super().form_valid(form)
 
-        password1 = form.cleaned_data.get('new_password1')
-        password2 = form.cleaned_data.get('new_password2')
+        if form.cleaned_data['new_password1'] != form.cleaned_data['new_password2']:
+            messages.error(self.request, 'Пароли не совпадают.')
+            return self.render_to_response(self.get_context_data(form=form))
 
-        if password1:
-            if password1 == password2:
-                if self.object.set_password(password1):
-                    messages.success(self.request, "Пароль успешно обновлён.")
-            else:
-                messages.error(self.request, 'Пароли не совпадают.')
+        username = form.cleaned_data.get('email')
+        password = form.cleaned_data.get('password1')
+        user = authenticate(
+            self.request,
+            username=username,
+            password=password,
+        )
+        login(request=self.request, user=user)
         messages.success(self.request, "Данные успешно обновлены.")
         return response
 
