@@ -75,7 +75,6 @@ class CreateOrderView(LoginRequiredMixin, View):
         if form.is_valid():
             form.save()
             # перейти к оплате, в случае успешной оплаты создать заказ
-
             # удалить товары из корзины
             return redirect('cart:order_list')
 

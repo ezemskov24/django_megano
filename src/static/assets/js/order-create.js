@@ -2,7 +2,6 @@
 
 mask_phone = new Inputmask("+7 (999) 999-99-99").mask(document.querySelector('.mask_phone'));
 
-
 // Функция для заполнения последней страницы заказа
 const total_price = parseFloat(document.getElementById('total-price').value)
 
@@ -102,52 +101,59 @@ order_next.forEach(function (btn_next) {
 
 // form validate
 
-let createOrderValidate = new window.JustValidate('#form-validate');
+let validator = new window.JustValidate('#form-validate');
 
-createOrderValidate.addField('#fio', [
-    {
-        rule: 'required',
-        errorMessage: 'Введите имя',
-    },
-    {
-        rule: 'minLength',
-        value: 2,
-        errorMessage: 'Минимум 2 символа',
-    }
-])
-.addField('#phone', [
-    {
-        rule: 'required',
-        errorMessage: 'Введите номер телефона!'
-    },
-    {
-        validator: (value) => {
-            const phone = mask_phone.unmaskedvalue();
-            return Boolean(Number(phone) && phone.length === 10)
+validator
+    .addField('#fio', [
+        {
+            rule: 'required',
+            errorMessage: 'Введите имя',
         },
-        errorMessage: 'Телефон введен не верно!'
-    },
-])
-.addField('#email', [
-    {
-        rule: 'required',
-        errorMessage: 'Введите почту!'
-    },
-    {
-        rule: 'email',
-        errorMessage: 'Почта введена неверно!'
-    }
-])
-.addField('#city', [
-    {
-        rule: 'required',
-        errorMessage: 'Введите город!'
-    }
-])
-.addField('#address', [
-    {
-        rule: 'required',
-        errorMessage: 'Введите адрес!'
-    }
-])
+        {
+            rule: 'minLength',
+            value: 2,
+            errorMessage: 'Минимум 2 символа',
+        }
+    ])
+    .addField('#phone', [
+        {
+            rule: 'required',
+            errorMessage: 'Введите номер телефона!'
+        },
+        {
+            validator: (value) => {
+                const phone = mask_phone.unmaskedvalue();
+                return Boolean(Number(phone) && phone.length === 10)
+            },
+            errorMessage: 'Телефон введен не верно!'
+        },
+    ])
+    .addField('#email', [
+        {
+            rule: 'required',
+            errorMessage: 'Введите почту!'
+        },
+        {
+            rule: 'email',
+            errorMessage: 'Почта введена неверно!'
+        }
+    ])
+    .addField('#city', [
+        {
+            rule: 'required',
+            errorMessage: 'Введите город!'
+        }
+    ])
+    .addField('#address', [
+        {
+            rule: 'required',
+            errorMessage: 'Введите адрес!'
+        }
+    ])
+    .onSuccess((event) => {
+        event.currentTarget.submit();
+    })
+    .onFail(() => {
+        alert('Заполнены не все поля заказа')
+    })
 
