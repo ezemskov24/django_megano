@@ -27,17 +27,21 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('account:profile')
 
     def form_valid(self, form):
+        form.save()
         response = super().form_valid(form)
 
-        password1 = form.cleaned_data.get('new_password1')
-        password2 = form.cleaned_data.get('new_password2')
+        if form.cleaned_data['new_password1'] != form.cleaned_data['new_password2']:
+            messages.error(self.request, 'Пароли не совпадают.')
+            return self.render_to_response(self.get_context_data(form=form))
 
-        if password1:
-            if password1 == password2:
-                if self.object.set_password(password1):
-                    messages.success(self.request, "Пароль успешно обновлён.")
-            else:
-                messages.error(self.request, 'Пароли не совпадают.')
+        username = form.cleaned_data.get('email')
+        password = form.cleaned_data.get('password1')
+        user = authenticate(
+            self.request,
+            username=username,
+            password=password,
+        )
+        login(request=self.request, user=user)
         messages.success(self.request, "Данные успешно обновлены.")
         return response
 
@@ -94,9 +98,9 @@ class UserLogoutView(LogoutView):
     next_page = reverse_lazy('account:login')
 
 
-class UserAccountView(LoginRequiredMixin, TemplateView):
-    login_url = 'account:login'
-    template_name = 'registration/account.jinja2'
+# class UserAccountView(LoginRequiredMixin, TemplateView):
+#     login_url = 'account:login'
+#     template_name = 'registration/account.jinja2'
 
 
 class UserEmailView(LoginRequiredMixin, TemplateView):
@@ -127,15 +131,15 @@ class HistoryOrderView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         history = Order.objects.filter(profile=self.request.user).order_by('-created_at')[:20]
 
-        # for item in history:
-        #     product = item.product
-        #     first_image = product.images.first()
-        #
-        #     item.image_url = first_image.image.url if first_image else None
-
         context['history'] = history
 
         return context
+
+
+class UserAccountView(HistoryOrderView):
+    login_url = 'account:login'
+    template_name = 'registration/account.jinja2'
+
 
 class UserBrowsingHistoryView(LoginRequiredMixin, TemplateView):
     template_name = 'registration/browsing-history.jinja2'
