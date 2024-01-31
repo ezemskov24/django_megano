@@ -8,9 +8,11 @@ from .models import Profile
 
 
 class UserRegistrationForm(UserCreationForm):
+    full_name = forms.CharField(max_length=200)
+
     class Meta:
         model = Profile
-        fields = ['email', 'password1', 'password2', 'username']
+        fields = ['full_name', 'email', 'password1', 'password2']
 
 
 class ProfileForm(forms.ModelForm):

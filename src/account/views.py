@@ -18,7 +18,6 @@ from cart.models import Order
 from products.models import Product
 
 
-
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     login_url = 'account:login'
     model = Profile
@@ -60,7 +59,17 @@ class RegisterView(CreateView):
     success_url = reverse_lazy('account:account')
 
     def form_valid(self, form):
-        form.save()
+        # form.save()
+        user_profile = form.save(commit=False)
+        full_name = form.cleaned_data.get('full_name')
+        # = input_string.split()
+        full_name = full_name.split()
+        user_profile.username = full_name[0]
+        if len(full_name) == 2 or 3:
+            user_profile.first_name = full_name[1]
+        if len(full_name) == 3:
+            user_profile.last_name = full_name[2]
+        user_profile.save()
         response = super().form_valid(form)
 
         if form.cleaned_data['password1'] != form.cleaned_data['password2']:
@@ -83,10 +92,11 @@ class RegisterView(CreateView):
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
+        # print(form)
         if form.is_valid():
             return self.form_valid(form)
         else:
-            return self.form_invalid(form)
+            return self.render_to_response({'form': form})
 
 
 class UserLoginView(LoginView):
