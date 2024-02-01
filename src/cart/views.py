@@ -1,4 +1,6 @@
+import datetime
 import json
+import logging
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import F
@@ -10,6 +12,7 @@ from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
 from account.models import Profile
+from adminsettings.models import SiteSettings
 from cart.serializer import CartSerializer, ProductSellerSerializer, CartPostSerializer
 from discounts.services.discount_utils import calculate_discounted_prices
 
@@ -42,11 +45,6 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         queryset = Order.objects.filter(archived=False, profile=self.request.user.id)
         return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context['order'].cart = json.loads(context['order'].cart)
-        return context
-
 
 class CreateOrderView(LoginRequiredMixin, View):
     """
@@ -59,13 +57,12 @@ class CreateOrderView(LoginRequiredMixin, View):
             carts = (get_carts_JSON(Cart.objects.filter(profile=request.user.id)))
 
             context = {
-                'form': CreateOrderForm(),
+                'form': CreateOrderForm(initial={"cart": carts, "profile": request.user.id}),
                 'user_fio': fio,
                 'user_phone': request.user.phone,
                 'user_email': request.user.email,
-                'carts': carts,
-                'json_carts': json.dumps(carts, cls=DjangoJSONEncoder),
                 'total_price': get_total_price(carts),
+                'express': SiteSettings.objects.first().express_delivery_cost,
             }
 
         else:
@@ -75,25 +72,14 @@ class CreateOrderView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = CreateOrderForm(request.POST)
-        if form.is_valid:
-            order = Order.objects.create(
-                profile=Profile.objects.get(id=request.user.id),
-                fio=request.POST['fio'],
-                phone=request.POST['phone'],
-                email=request.POST['mail'],
-                city=request.POST['city'],
-                cart=request.POST['carts'],
-                delivery_address=request.POST['delivery_address'],
-                delivery_type=request.POST['delivery_type'],
-                payment_type=request.POST['payment_type'],
-                comment=request.POST['comment'],
-                total_price=request.POST['total_price'],
-            )
+        if form.is_valid():
+            form.save()
+            # перейти к оплате, в случае успешной оплаты создать заказ
+            # удалить товары из корзины
+            return redirect('cart:order_list')
 
         else:
-            redirect('cart:create_order')
-
-        return redirect('cart:order_list')
+            return self.get(request)
 
 
 class CartView(ListView):

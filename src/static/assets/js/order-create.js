@@ -1,12 +1,9 @@
 //Маска ввода номера телефона при оформлении заказа
 
-const phone = document.querySelector('.mask_phone')
-const mask_phone = new Inputmask("+7 (999) 999-99-99")
-
-mask_phone.mask(phone);
-
+mask_phone = new Inputmask("+7 (999) 999-99-99").mask(document.querySelector('.mask_phone'));
 
 // Функция для заполнения последней страницы заказа
+const total_price = parseFloat(document.getElementById('total-price').value)
 
 function makeDataOrderCreate() {
     let delivery_type = '';
@@ -14,7 +11,7 @@ function makeDataOrderCreate() {
 
     let user_name = document.getElementById('fio').value;
     let user_phone = document.getElementById('phone').value;
-    let user_email = document.getElementById('mail').value;
+    let user_email = document.getElementById('email').value;
 
     let delivery_type_1 = document.getElementById('delivery_type_1');
     let delivery_type_2 = document.getElementById('delivery_type_2');
@@ -42,8 +39,17 @@ function makeDataOrderCreate() {
     document.getElementById('user_city').innerText = city;
     document.getElementById('user_delivery_address').innerText = delivery_address;
     document.getElementById('user_payment_type').innerText = payment_type;
-}
 
+    if (delivery_type === "Экспресс доставка") {
+        document.getElementById('total-price').value =
+            total_price + parseFloat(document.getElementById('delivery_type_2').dataset['price']);
+        document.getElementById('Cart-price').innerText =
+            "$" + document.getElementById('total-price').value;
+    } else {
+        document.getElementById('total-price').value = total_price
+        document.getElementById('Cart-price').innerText = "$" + total_price;
+    }
+}
 
 // Перемещение по страницам создания заказа
 
@@ -92,4 +98,62 @@ order_next.forEach(function (btn_next) {
     });
 });
 
+
+// form validate
+
+let validator = new window.JustValidate('#form-validate');
+
+validator
+    .addField('#fio', [
+        {
+            rule: 'required',
+            errorMessage: 'Введите имя',
+        },
+        {
+            rule: 'minLength',
+            value: 2,
+            errorMessage: 'Минимум 2 символа',
+        }
+    ])
+    .addField('#phone', [
+        {
+            rule: 'required',
+            errorMessage: 'Введите номер телефона!'
+        },
+        {
+            validator: (value) => {
+                const phone = mask_phone.unmaskedvalue();
+                return Boolean(Number(phone) && phone.length === 10)
+            },
+            errorMessage: 'Телефон введен не верно!'
+        },
+    ])
+    .addField('#email', [
+        {
+            rule: 'required',
+            errorMessage: 'Введите почту!'
+        },
+        {
+            rule: 'email',
+            errorMessage: 'Почта введена неверно!'
+        }
+    ])
+    .addField('#city', [
+        {
+            rule: 'required',
+            errorMessage: 'Введите город!'
+        }
+    ])
+    .addField('#address', [
+        {
+            rule: 'required',
+            errorMessage: 'Введите адрес!'
+        }
+    ])
+    .onSuccess((event) => {
+        event.currentTarget.submit();
+    })
+    .onFail(() => {
+        alert('Заполнены не все поля заказа')
+    })
 
