@@ -33,7 +33,7 @@ def get_fio(first_name: str, last_name: str, username: str) -> str:
 def get_carts_JSON(carts):
     response = {}
     carts_list = [
-        (cart.product_seller.product, cart.product_seller.price, cart.count)
+        (cart.product_seller.product, cart.product_seller.price, cart.count, cart.product_seller.pk)
         for cart in carts
     ]
     carts_list = calculate_discounted_prices(carts_list)

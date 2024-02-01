@@ -25,7 +25,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import CreateOrderForm
 from .models import Order, Cart
+from .services.cart_actions import check_product_amt
 from .services.order_create import get_total_price, get_fio, get_carts_JSON
+from payments.services.payment_service import get_paid, get_payment_status
 
 
 class OrderListView(LoginRequiredMixin, ListView):
@@ -43,6 +45,7 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         queryset = Order.objects.filter(archived=False, profile=self.request.user.id)
+        get_payment_status(Order.objects.get(pk=self.kwargs['pk']))
         return queryset
 
 
@@ -78,6 +81,9 @@ class CreateOrderView(LoginRequiredMixin, View):
             # удалить товары из корзины
             return redirect('cart:order_list')
 
+            paid_url = get_paid(order)
+            return redirect(paid_url)
+
         else:
             return self.get(request)
 
@@ -93,7 +99,9 @@ class CartView(ListView):
                 return []
             return [[SellerProduct.objects.get(pk=obj['product_seller']), obj['count']] for obj in cart_list]
 
-        return Cart.objects.filter(profile=self.request.user)
+        cart = Cart.objects.filter(profile=self.request.user)
+        check_product_amt(cart)
+        return cart
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
@@ -160,6 +168,8 @@ class CartApiViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             cart_list = request.session.get('cart')
+            if cart_list is None:
+                return Response({'length': 0})
             queryset = self.filter_queryset(self.get_queryset())
             serializer = self.get_serializer(queryset, many=True)
             for item, cart_product in zip(serializer.data, cart_list):
@@ -236,7 +246,7 @@ class CartApiViewSet(ModelViewSet):
 
 
 class SellerApiViewSet(ModelViewSet):
-    queryset = SellerProduct.objects.all().order_by('price')
+    queryset = SellerProduct.objects.filter(count__gt=0).order_by('price')
     serializer_class = ProductSellerSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ['product', 'seller']
