@@ -11,6 +11,7 @@ class SiteSettingsAdmin(admin.ModelAdmin):
     list_display = [
         'reviews_count',
         'products_per_page',
+        'min_price_for_free_delivery',
         'delivery_cost',
         'express_delivery_cost',
         'discount_percentage',
