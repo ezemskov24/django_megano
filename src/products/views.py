@@ -12,8 +12,6 @@ from django.urls import reverse
 from django.views.generic import DetailView, FormView, ListView, TemplateView
 from django.utils import timezone
 
-from catalog.forms import ReviewForm
-
 from .forms import ProductsImportForm
 from .models import Product
 from .services.catalog_queryset import CatalogQuerySetProcessor
