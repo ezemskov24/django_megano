@@ -23,70 +23,62 @@
                             <div class="row">
                                 <div class="row-block">
                                     <div class="form-group">
-                                        <label class="form-label" for="avatar">Аватар
-                                        </label>
+                                        <label class="form-label" for="avatar">Аватар</label>
                                         <div class="Profile-avatar Profile-avatar_noimg">
-
                                             <label class="Profile-fileLabel" for="avatar"
                                                    style="width: 100%;
                                                           height: 100%;
                                                           margin: 0;
                                                           top: 0;
                                                           left: 0;">
-                                            {% if profile.avatar %}
-                                            <div style="width: 100%; height: 100%;
+                                                {% if profile.avatar %}
+                                                    <div style="width: 100%; height: 100%;
                                                 background: url('{{ profile.avatar.url }}') no-repeat center;
                                                 background-size: contain" id="coverPreview">
-                                            {% else %}
-                                            <div style="width: 100%; height: 100%;
+                                                {% else %}
+                                                    <div style="width: 100%; height: 100%;
                                                 background: url('/static/assets/img/icons/blankphoto.jpg') no-repeat center;
                                                 background-size: contain">
-                                            {% endif %}
-                                                <input type="file" name="avatar" accept="image/*" id="cover"
-                                                     style="height: 100%; opacity: 0;">
-
-
-{#                                        <img src="https://www.freeiconspng.com/uploads/no-image-icon-13.png" id="coverPreview" alt="">#}
-{#                                        <input type="file" id="cover" />#}
-
-
-                                              </div>
+                                                {% endif %}
+                                                    <input type="file" name="avatar" accept="image/*" id="cover"
+                                                           style="height: 100%; opacity: 0;">
+                                                    </div>
                                             </label>
-
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label" for="username">ФИО
-                                        <input class="form-input" id="name" name="username" type="text" value={{ user.username }} data-validate="require" />
-
-
+{#                                          {% set full_name = user.username +  + user.first_name %}#}
+                                            <input class="form-input" id="name" name="username" type="text"
+                                                   style="text-transform: capitalize"
+                                                   value="{{ user.username }} {{ user.first_name }} {{ user.last_name }}"
+                                                   data-validate="require" />
                                         </label>
                                     </div>
                                      {% if form.errors %}
-                                        <div style="color: red">
-{#                                          <strong>There was an error:</strong>#}
-                                          <ul>
-                                            {% for field in form %}
-                                              {% if field.errors %}
-                                                {% for error in field.errors %}
-                                                    <li class="error_text">{{ field.label }}: {{ error }}</li>
-                                                {% endfor %}
-                                              {% endif %}
-                                            {% endfor %}
-                                          </ul>
-                                        </div>
+                                          <div style="color: red">
+  {#                                          <strong>There was an error:</strong>#}
+                                              <ul>
+                                                  {% for field in form %}
+                                                      {% if field.errors %}
+                                                          {% for error in field.errors %}
+                                                              <li class="error_text">{{ field.label }}: {{ error }}</li>
+                                                          {% endfor %}
+                                                      {% endif %}
+                                                  {% endfor %}
+                                              </ul>
+                                          </div>
                                       {% endif %}
                                 </div>
                                 <div class="row-block">
                                     <div class="form-group">
-                                        <label class="form-label" for="phone">Телефон
-                                        </label>
-                                          {% if not profile.phone %}
-                                              <input type="text" name="phone" value='+7 (___) ___-__-__' id="id_phone"
-                                              style="color: grey; background-color: #f9fafc">
-                                          {% else %}
+                                        <label class="form-label" for="phone">Телефон</label>
+                                        {% if not profile.phone %}
+                                            <input type="text" name="phone" value='+7 (___) ___-__-__' id="id_phone"
+                                            style="color: grey; background-color: #f9fafc">
+                                        {% else %}
                                             <input type="text" name="phone" value={{ profile.phone }} id="id_phone">
-                                          {% endif %}
+                                        {% endif %}
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label" for="mail">E-mail
@@ -101,13 +93,10 @@
                                         <label class="form-label" for="passwordReply">Подтверждение пароля</label>
                                       <input class="form-input" id="id_new_password2" name="new_password2" type="password" placeholder="Введите пароль повторно">
                                     </div>
-
-{#                                    {{ form.as_p() }}#}
                                     <div class="form-group">
                                         <div class="Profile-btn">
                                             <button class="btn btn_success" type="submit">Сохранить</button>
                                         </div>
-{#                                        {% if form.errors %}#}
                                         {% if messages %}
                                             <ul class="messages">
                                                 {% for message in messages %}
@@ -136,21 +125,12 @@
     coverPreview.addEventListener('click',_=>cover.click());
 
     cover.addEventListener("change",_=>{
-        console.log(coverPreview.files[0].mozFullPath);
-        {#console.log('dfdhslfdsf =', this.files[0].mozFullPath);#}
-        {#window.getComputedStyle(coverPreview, false),#}
-        {#bi = style.backgroundImage.slice(4, -1).replace(/"/g, "");#}
-        {#console.log('********', bi)#}
-            let file = cover.files[0];
-            console.log(file.mozFullPath);
-            let reader = new FileReader();
-            {#console.log('********', file)#}
-            reader.onload = function (){
-                coverPreview.src = reader.result; }
-                {#console.log(coverPreview.src)#}
-            {#console.log('********', file.webkitRelativePath+file.name);#}
-            {#reader.readAsDataURL(file);#}
-            file.name;
+        let file = cover.files[0];
+        console.log(file.mozFullPath);
+        let reader = new FileReader();
+        reader.onload = function (){
+            coverPreview.src = reader.result; }
+        file.name;
     });
 </script>
 

@@ -78,6 +78,8 @@ class ImportLogger:
         log_path = self.__file_manager.get_log_path()
         self.__file_manager.save_file(log, log_path)
 
+        return log
+
 
 class FileManager:
     def __init__(self, start):
@@ -127,7 +129,7 @@ class FileManager:
     def get_filename(self, extension=''):
         if not self.__filename:
             self.__filename = self.__start.strftime(
-                '%H:%M:%S - ',
+                '[%Y-%m-%d %H:%M:%S] - ',
             ) + celery.uuid()
 
         return self.__filename + '.' + extension if extension else self.__filename
