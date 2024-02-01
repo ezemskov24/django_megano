@@ -175,10 +175,10 @@ def get_combo_discounts_for_products(
     Returns:
         Список скидок на наборы, применимых к продуктам.
     """
-    combo_discounts = ComboDiscount.current.filter(
+    combo_discounts = list(ComboDiscount.current.filter(
         Q(set_1__products__in=products) | Q(set_1__categories__products__in=products),
         Q(set_2__products__in=products) | Q(set_2__categories__products__in=products),
-    ).order_by('weight').all()
+    ).order_by('weight').all())
     return combo_discounts
 
 
@@ -315,10 +315,11 @@ def _process_combo_discount(
     result = []
 
     products_1 = list(filter(filter_set1, products))
-    products_2 = list(filter(filter_set2, list(set(products)-set(products_1))))
+    remaining_products = list(set(products)-set(products_1))
+    products_2 = list(filter(filter_set2, remaining_products))
 
     if products_1 and products_2:
-        products_1.append(products_2)
+        products_1.extend(products_2)
         processed_products = _process_multiproduct_discount(
             products_1,
             discount,
@@ -383,7 +384,7 @@ def _process_multiproduct_discount(
     """
     result = []
 
-    total_price = sum(product[1]*product[2] for product in products)
+    total_price = sum([product[1]*product[2] for product in products])
 
     for product in products:
         product, price, amount = product
