@@ -1,0 +1,119 @@
+[
+  {
+    "model": "account.profile",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$AuLJoSwsZ7i0uT1bkYGROc$hUeOv1PZjFhubeAIR8NaIHyau+wcA0KKCDAwjS38bxo=",
+      "last_login": "2024-02-03T18:08:23.906Z",
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "John",
+      "last_name": "Wick",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-02-03T18:07:52.936Z",
+      "registered_at": "2024-02-03T18:07:53.408Z",
+      "agreement_accept": false,
+      "phone": "+79998887766",
+      "avatar": "avatars/john_wick_mqVTCyH.jpg",
+      "address": "",
+      "cart": null,
+      "archived": false,
+      "email": "admin@test.com",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "account.profile",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$3KAz7gYDbQEQO00H6l6CKR$mbt9N8K1SVtCtAftAGRXCqxp1FDF5zN2WNBUG4xuak0=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "new_user_2",
+      "first_name": "Tony",
+      "last_name": "Stark",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-02-03T19:02:46.764Z",
+      "registered_at": "2024-02-03T19:02:47.281Z",
+      "agreement_accept": false,
+      "phone": null,
+      "avatar": "avatars/tony_stark_zT021QP.jpg",
+      "address": "",
+      "cart": null,
+      "archived": false,
+      "email": "seller2@test.com",
+      "groups": [
+        1
+      ],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "account.profile",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$4GquxbnnDbgbEB9Kwk6Qw4$TArNN0sLv4rL5As2liTgw018HWFYUQBUh8AaYcQcBKo=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "new_user_1",
+      "first_name": "Enzo",
+      "last_name": "Ferrari",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-02-03T19:05:30.921Z",
+      "registered_at": "2024-02-03T19:05:31.420Z",
+      "agreement_accept": false,
+      "phone": null,
+      "avatar": "",
+      "address": "",
+      "cart": null,
+      "archived": false,
+      "email": "seller1@test.com",
+      "groups": [
+        1
+      ],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "account.browsinghistory",
+    "pk": 1,
+    "fields": {
+      "profile": 1,
+      "product": 2,
+      "timestamp": "2024-02-03T19:10:20.739Z"
+    }
+  },
+  {
+    "model": "account.browsinghistory",
+    "pk": 2,
+    "fields": {
+      "profile": 1,
+      "product": 16,
+      "timestamp": "2024-02-03T19:07:44.120Z"
+    }
+  },
+  {
+    "model": "account.seller",
+    "pk": 1,
+    "fields": {
+      "name": "ООО \"Торговый дом\"",
+      "description": "This is a new seller",
+      "profile": 2,
+      "archived": false
+    }
+  },
+  {
+    "model": "account.seller",
+    "pk": 2,
+    "fields": {
+      "name": "ИП Петров",
+      "description": "This is a second seller",
+      "profile": 3,
+      "archived": false
+    }
+  }
+]

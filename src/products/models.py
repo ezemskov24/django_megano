@@ -50,10 +50,8 @@ class Product(models.Model):
         on_delete=models.CASCADE,
     )
     name = models.CharField(max_length=200, null=False, blank=False)
-    name_en = models.CharField(max_length=200, null=False, blank=False)
     slug = models.SlugField(max_length=200, unique=True, null=False)
     description = models.TextField(blank=True)
-    description_en = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     count_sells = models.IntegerField(default=0)
     archived = models.BooleanField(default=False)
