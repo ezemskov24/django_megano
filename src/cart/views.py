@@ -1,4 +1,6 @@
+import datetime
 import json
+import logging
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import F
@@ -10,6 +12,7 @@ from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
 from account.models import Profile
+from adminsettings.models import SiteSettings
 from cart.serializer import CartSerializer, ProductSellerSerializer, CartPostSerializer
 from discounts.services.discount_utils import calculate_discounted_prices
 
@@ -22,7 +25,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import CreateOrderForm
 from .models import Order, Cart
+from .services.cart_actions import check_product_amt
 from .services.order_create import get_total_price, get_fio, get_carts_JSON
+from payments.services.payment_service import get_paid, get_payment_status
 
 
 class OrderListView(LoginRequiredMixin, ListView):
@@ -40,12 +45,8 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         queryset = Order.objects.filter(archived=False, profile=self.request.user.id)
+        get_payment_status(Order.objects.get(pk=self.kwargs['pk']))
         return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context['order'].cart = json.loads(context['order'].cart)
-        return context
 
 
 class CreateOrderView(LoginRequiredMixin, View):
@@ -59,13 +60,12 @@ class CreateOrderView(LoginRequiredMixin, View):
             carts = (get_carts_JSON(Cart.objects.filter(profile=request.user.id)))
 
             context = {
-                'form': CreateOrderForm(),
+                'form': CreateOrderForm(initial={"cart": carts, "profile": request.user.id}),
                 'user_fio': fio,
                 'user_phone': request.user.phone,
                 'user_email': request.user.email,
-                'carts': carts,
-                'json_carts': json.dumps(carts, cls=DjangoJSONEncoder),
                 'total_price': get_total_price(carts),
+                'express': SiteSettings.objects.first().express_delivery_cost,
             }
 
         else:
@@ -75,25 +75,17 @@ class CreateOrderView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = CreateOrderForm(request.POST)
-        if form.is_valid:
-            order = Order.objects.create(
-                profile=Profile.objects.get(id=request.user.id),
-                fio=request.POST['fio'],
-                phone=request.POST['phone'],
-                email=request.POST['mail'],
-                city=request.POST['city'],
-                cart=request.POST['carts'],
-                delivery_address=request.POST['delivery_address'],
-                delivery_type=request.POST['delivery_type'],
-                payment_type=request.POST['payment_type'],
-                comment=request.POST['comment'],
-                total_price=request.POST['total_price'],
-            )
+        if form.is_valid():
+            form.save()
+            # перейти к оплате, в случае успешной оплаты создать заказ
+            # удалить товары из корзины
+            return redirect('cart:order_list')
+
+            paid_url = get_paid(order)
+            return redirect(paid_url)
 
         else:
-            redirect('cart:create_order')
-
-        return redirect('cart:order_list')
+            return self.get(request)
 
 
 class CartView(ListView):
@@ -107,7 +99,9 @@ class CartView(ListView):
                 return []
             return [[SellerProduct.objects.get(pk=obj['product_seller']), obj['count']] for obj in cart_list]
 
-        return Cart.objects.filter(profile=self.request.user)
+        cart = Cart.objects.filter(profile=self.request.user)
+        check_product_amt(cart)
+        return cart
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
@@ -174,6 +168,8 @@ class CartApiViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             cart_list = request.session.get('cart')
+            if cart_list is None:
+                return Response({'length': 0})
             queryset = self.filter_queryset(self.get_queryset())
             serializer = self.get_serializer(queryset, many=True)
             for item, cart_product in zip(serializer.data, cart_list):
@@ -250,7 +246,7 @@ class CartApiViewSet(ModelViewSet):
 
 
 class SellerApiViewSet(ModelViewSet):
-    queryset = SellerProduct.objects.all().order_by('price')
+    queryset = SellerProduct.objects.filter(count__gt=0).order_by('price')
     serializer_class = ProductSellerSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ['product', 'seller']

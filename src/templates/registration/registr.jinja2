@@ -20,7 +20,7 @@
             <form method="POST">
                 {% csrf_token %}
                 <div>
-                    <input class="user-input" type="text" name="username" id="username" placeholder="Имя" required>
+                    <input class="user-input" type="text" name="full_name" id="full_name" placeholder="Имя" required>
                 </div>
                 <div>
                     <input class="user-input" type="email" name="email" id="email" placeholder="E-mail" required autofocus>
@@ -32,14 +32,13 @@
                 <div>
                     <input type="password" name="password2" id="password2" placeholder="Подтверждение пароля" required>
                 </div>
-                <div class='error'>{{form.errors}}</div>
                 <input type="submit" value="Зарегистрироваться" />
-
-
                 <a class="registr" href="../login">
                     Вход
                 </a>
                 <div class="clear"></div>
+
+                <div class='error'>{{ form.errors }}</div>
             </form>
         </div>
 
