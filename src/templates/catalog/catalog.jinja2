@@ -15,7 +15,7 @@
             <div class="Section-column">
                 <div class="Section-columnSection">
                     <header class="Section-header">
-                        <strong class="Section-title">Фильтр
+                        <strong class="Section-title">{% trans %}Фильтр{% endtrans %}
                         </strong>
                     </header>
                     <div class="Section-columnContent">
@@ -25,7 +25,7 @@
                                 <div class="form-group">
                                     <div class="range Section-columnRange">
                                         {{ filter_form.price }}
-                                        <div class="range-price">Цена:&#32;
+                                        <div class="range-price">{% trans %}Цена:{% endtrans %}&#32;
                                             <div class="rangePrice">
                                             </div>
                                         </div>
@@ -36,12 +36,12 @@
                                     <div class="form-group">
                                         <label class="toggle">
                                             {{ filter_form.in_stock }}
-                                            <span class="toggle-box"></span><span class="toggle-text">Только товары в наличии</span>
+                                            <span class="toggle-box"></span><span class="toggle-text">{% trans %}Только товары в наличии{% endtrans %}</span>
                                         </label>
                                     </div>
                                     <div class="form-group">
                                         <div class="buttons">
-                                            <input class="btn btn_square btn_dark btn_narrow" type="submit" value="Фильтр">
+                                            <input class="btn btn_square btn_dark btn_narrow" type="submit" value="{% trans %}Фильтр{% endtrans %}">
                                         </div>
                                     </div>
                                 </div>
@@ -51,7 +51,7 @@
                 </div>
                 <div class="Section-columnSection">
                         <header class="Section-header">
-                            <strong class="Section-title">Популярные тэги
+                            <strong class="Section-title">{% trans %}Популярные тэги{% endtrans %}
                             </strong>
                         </header>
                         <div class="Section-columnContent">
@@ -65,7 +65,7 @@
             </div>
             <div class="Section-content">
                 <div class="Sort">
-                        <div class="Sort-title">Сортировать по:
+                        <div class="Sort-title">{% trans %}Сортировать по:{% endtrans %}
                         </div>
                         <div class="Sort-variants">
                             <a class="Sort-sortBy {% if curr_sort and curr_sort == sort.POP_ASC.value %}
@@ -80,7 +80,7 @@ Sort-sortBy_dec
                                            {% else %}
 {{ sort.POP_ASC.value }}
                                            {% endif %}">
-                                Популярности
+                                {% trans %}Популярности{% endtrans %}
                             </a>
                             <a class="Sort-sortBy {% if curr_sort and curr_sort == sort.PRI_ASC.value %}
 Sort-sortBy_inc
@@ -94,7 +94,7 @@ Sort-sortBy_dec
                                            {% else %}
 {{ sort.PRI_DEC.value }}
                                            {% endif %}">
-                                Цене
+                                {% trans %}Цене{% endtrans %}
                             </a>
                             <a class="Sort-sortBy {% if curr_sort and curr_sort == sort.REV_ASC.value %}
 Sort-sortBy_inc
@@ -108,7 +108,7 @@ Sort-sortBy_dec
                                            {% else %}
 {{ sort.REV_ASC.value }}
                                            {% endif %}">
-                                Отзывам
+                                {% trans %}Отзывам{% endtrans %}
                             </a>
                             <a class="Sort-sortBy {% if curr_sort and curr_sort == sort.CRE_ASC.value %}
 Sort-sortBy_inc
@@ -122,7 +122,7 @@ Sort-sortBy_dec
                                            {% else %}
 {{ sort.CRE_ASC.value }}
                                            {% endif %}">
-                                Новизне
+                                {% trans %}Новизне{% endtrans %}
                             </a>
                         </div>
                     </div>
@@ -145,7 +145,7 @@ Sort-sortBy_dec
                                                 {% endif %}
                                                 <span class="Card-price">${{ discounted_price }}</span>
                                             {% else %}
-                                                <span class="Card-priceOutOfStock">Нет в наличии</span>
+                                                <span class="Card-priceOutOfStock">{% trans %}Нет в наличии{% endtrans %}</span>
                                             {% endif %}
                                         </div>
                                         <div class="Card-category">
@@ -163,7 +163,7 @@ Sort-sortBy_dec
                             </div>
                         </div>
                     {% else %}
-                        Не найдено продуктов для отображения.
+                        {% trans %}Не найдено продуктов для отображения.{% endtrans %}
                     {% endfor %}
                 </div>
                 {% if products.has_other_pages() %}
