@@ -1,4 +1,4 @@
-from django.utils.translation import gettext as _, ngettext
+from django.utils.translation import ngettext
 
 from account.models import Profile
 from .forms import ReviewForm
