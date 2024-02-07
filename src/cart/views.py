@@ -45,7 +45,6 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         queryset = Order.objects.filter(archived=False, profile=self.request.user.id)
-        get_payment_status(Order.objects.get(pk=self.kwargs['pk']))
         return queryset
 
 
@@ -79,9 +78,7 @@ class CreateOrderView(LoginRequiredMixin, View):
             form.save()
             # перейти к оплате, в случае успешной оплаты создать заказ
             # удалить товары из корзины
-            return redirect('cart:order_list')
-
-            paid_url = get_paid(order)
+            paid_url = get_paid(Order.objects.filter(profile=request.user.pk).last())
             return redirect(paid_url)
 
         else:

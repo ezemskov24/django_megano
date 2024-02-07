@@ -28,7 +28,10 @@ SECRET_KEY = "django-insecure-ew#o(-glp(5b906c3k1o&syu&e+*-k-hvke=3*x)icr%@u-h&o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'nice-kids-float.loca.lt',
+]
 
 
 AUTH_USER_MODEL = 'account.Profile'

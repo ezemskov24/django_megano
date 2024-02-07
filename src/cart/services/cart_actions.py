@@ -1,7 +1,6 @@
 from django.core.exceptions import ValidationError
 
 from cart.models import Cart
-from django.db.models import Subquery, OuterRef, Count
 from products.models import SellerProduct
 
 

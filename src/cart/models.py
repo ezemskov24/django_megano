@@ -52,4 +52,4 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    # payment_id = models.SlugField(max_length=200, unique=True, null=True)
+    payment_id = models.SlugField(max_length=200, unique=True, null=True)
