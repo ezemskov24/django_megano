@@ -19,11 +19,11 @@
                                         {{ banner.name|truncate(30) }}
                                     </strong>
                                     <div class="Slider-text">
-                                        {{ banner.description|truncate(250) }}
+                                        {{ banner.description|truncate(200) }}
                                     </div>
                                     <div class="Slider-footer">
                                         <a class="btn btn_primary"
-                                           href="{{ banner.absolute_url }}">Get Started</a>
+                                           href="{{ banner.absolute_url }}">{% trans %}Открыть{% endtrans %}</a>
                                     </div>
                                 </div>
                                 <div class="row-block">

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-06 22:56+0000\n"
+"POT-Creation-Date: 2024-02-07 20:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -277,6 +277,7 @@ msgid "Сравнение"
 msgstr "Comparison"
 
 #: templates/common/footer.jinja2:25 templates/navigation/navigation.jinja2:20
+#: templates/registration/profile.jinja2:4
 msgid "Профиль"
 msgstr "Profile"
 
@@ -284,21 +285,22 @@ msgstr "Profile"
 msgid "Контакты"
 msgstr "Contacts"
 
-#: templates/common/header_parts/header_control_panel.jinja2:36
+#: templates/common/header_parts/header_control_panel.jinja2:40
 #: templates/common/header_parts/header_menu_cart.jinja2:34
 #: templates/navigation/navigation.jinja2:17
 msgid "Личный кабинет"
 msgstr "Personal Area"
 
-#: templates/common/header_parts/header_control_panel.jinja2:38
+#: templates/common/header_parts/header_control_panel.jinja2:42
 #: templates/registration/e-mail.jinja2:40
-#: templates/registration/login.jinja2:14
+#: templates/registration/login.jinja2:4 templates/registration/login.jinja2:14
 #: templates/registration/registr.jinja2:37
 msgid "Вход"
 msgstr "Entrance"
 
-#: templates/common/header_parts/header_control_panel.jinja2:39
+#: templates/common/header_parts/header_control_panel.jinja2:43
 #: templates/registration/login.jinja2:33
+#: templates/registration/registr.jinja2:4
 #: templates/registration/registr.jinja2:15
 msgid "Регистрация"
 msgstr "Registration"
@@ -332,6 +334,10 @@ msgstr "All categories"
 msgid "Поиск"
 msgstr "Search"
 
+#: templates/index.jinja2:26
+msgid "Открыть"
+msgstr "Get Started"
+
 #: templates/index.jinja2:85
 msgid "ОГРАНИЧЕННЫЕ ПРЕДЛОЖЕНИЯ"
 msgstr "LIMITED OFFERS"
@@ -346,6 +352,7 @@ msgstr "Limited edition"
 
 #: templates/navigation/navigation.jinja2:23
 #: templates/registration/account.jinja2:49
+#: templates/registration/historyorder.jinja2:4
 msgid "История заказов"
 msgstr "History of orders"
 
@@ -355,23 +362,23 @@ msgstr "History of orders"
 msgid "История просмотров"
 msgstr "Browsing history"
 
-#: templates/products/compare/compare.jinja2:19
+#: templates/products/compare/compare.jinja2:18
 msgid "Невозможно сравнить"
 msgstr "Can't compare"
 
-#: templates/products/compare/compare.jinja2:26
+#: templates/products/compare/compare.jinja2:25
 msgid "Только различающиеся характеристики"
 msgstr "Only different characteristics"
 
-#: templates/products/compare/compare.jinja2:30
+#: templates/products/compare/compare.jinja2:29
 msgid "Удалить всё"
 msgstr "Delete everything"
 
-#: templates/products/compare/compare.jinja2:74
+#: templates/products/compare/compare.jinja2:73
 msgid "Добавить в корзину"
 msgstr "Add to cart"
 
-#: templates/products/compare/compare.jinja2:83
+#: templates/products/compare/compare.jinja2:82
 msgid "Недостаточно товаров для сравнения"
 msgstr "Not enough products to compare"
 
@@ -428,6 +435,10 @@ msgstr "Device type"
 #: templates/products/product-details.jinja2:197
 msgid "Стоимость:"
 msgstr "Price:"
+
+#: templates/registration/account.jinja2:4
+msgid "Аккаунт"
+msgstr "Account"
 
 #: templates/registration/account.jinja2:30
 msgid "Редактировать профиль"
