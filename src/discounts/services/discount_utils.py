@@ -12,7 +12,7 @@ from discounts.models import (
     DiscountTypeEnum,
     ProductDiscount,
 )
-from products.models import Product
+from products.models import Product, SellerProduct
 
 
 def get_discounted_price(discount: Discount, price: Decimal):
@@ -182,19 +182,19 @@ def get_combo_discounts_for_products(
     return combo_discounts
 
 
-def get_bulk_discount(products: List[Tuple[Product, Decimal, int]]) -> Any:
+def get_bulk_discount(products: List[Tuple[SellerProduct, int]]) -> Any:
     """
     Получение списка оптовых скидок, применимых к списку продуктов.
 
     Args:
-        products: Список кортежей (Продукт, Цена, Количество), для которых
+        products: Список кортежей (SellerProduct, Количество), для которых
                   нужно найти скидки.
     Returns:
-        Список скидок, применимых к продуктам.\.
+        Список скидок, применимых к продуктам.
     """
     unique_amount = len(products)
-    total_amount = sum([prod[2] for prod in products])
-    total_price = sum([prod[1] * prod[2] for prod in products])
+    total_amount = sum([prod[1] for prod in products])
+    total_price = sum([prod[0].price * prod[1] for prod in products])
 
     discount = BulkDiscount.current.filter(
         Q(product_amount__lte=unique_amount, only_unique=True) | Q(product_amount__lte=total_amount, only_unique=False),
@@ -204,8 +204,8 @@ def get_bulk_discount(products: List[Tuple[Product, Decimal, int]]) -> Any:
 
 
 def calculate_discounted_prices(
-    products: List[Tuple[Product, Decimal, int]]
-) -> List[Tuple[Product, Decimal, Decimal, int, bool]]:
+    products: List[Tuple[SellerProduct, int]]
+) -> List[Tuple[SellerProduct, Decimal, int, bool]]:
     """
     # TOP
     Вычисление цен со скидками для продуктов.
@@ -214,17 +214,17 @@ def calculate_discounted_prices(
 
     Args:
         products: Список кортежей с информацией о продуктах.
-                  (Продукт, Цена, Количество)
+                  (SellerProduct, Количество)
 
     Returns:
         Список кортежей с информацией о товарах после применения скидок.
-        (Продукт, Цена, Цена со скидкой, Количество, Применена ли скидка)
+        (SellerProduct, Цена со скидкой, Количество, Применена ли скидка)
     """
     product_discounts = get_all_discounts_for_products(
-        [product[0] for product in products],
+        [product[0].product for product in products],
     )
     combo_discounts = get_combo_discounts_for_products(
-        [product[0] for product in products],
+        [product[0].product for product in products],
     )
     bulk_discount = get_bulk_discount(products)
 
@@ -245,23 +245,23 @@ def calculate_discounted_prices(
 
 
 def _process_discounts(
-    products: List[Tuple[Product, Decimal, int]],
+    products: List[Tuple[SellerProduct, int]],
     discounts: List[Union[
         'ProductDiscount',
         'ComboDiscount',
         'CategoryDiscount',
     ]],
-) -> List[Tuple[Product, Decimal, Decimal, int, bool]]:
+) -> List[Tuple[SellerProduct, Decimal, int, bool]]:
     """
     Обработка списка товаров с применением скидок.
 
     Args:
         products: Список кортежей с информацией о продуктах.
-                  (Продукт, Цена, Количество)
+                  (SellerProduct, Количество)
         discounts: Список скидок для применения к продуктам.
     Returns:
         Список кортежей с информацией о товарах после применения скидок.
-        (Продукт, Цена, Цена со скидкой, Количество, Применена ли скидка)
+        (SellerProduct, Цена со скидкой, Количество, Применена ли скидка)
     """
     result = []
     for discount in discounts:
@@ -276,7 +276,7 @@ def _process_discounts(
 
     if products:
         result.extend(
-            (product[0], product[1], product[1], product[2], False)
+            (product[0], product[0].price, product[1], False)
             for product in products
         )
 
@@ -284,7 +284,7 @@ def _process_discounts(
 
 
 def _process_combo_discount(
-    products: List[Tuple[Product, Decimal, int]],
+    products: List[Tuple[SellerProduct, int]],
     discount: 'ComboDiscount',
 ):
     """
@@ -292,21 +292,21 @@ def _process_combo_discount(
 
     Args:
         products: Список кортежей с информацией о продуктах.
-                  (Продукт, Цена, Количество)
+                  (SellerProduct, Количество)
         discounts: Список скидок на наборы для применения к продуктам.
     Returns:
         Список кортежей с информацией о товарах после применения скидок.
-        (Продукт, Цена, Цена со скидкой, Количество, Применена ли скидка)
+        (SellerProduct, Цена со скидкой, Количество, Применена ли скидка)
     """
-    def filter_set1(product: Tuple[Product, Decimal, int]):
-        product = product[0]
+    def filter_set1(product: Tuple[SellerProduct, int]):
+        product = product[0].product
         return (
             product in discount.set_1.products.all() or
             product.category in discount.set_1.categories.all()
         )
 
-    def filter_set2(product: Tuple[Product, Decimal, int]):
-        product = product[0]
+    def filter_set2(product: Tuple[SellerProduct, int]):
+        product = product[0].product
         return (
             product in discount.set_2.products.all() or
             product.category in discount.set_2.categories.all()
@@ -332,22 +332,22 @@ def _process_combo_discount(
 
 
 def _process_individual_discount(
-    products: List[Tuple[Product, Decimal, int]],
+    products: List[Tuple[SellerProduct, int]],
     discount: Union['ProductDiscount', 'CategoryDiscount'],
-) -> List[Tuple[Product, Decimal, Decimal, int, bool]]:
+) -> List[Tuple[SellerProduct, Decimal, int, bool]]:
     """
     Обработка списка товаров с применением скидок на отдельные товары.
 
     Args:
         products: Список кортежей с информацией о продуктах.
-                  (Продукт, Цена, Количество)
+                  (SellerProduct, Количество)
         discounts: Список скидок для применения к продуктам.
     Returns:
         Список кортежей с информацией о товарах после применения скидок.
-        (Продукт, Цена, Цена со скидкой, Количество, Применена ли скидка)
+        (SellerProduct, Цена со скидкой, Количество, Применена ли скидка)
     """
-    def filter_product(product: Tuple[Product, Decimal, int]):
-        product = product[0]
+    def filter_product(product: Tuple[SellerProduct, int]):
+        product = product[0].product
         if isinstance(discount, CategoryDiscount):
             return product.category in discount.categories.all()
         else:
@@ -357,9 +357,9 @@ def _process_individual_discount(
 
     result = []
     for prod in viable_products:
-        product, price, amount = prod
-        discounted_price = get_discounted_price(discount, price)
-        processed_product = (product, price, discounted_price, amount, True)
+        product, amount = prod
+        discounted_price = get_discounted_price(discount, product.price)
+        processed_product = (product, discounted_price, amount, True)
         result.append(processed_product)
         products.remove(prod)
 
@@ -367,38 +367,38 @@ def _process_individual_discount(
 
 
 def _process_multiproduct_discount(
-    products: List[Tuple[Product, Decimal, int]],
+    products: List[Tuple[SellerProduct, int]],
     discount: Union[BulkDiscount, ComboDiscount],
-) -> List[Tuple[Product, Decimal, Decimal, int, bool]]:
+) -> List[Tuple[SellerProduct, Decimal, int, bool]]:
     """
     Обработка списка товаров с применением одной скидки ко всему списку.
 
     Args:
         products: Список кортежей с информацией о продуктах.
-                  (Продукт, Цена, Количество)
+                  (SellerProduct, Количество)
         discount: Скидок для применения к продуктам.
     Returns:
         Список кортежей с информацией о товарах после применения скидок.
-        (Продукт, Цена, Цена со скидкой, Количество, Применена ли скидка)
+        (SellerProduct, Цена со скидкой, Количество, Применена ли скидка)
 
     """
     result = []
 
-    total_price = sum([product[1]*product[2] for product in products])
+    total_price = sum([product[0].price*product[1] for product in products])
 
     for product in products:
-        product, price, amount = product
+        product, amount = product
 
         if discount.discount_type == DiscountTypeEnum.PERCENTAGE:
             discounted_price = round(
-                price * (100 - discount.value) * decimal.Decimal(0.01), 2
+                product.price * (100 - discount.value) * decimal.Decimal(0.01), 2
             )
         else:
-            proportion = price / total_price
+            proportion = product.price / total_price
             if discount.discount_type == DiscountTypeEnum.FIXED_VALUE:
                 discounted_price = round(
                     max(
-                        price - (discount.value * proportion),
+                        product.price - (discount.value * proportion),
                         discount.MIN_VALUE,
                     ),
                     2,
@@ -408,7 +408,7 @@ def _process_multiproduct_discount(
                     discount.value * proportion,
                     2,
                 )
-        processed_product = (product, price, discounted_price, amount, True)
+        processed_product = (product, discounted_price, amount, True)
         result.append(processed_product)
 
     return result
