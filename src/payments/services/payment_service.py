@@ -1,19 +1,16 @@
 from django.shortcuts import redirect
 
-from yookassa import Configuration, Payment, Webhook
+from yookassa import Configuration, Payment
 import uuid
 
 from cart.services.cart_actions import clear_cart
 
-import json
-
 from products.models import SellerProduct
+
+from cart.models import Order
 
 Configuration.account_id = '306183'
 Configuration.secret_key = 'test_6EQxV_1iuGm1G3oircj-EAeRk4PZSRW3t1yTT6QU2ko'
-
-
-# Configuration.configure_auth_token('test_6EQxV_1iuGm1G3oircj-EAeRk4PZSRW3t1yTT6QU2ko')
 
 
 def get_paid(order):
@@ -45,6 +42,7 @@ def change_seller_product_count(cart):
 
 def get_payment_status(order):
     change_seller_product_count(order.cart)
-    clear_cart(order.profile)
+    if order == Order.objects.filter(profile=order.profile, archived=False).last():
+        clear_cart(order.profile)
     order.status = True
     order.save()

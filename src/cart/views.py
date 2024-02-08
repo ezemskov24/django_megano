@@ -47,6 +47,10 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         queryset = Order.objects.filter(archived=False, profile=self.request.user.id)
         return queryset
 
+    def post(self, request, pk):
+        paid_url = get_paid(Order.objects.get(pk=pk))
+        return redirect(paid_url)
+
 
 class CreateOrderView(LoginRequiredMixin, View):
     """
