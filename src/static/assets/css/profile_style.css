@@ -54,6 +54,8 @@
 .error_text {
     animation: fade-out 10s;
     opacity: 0;
+    position: absolute;
+    bottom: -50%;
 }
 
 .messages li {

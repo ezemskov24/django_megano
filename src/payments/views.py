@@ -1,5 +1,6 @@
+import json
+
 from django.http import HttpResponse
-from django.shortcuts import render
 
 from payments.services.payment_service import get_payment_status
 
@@ -8,8 +9,16 @@ from cart.models import Order
 
 def payment_webhook_view(request):
     if request.method == 'GET':
-        return HttpResponse(404)
+        return HttpResponse(status=404)
     if request.method == 'POST':
-        order = Order.object.get(payment_id=request.data[''])
+        response = json.loads(request.body)
+
+        if response['object']['status'] != 'succeeded':
+            return HttpResponse(status=400)
+
+        if response['object']['status'] == 'canceled':
+            return HttpResponse(status=200)
+
+        order = Order.objects.get(payment_id=response['object']['id'])
         get_payment_status(order)
-        return HttpResponse(200)
+        return HttpResponse(status=200)

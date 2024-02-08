@@ -109,7 +109,7 @@
       "value": "15.00",
       "image": "",
       "categories": [
-        3
+        2
       ]
     }
   },
@@ -218,7 +218,7 @@
       "start": null,
       "end": "2024-03-01T11:13:14Z",
       "active": true,
-      "weight": 0,
+      "weight": 60,
       "name": "Телефоны с наушниками",
       "slug": "telefony-s-naushnikami",
       "description": "Купи любой телефон с наушниками и сэкономь 10%!",

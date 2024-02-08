@@ -67,9 +67,9 @@ class RegisterView(CreateView):
         # = input_string.split()
         full_name = full_name.split()
         user_profile.username = full_name[0]
-        if len(full_name) == 2 or 3:
+        if len(full_name) > 1:
             user_profile.first_name = full_name[1]
-        if len(full_name) == 3:
+        if len(full_name) > 2:
             user_profile.last_name = full_name[2]
         user_profile.save()
         response = super().form_valid(form)

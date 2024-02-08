@@ -13,9 +13,9 @@
             <div class="wrap">
             {% if properties|length != 0 %}
                 <div class="Product Product-compare" id="compare-main">
-                    <label class="label_success_message" id="compare-main-error"></label>
+                    <p id="compare-main-error"></p>
                     {% if diff_category %}
-                        <label class="label_success_message" id="compare_dif_category">{% trans %}Невозможно сравнить{% endtrans %}</label>
+                        <p style="color: red" id="compare_dif_category">{% trans %}Невозможно сравнить{% endtrans %}</p>
                     {% endif %}
                     <div class="Product-delete-all">
                         <div class="form-group" id="properties_chekbox_div">
@@ -79,7 +79,7 @@
                     </div>
                 </div>
             {% else %}
-                <div class="Product Product-compare">{% trans %}Недостаточно товаров для сравнения{% endtrans %}</div>
+                <div class="Product Product-compare" style="color: red">{% trans %}Недостаточно товаров для сравнения{% endtrans %}</div>
             {% endif %}
             </div>
     </div>
