@@ -1,13 +1,13 @@
 from django.shortcuts import redirect
 
-from yookassa import Configuration, Payment, Webhook
+from yookassa import Configuration, Payment
 import uuid
 
 from cart.services.cart_actions import clear_cart
 
-import json
-
 from products.models import SellerProduct
+
+from cart.models import Order
 
 Configuration.account_id = '306183'
 Configuration.secret_key = 'test_6EQxV_1iuGm1G3oircj-EAeRk4PZSRW3t1yTT6QU2ko'
@@ -29,29 +29,20 @@ def get_paid(order):
     }, uuid.uuid4())
     order.payment_id = payment.id
     order.save()
-    # response = Webhook.add({
-    #     "event": "payment.succeeded",
-    #     "url": "http://127.0.0.1:8000/payment/notification_url/",
-    # })
-    # print(response)
     return payment.confirmation.confirmation_url
 
 
 def change_seller_product_count(cart):
-    for product_seller, count in map(lambda product: (product['product_seller'], product['count']), json.loads(cart).values()):
+    for product_seller, count in map(lambda product: (product['seller'], product['count']),
+                                     cart.values()):
         seller = SellerProduct.objects.get(pk=product_seller)
         seller.count -= count
         seller.save()
 
 
 def get_payment_status(order):
-    if order.status:
-        return True
-    payment = Payment.find_one(order.payment_id)
-    if payment.status == 'succeeded':
-        change_seller_product_count(order.cart)
+    change_seller_product_count(order.cart)
+    if order == Order.objects.filter(profile=order.profile, archived=False).last():
         clear_cart(order.profile)
-        order.status = True
-        order.save()
-        return True
-    return False
+    order.status = True
+    order.save()

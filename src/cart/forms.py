@@ -4,7 +4,7 @@ import phonenumbers as phonenumbers
 from django import forms
 
 from .models import Order
-import phonenumbers
+# import phonenumbers
 
 
 class CreateOrderForm(forms.ModelForm):

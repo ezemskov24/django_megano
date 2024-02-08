@@ -125,11 +125,11 @@
                                         </strong>
                                     </div>
                                     {% if not order.status %}
-                                        <form method="post">
+                                        <form method="POST">
                                         {% csrf_token %}
-                                    <button type="submit" class="btn">
-                                        Оплатить
-                                    </button>
+                                            <button type="submit" class="btn">
+                                                Оплатить
+                                            </button>
                                         </form>
                                     {% endif %}
                                 </div>

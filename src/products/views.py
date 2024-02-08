@@ -170,7 +170,6 @@ class ProductsCompareView(ListView):
         ]
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        # messages.success(self.request, 'Profile details updated.')
         context = super().get_context_data()
 
         if not context['object_list']:

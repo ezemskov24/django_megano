@@ -11,7 +11,8 @@ async function delete_all() {
         }
     })
     document.getElementById('all_products').style.display = 'none'
-    compare_main.innerHTML = 'Недостаточно товаров для сравнения'
+    // compare_main.style = "color: red"
+    // compare_main.innerHTML = 'Недостаточно товаров для сравнения'
     compare_length()
 }
 
