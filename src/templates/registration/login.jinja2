@@ -9,6 +9,8 @@
 {% endblock %}
 
 {% block content %}
+  <link href="{{ static('assets/css/profile_style.css') }}" rel="stylesheet">
+
    <div class="wrapper">
       <div class="header">
           <h3 class="sign-in">Вход</h3>
@@ -33,8 +35,8 @@
                 Регистрация
             </a>
 
-          {% if form.errors %}
-            <div style="color: red">
+          {% if errors %}
+            <div class="error_text">
             <p>Неверное имя пользователя либо пароль.</p>
 {#              {{ form.errors }}#}
             </div>

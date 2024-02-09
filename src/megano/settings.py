@@ -38,6 +38,7 @@ DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "0.0.0.0",
+    'nice-kids-float.loca.lt',
 ] + os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",")
 
 

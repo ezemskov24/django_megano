@@ -110,7 +110,8 @@ class CatalogQuerySetProcessor:
         """ Получение выбранного типа сортировки из запроса. """
         sort = request.GET.get('sort')
         if sort:
-            if (sort == SortEnum.NONE.value and
+            if ((sort == SortEnum.NONE.value or
+                 sort not in SortEnum._value2member_map_.values()) and
                     request.session.get('sort')):
                 del request.session['sort']
             else:
@@ -212,23 +213,13 @@ class CatalogQuerySetProcessor:
         self.filter_name = request.session.get('filter_name')
         self.filter_prices = request.session.get('filter_prices', {})
         self.search_query = request.session.get('search_query')
-        if self.search_query:
-            request.session['search_query'] = self.search_query
-        else:
-            search_query = request.session.get('search_query')
-            if search_query:
-                if not change_page:
-                    del request.session['search_query']
-                else:
-                    self.search_query = search_query
 
     def process_post_params(self, request: HttpRequest, **kwargs):
         self.__process_path_params(**kwargs)
         filter_form = FilterForm(request.POST)
         search_form = SearchForm(request.POST)
+        self.__clean_session_filter(request)
         if filter_form.is_valid():
-            self.__clean_session_filter(request)
-
             cd = filter_form.cleaned_data
             filter_params = {}
             filter_prices = {}
@@ -250,9 +241,9 @@ class CatalogQuerySetProcessor:
                 request.session['filter_params'] = filter_params
             if filter_prices:
                 request.session['filter_prices'] = filter_prices
-
-        if search_form.is_valid():
+        if request.POST.get('query') is not None and request.POST.get('query').strip() == '':
             self.__clean_session_search(request)
+        if search_form.is_valid():
             request.session['search_query'] = search_form.cleaned_data['query']
 
         self.after_post = True

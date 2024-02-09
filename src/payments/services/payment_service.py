@@ -5,6 +5,10 @@ import uuid
 
 from cart.services.cart_actions import clear_cart
 
+from products.models import SellerProduct
+
+from cart.models import Order
+
 Configuration.account_id = '306183'
 Configuration.secret_key = 'test_6EQxV_1iuGm1G3oircj-EAeRk4PZSRW3t1yTT6QU2ko'
 
@@ -28,19 +32,17 @@ def get_paid(order):
     return payment.confirmation.confirmation_url
 
 
-def change_seller_product_count(order):
-    order_products = order.cart.select_related('product_seller')
-    for order_product in order_products:
-        order_product.product_seller.count -= order_product.count
-        order_product.product_seller.save()
+def change_seller_product_count(cart):
+    for product_seller, count in map(lambda product: (product['seller'], product['count']),
+                                     cart.values()):
+        seller = SellerProduct.objects.get(pk=product_seller)
+        seller.count -= count
+        seller.save()
 
 
 def get_payment_status(order):
-    if order.status:
-        return
-    payment = Payment.find_one(order.payment_id)
-    if payment.status == 'succeeded':
-        change_seller_product_count(order)
+    change_seller_product_count(order.cart)
+    if order == Order.objects.filter(profile=order.profile, archived=False).last():
         clear_cart(order.profile)
-        order.status = True
-        order.save()
+    order.status = True
+    order.save()

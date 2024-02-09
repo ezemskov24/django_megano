@@ -24,23 +24,25 @@ class Order(models.Model):
     """
     Модель для описания заказа покупателя.
 
-    profile - связь с пользователем;
+    profile - id пользователя;
     fio - фамилия, имя и отчество покупателя;
     phone - телефон покупателя;
     email - адрес электронной почты покупателя;
-    cart - связь с товарами в корзине;
+    cart - перечень товаров в заказе;
     delivery_address - адрес доставки;
     delivery_type - способ доставки;
     payment_type - способ оплаты;
     comment - коментарий к заказу;
     archived - метка для мягкого удаления;
-    created_at - дата и время создания заказа.
+    created_at - дата и время создания заказа;
+    status - статус заказа;
+    total_price - итоговая стоимость заказа;
     """
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=False, blank=False, related_name='order')
+    profile = models.CharField(max_length=4, null=False, blank=False)
     fio = models.CharField(max_length=255, null=False, blank=False)
     phone = models.CharField(max_length=10, blank=True, null=True)
     email = models.EmailField(null=False, blank=False)
-    cart = models.JSONField()
+    cart = models.JSONField(null=False, blank=False)
     city = models.CharField(max_length=255, null=False, blank=False)
     delivery_address = models.CharField(max_length=255, null=False, blank=False)
     delivery_type = models.CharField(default='обычная доставка', max_length=20)
