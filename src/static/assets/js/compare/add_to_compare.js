@@ -1,11 +1,14 @@
 function add_to_compare(slug) {
-    fetch('http://127.0.0.1:8000/catalog/compare/add/' + slug + '/', {
+    const currentLanguage = localStorage.getItem('preferredLanguage') || 'en';
+    const url = `/${currentLanguage}/catalog/compare/add/${slug}/`;
+
+    fetch(url, {
         method: 'POST',
         headers: {
             'X-CSRFToken': csrftoken,
         }
     })
     .then((res) => {
-        compare_length()
-    })
+        compare_length();
+    });
 }
