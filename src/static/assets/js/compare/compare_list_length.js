@@ -1,7 +1,7 @@
 const compare_amt = document.getElementById('compare_amt')
 
 function compare_length() {
-    fetch(`/${currentLanguage}/catalog/compare/amt/`).
+    fetch(`/catalog/compare/amt/`).
     then((response) => {
         return response.json()
     }).then((data) => {
