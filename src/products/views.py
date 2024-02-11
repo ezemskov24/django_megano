@@ -22,11 +22,12 @@ from .services.compare_products import (
     get_compare_list_amt,
     get_compare_list,
 )
-from .services.banners import Banner, LimitedProduct, TopSellerProduct
+from .services.banners import Banner, LimitedProduct, TopSellerProduct, clear_banner_cache
 from .tasks import import_products
 from account.models import BrowsingHistory
 from catalog.forms import ReviewForm
 from catalog.services import add_review, get_count_review
+from .context_processors import clear_category_cache
 
 
 class IndexView(TemplateView):
@@ -292,3 +293,14 @@ class ProductImportFormView(PermissionRequiredMixin, FormView):
             else:
                 context['status'] = task.status
         return context
+
+
+def reset_banners_cache(request):
+    """
+    AJAX функция для сброса кэша при смене языка
+    """
+    if request.method == 'POST':
+        clear_banner_cache()
+        clear_category_cache()
+        return HttpResponse()
+    return HttpResponse('Нет доступа')
