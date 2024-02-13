@@ -84,8 +84,7 @@ class CreateOrderView(LoginRequiredMixin, View):
         form = CreateOrderForm(request.POST)
         if form.is_valid():
             form.save()
-            # удалить товары из корзины
-            # Cart.objects.filter(profile=request.user.id).delete()
+            Cart.objects.filter(profile=request.user.id).delete()
 
             paid_url = get_paid(Order.objects.filter(profile=request.user.pk).last())
             return redirect(paid_url)
