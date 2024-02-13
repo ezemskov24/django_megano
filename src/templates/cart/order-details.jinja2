@@ -76,13 +76,7 @@
                                             {% if order.status %}
                                             <div class="Order-infoContent">Oплачен</div>
                                             {% else %}
-                                            <div class="Order-infoContent">Не оплачен</div>
-                                            {% endif %}
-                                        </div>
-                                        <div class="Order-info Order-info_error">
-                                            {% if not order.status %}
-                                            <div class="Order-infoType">Оплата не прошла:</div>
-                                            <div class="Order-infoContent">Оплата не выполнена</div>
+                                            <div class="Order-infoContent" style="color: red">Не оплачен</div>
                                             {% endif %}
                                         </div>
                                     </div>
