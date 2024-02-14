@@ -3,6 +3,7 @@ from django.db.models import QuerySet
 from django import forms
 from django.http import HttpRequest
 from django.urls import path
+from modeltranslation.admin import TranslationAdmin
 
 from . import admin_filters, models
 from .views import ProductImportFormView
@@ -32,7 +33,7 @@ class PictureInline(admin.StackedInline):
 
 
 @admin.register(models.Value)
-class PropertyValueAdmin(admin.ModelAdmin):
+class PropertyValueAdmin(TranslationAdmin):
 
     actions = [
         mark_archived,
@@ -46,7 +47,7 @@ class PropertyValueAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Property)
-class PropertyAdmin(admin.ModelAdmin):
+class PropertyAdmin(TranslationAdmin):
 
     actions = [
         mark_archived,
@@ -59,7 +60,7 @@ class PropertyAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(TranslationAdmin):
     actions = [
         mark_archived,
         mark_unarchived
@@ -162,7 +163,7 @@ class SubcategoryInline(admin.TabularInline):
 
 
 @admin.register(models.Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(TranslationAdmin):
     list_display = [
         'name',
         'slug',

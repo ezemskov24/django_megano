@@ -58,3 +58,7 @@ def header_menu(request):
         'search_form': SearchForm(),
         'active_discounts': active_discounts,
     }
+
+
+def clear_category_cache():
+    cache.delete(CATEGORIES_KEY)

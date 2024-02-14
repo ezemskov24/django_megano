@@ -16,9 +16,10 @@ function getCookie(name) {
     return cookieValue;
 }
 const csrftoken = getCookie('csrftoken');
+const currentLanguage = localStorage.getItem('preferredLanguage') || 'en';
 
 async function cart_amt() {
-    await fetch(`/cart/api/cart/`)
+    await fetch(`/${currentLanguage}/cart/api/cart/`)
         .then((response) => {
             return response.json();
         })
@@ -28,12 +29,12 @@ async function cart_amt() {
 }
 
 async function add_to_cart(product_pk, seller='') {
-    await fetch(`/cart/api/product-seller/?product=${product_pk}&seller=${seller}`)
+    await fetch(`/${currentLanguage}/cart/api/product-seller/?product=${product_pk}&seller=${seller}`)
         .then((response) => {
             return response.json();
         })
         .then((data) => {
-            fetch(`/cart/api/cart/`, {
+            fetch(`/${currentLanguage}/cart/api/cart/`, {
                 method: 'POST',
                 body: JSON.stringify({
                     'product_seller': data[0].pk,
