@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-07 20:26+0000\n"
+"POT-Creation-Date: 2024-02-14 15:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,20 +26,12 @@ msgstr[0] "отзыв"
 msgstr[1] "отзыва"
 msgstr[2] "отзывов"
 
-#: megano/settings.py:151
-msgid "English"
-msgstr "Английский"
-
-#: megano/settings.py:152
-msgid "Russian"
-msgstr "Русский"
-
-#: templates/cart/cart.jinja2:58 templates/cart/create_order.jinja2:208
-#: templates/cart/order-details.jinja2:123
+#: templates/cart/cart.jinja2:57 templates/cart/create_order.jinja2:212
+#: templates/cart/order-details.jinja2:117
 msgid "Итого:"
 msgstr ""
 
-#: templates/cart/cart.jinja2:62
+#: templates/cart/cart.jinja2:61
 msgid "Оформить заказ"
 msgstr ""
 
@@ -153,8 +145,8 @@ msgstr ""
 msgid "шт."
 msgstr ""
 
-#: templates/cart/create_order.jinja2:213
-#: templates/cart/order-details.jinja2:131
+#: templates/cart/create_order.jinja2:217
+#: templates/cart/order-details.jinja2:125
 msgid "Оплатить"
 msgstr ""
 
@@ -184,14 +176,6 @@ msgstr ""
 
 #: templates/cart/order-details.jinja2:79
 msgid "Не оплачен"
-msgstr ""
-
-#: templates/cart/order-details.jinja2:84
-msgid "Оплата не прошла:"
-msgstr ""
-
-#: templates/cart/order-details.jinja2:85
-msgid "Оплата не выполнена"
 msgstr ""
 
 #: templates/cart/order-list.jinja2:4
@@ -234,11 +218,11 @@ msgstr ""
 msgid "Новизне"
 msgstr ""
 
-#: templates/catalog/catalog.jinja2:148
+#: templates/catalog/catalog.jinja2:152
 msgid "Нет в наличии"
 msgstr ""
 
-#: templates/catalog/catalog.jinja2:166
+#: templates/catalog/catalog.jinja2:170
 msgid "Не найдено продуктов для отображения."
 msgstr ""
 
@@ -338,6 +322,10 @@ msgstr ""
 
 #: templates/index.jinja2:26
 msgid "Открыть"
+msgstr ""
+
+#: templates/index.jinja2:63 templates/registration/historyorder.jinja2:29
+msgid "от"
 msgstr ""
 
 #: templates/index.jinja2:85
@@ -478,10 +466,6 @@ msgstr ""
 msgid "Получить проверочный код"
 msgstr ""
 
-#: templates/registration/historyorder.jinja2:29
-msgid "от"
-msgstr ""
-
 #: templates/registration/login.jinja2:26
 msgid "Войти"
 msgstr ""
@@ -544,3 +528,9 @@ msgstr ""
 #: templates/users/seller_details.jinja2:48
 msgid "Аватар продавца"
 msgstr ""
+
+#~ msgid "English"
+#~ msgstr "Английский"
+
+#~ msgid "Russian"
+#~ msgstr "Русский"

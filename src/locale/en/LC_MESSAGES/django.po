@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-07 20:26+0000\n"
+"POT-Creation-Date: 2024-02-14 15:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,20 +24,12 @@ msgid_plural "reviews"
 msgstr[0] ""
 msgstr[1] ""
 
-#: megano/settings.py:151
-msgid "English"
-msgstr ""
-
-#: megano/settings.py:152
-msgid "Russian"
-msgstr ""
-
-#: templates/cart/cart.jinja2:58 templates/cart/create_order.jinja2:208
-#: templates/cart/order-details.jinja2:123
+#: templates/cart/cart.jinja2:57 templates/cart/create_order.jinja2:212
+#: templates/cart/order-details.jinja2:117
 msgid "Итого:"
 msgstr "Total:"
 
-#: templates/cart/cart.jinja2:62
+#: templates/cart/cart.jinja2:61
 msgid "Оформить заказ"
 msgstr "Checkout"
 
@@ -151,8 +143,8 @@ msgstr "Comment to order:"
 msgid "шт."
 msgstr "units"
 
-#: templates/cart/create_order.jinja2:213
-#: templates/cart/order-details.jinja2:131
+#: templates/cart/create_order.jinja2:217
+#: templates/cart/order-details.jinja2:125
 msgid "Оплатить"
 msgstr "Pay"
 
@@ -183,14 +175,6 @@ msgstr "Paid"
 #: templates/cart/order-details.jinja2:79
 msgid "Не оплачен"
 msgstr "Not paid"
-
-#: templates/cart/order-details.jinja2:84
-msgid "Оплата не прошла:"
-msgstr "Payment failed:"
-
-#: templates/cart/order-details.jinja2:85
-msgid "Оплата не выполнена"
-msgstr "Payment failed"
 
 #: templates/cart/order-list.jinja2:4
 msgid "Список заказов"
@@ -232,11 +216,11 @@ msgstr "Reviews"
 msgid "Новизне"
 msgstr "Newness"
 
-#: templates/catalog/catalog.jinja2:148
+#: templates/catalog/catalog.jinja2:152
 msgid "Нет в наличии"
 msgstr "Not available"
 
-#: templates/catalog/catalog.jinja2:166
+#: templates/catalog/catalog.jinja2:170
 msgid "Не найдено продуктов для отображения."
 msgstr "No products found to display."
 
@@ -337,6 +321,10 @@ msgstr "Search"
 #: templates/index.jinja2:26
 msgid "Открыть"
 msgstr "Get Started"
+
+#: templates/index.jinja2:63 templates/registration/historyorder.jinja2:29
+msgid "от"
+msgstr "from"
 
 #: templates/index.jinja2:85
 msgid "ОГРАНИЧЕННЫЕ ПРЕДЛОЖЕНИЯ"
@@ -478,10 +466,6 @@ msgstr ""
 msgid "Получить проверочный код"
 msgstr "Get verification code"
 
-#: templates/registration/historyorder.jinja2:29
-msgid "от"
-msgstr "from"
-
 #: templates/registration/login.jinja2:26
 msgid "Войти"
 msgstr "Login"
@@ -544,3 +528,9 @@ msgstr "Register"
 #: templates/users/seller_details.jinja2:48
 msgid "Аватар продавца"
 msgstr "Seller avatar"
+
+#~ msgid "Оплата не прошла:"
+#~ msgstr "Payment failed:"
+
+#~ msgid "Оплата не выполнена"
+#~ msgstr "Payment failed"

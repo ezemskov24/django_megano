@@ -188,8 +188,8 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'ru'
 
 LANGUAGES = [
-    ('en', _('English')),
-    ('ru', _('Russian')),
+    ('en', 'English'),
+    ('ru', 'Russian'),
 ]
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'ru'
