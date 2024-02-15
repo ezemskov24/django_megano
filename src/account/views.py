@@ -73,7 +73,6 @@ class RegisterView(ForValidationMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
-        # print(form)
         if form.is_valid():
             return self.form_valid(form)
         else:
@@ -96,11 +95,6 @@ class UserLoginView(LoginView):
 
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('account:login')
-
-
-# class UserAccountView(LoginRequiredMixin, TemplateView):
-#     login_url = 'account:login'
-#     template_name = 'registration/account.jinja2'
 
 
 class UserEmailView(LoginRequiredMixin, TemplateView):
