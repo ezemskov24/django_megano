@@ -42,7 +42,7 @@ async function changing_product_amt(pk, term, max_value, auth) {
     }
     await fetch(`/${currentLanguage}/cart/api/cart/`+ pk +'/', {
         method: 'PATCH',
-        body: JSON.stringify({'count': value}),
+        body: JSON.stringify({'count': value, 'pk': pk}),
         headers: {
             "Content-Type": "application/json",
             'X-CSRFToken': csrftoken,
