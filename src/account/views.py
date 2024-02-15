@@ -86,6 +86,7 @@ class RegisterView(CreateView):
             username=username,
             password=password,
         )
+        merge_cart_products(user, self.request.session.get('cart'))
         login(request=self.request, user=user)
         return response
 
