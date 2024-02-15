@@ -21,13 +21,3 @@ class Review(models.Model):
         ordering = ['-created_at']
         verbose_name = 'review'
         verbose_name_plural = 'reviews'
-
-
-@receiver(post_save, sender=Review)
-def clear_review_cache(sender, instance, **kwargs):
-    """
-    Очистка кеша при добавлении отзыва
-    """
-    product = instance.product
-    cache_key = f'product_details_{product.pk}'
-    cache.delete(cache_key)

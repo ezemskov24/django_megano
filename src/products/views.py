@@ -12,8 +12,6 @@ from django.urls import reverse
 from django.views.generic import DetailView, FormView, ListView, TemplateView
 from django.utils import timezone
 
-from catalog.forms import ReviewForm
-
 from .forms import ProductsImportForm
 from .models import Product
 from .services.catalog_queryset import CatalogQuerySetProcessor
@@ -24,11 +22,12 @@ from .services.compare_products import (
     get_compare_list_amt,
     get_compare_list,
 )
-from .services.banners import Banner, LimitedProduct, TopSellerProduct
+from .services.banners import Banner, LimitedProduct, TopSellerProduct, clear_banner_cache
 from .tasks import import_products
 from account.models import BrowsingHistory
 from catalog.forms import ReviewForm
 from catalog.services import add_review, get_count_review
+from .context_processors import clear_category_cache
 
 
 class IndexView(TemplateView):
@@ -109,7 +108,7 @@ class ProductDetailsView(DetailView):
         if queryset is None:
             queryset = Product.objects.prefetch_related(
                 'images',
-                'sellerproduct_set__seller',
+                'sellerproduct__seller',
                 'product_property_value__property'
             )
             cache.set(cache_key, queryset, 60 * 60 * 24)
@@ -120,7 +119,7 @@ class ProductDetailsView(DetailView):
         context_data = super().get_context_data(**kwargs)
 
         context_data['images'] = self.object.images.all()
-        context_data['seller_products'] = self.object.sellerproduct_set.all()
+        context_data['seller_products'] = self.object.sellerproduct.all()
         context_data['properties'] = self.object.product_property_value.all()
         context_data['reviews'] = self.object.reviews.all()
         context_data['get_count_review'] = get_count_review(self.object.pk)
@@ -294,3 +293,14 @@ class ProductImportFormView(PermissionRequiredMixin, FormView):
             else:
                 context['status'] = task.status
         return context
+
+
+def reset_banners_cache(request):
+    """
+    AJAX функция для сброса кэша при смене языка
+    """
+    if request.method == 'POST':
+        clear_banner_cache()
+        clear_category_cache()
+        return HttpResponse()
+    return HttpResponse('Нет доступа')
