@@ -41,6 +41,7 @@ class ForValidationMixin:
             username=username,
             password=password,
         )
+        merge_cart_products(user, self.request.session.get('cart'))
         login(request=self.request, user=user)
         messages.success(self.request, "Данные успешно обновлены.")
         return response
