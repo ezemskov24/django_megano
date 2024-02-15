@@ -21,5 +21,3 @@ function compare_length() {
     return data
     })
 }
-
-compare_length()
