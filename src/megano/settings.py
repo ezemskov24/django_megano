@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
-    'nice-kids-float.loca.lt',
+    'fifty-ants-love.loca.lt',
 ]
 
 

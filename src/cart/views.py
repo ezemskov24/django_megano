@@ -243,7 +243,14 @@ class CartApiViewSet(ModelViewSet):
             self.get_object().clean(request.data['count'])
             return super().partial_update(request)
         except ValidationError:
-            return Response(request.data)
+            return Response(
+                {'product_seller':
+                    {
+                        'price': self.get_object().product_seller.price
+                    },
+                 'count': request.data['count']
+                 }
+            )
 
 
 class SellerApiViewSet(ModelViewSet):
@@ -251,4 +258,3 @@ class SellerApiViewSet(ModelViewSet):
     serializer_class = ProductSellerSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ['product', 'seller']
-
