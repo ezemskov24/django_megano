@@ -1,4 +1,4 @@
-from django.shortcuts import redirect
+from django.urls import reverse
 
 from yookassa import Configuration, Payment
 import uuid
@@ -14,7 +14,7 @@ Configuration.secret_key = 'test_6EQxV_1iuGm1G3oircj-EAeRk4PZSRW3t1yTT6QU2ko'
 
 
 def get_paid(order):
-    return_url = redirect('cart:order_detail', pk=order.pk)
+    return_url = reverse('cart:order_detail', args=(order.pk,))
     payment = Payment.create({
         "amount": {
             "value": str(order.total_price),
@@ -22,7 +22,7 @@ def get_paid(order):
         },
         "confirmation": {
             "type": "redirect",
-            "return_url": "http://127.0.0.1{}".format(return_url.url)
+            "return_url": f'https://45.153.69.124{return_url}'
         },
         "capture": True,
         "test": True,
