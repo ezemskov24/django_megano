@@ -259,3 +259,7 @@ REDIS_DB = 1
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_ADMIN_EMAIL = 'admin@megano.com'
 DEFAULT_FROM_EMAIL = 'admin@megano.com'
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
