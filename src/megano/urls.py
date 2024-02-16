@@ -26,14 +26,13 @@ from products.views import IndexView
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('adminsettings/', include('adminsettings.urls')),
-
+    path('payment/', include('payments.urls')),
 ]
 
 urlpatterns += i18n_patterns(
     path('account/', include('account.urls')),
     path('sale/', include('discounts.urls')),
     path('cart/', include('cart.urls')),
-    path('payment/', include('payments.urls')),
     path('catalog/', include('products.urls')),
     path('', IndexView.as_view(), name='index'),
 )
