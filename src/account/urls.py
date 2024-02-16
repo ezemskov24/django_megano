@@ -10,8 +10,6 @@ from .views import (
     UserEmailView,
     UserLoginView,
     UserLogoutView,
-    # password_change,
-    # ChangePasswordView,
 )
 
 app_name = 'account'
@@ -34,7 +32,4 @@ urlpatterns = [
         name='browsing_history',
     ),
     path('account/', UserAccountView.as_view(), name='account'),
-    # path('password_change/', password_change, name='password_change'),
-    # path('password_change/', ChangePasswordView.as_view(),
-    #      name='password_change'),
 ]
