@@ -23,6 +23,7 @@ services:
     volumes:
       - static:/app/static
       - media:/app/media
+      - ./imports:/app/imports
 
   database:
     image: postgres:14.10-alpine
@@ -39,6 +40,7 @@ services:
 
   nginx:
     image: nginx:1.24-alpine
+    restart: always
     ports:
       - "80:80"
       - "443:443"
@@ -52,16 +54,43 @@ services:
 
   rabbitmq:
     image: rabbitmq:management
+    restart: always
     ports:
       - "5672:5672"
       - "15672:15672"
 
   redis:
     image: redis
+    restart: always
     ports:
       - "6379:6379"
+
+  worker:
+    build:
+      dockerfile: ./Dockerfile
+    command:
+      - celery
+      - -A
+      - megano
+      - worker
+      - -l
+      - info
+    links:
+      - rabbitmq
+      - redis
+    env_file:
+      - .env
+    restart: always
+    depends_on:
+      - database
+      - rabbitmq
+    volumes:
+      - static:/app/static
+      - media:/app/media
+      - ./imports:/app/imports
 
 volumes:
   postgres_data:
   static:
   media:
+  imports:

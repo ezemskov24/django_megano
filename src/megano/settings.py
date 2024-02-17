@@ -252,9 +252,14 @@ IMPORT_SUCCESS_DIR = IMPORT_DIR / 'success'
 IMPORT_FAILURE_DIR = IMPORT_DIR / 'failure'
 IMPORT_LOGS_DIR = IMPORT_DIR / 'logs'
 
-REDIS_HOST = 'redis'
-REDIS_PORT = 6379
-REDIS_DB = 1
+REDIS_HOST = os.getenv("REDIS_HOST")
+REDIS_PORT = os.getenv("REDIS_PORT")
+REDIS_DB = os.getenv("REDIS_DB")
+
+RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
+RABBITMQ_PORT = os.getenv("RABBITMQ_PORT")
+RABBITMQ_USER = os.getenv("RABBITMQ_USER")
+RABBITMQ_PASS = os.getenv("RABBITMQ_PASS")
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_ADMIN_EMAIL = 'admin@megano.com'
