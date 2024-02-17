@@ -40,9 +40,9 @@
                                         <div class="row">
                                             <div class="row-block">
                                                 <a class="Order-title" href="{{ url('cart:order_detail', order.pk) }}">
-                                                    Заказ №
+                                                    {% trans %}Заказ{% endtrans %} №
                                                     <span class="Order-numberOrder">{{ order.id }}</span>
-                                                    от
+                                                    {% trans %}от{% endtrans %}
                                                     <span class="Order-dateOrder">{{ order.created_at.strftime('%d.%m.%Y') }}</span>
                                                 </a>
                                                 <a class="menu-link" id="historyorder" href="{{ url('account:historyorder') }}">

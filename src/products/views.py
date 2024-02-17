@@ -96,11 +96,18 @@ class CatalogView(ListView):
 
 
 class ProductDetailsView(DetailView):
+    """
+    View детальной страницы товара
+    """
     model = Product
     template_name = "products/product-details.jinja2"
     context_object_name = "product"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """
+        Метод для получения queryset товара.
+        Если данные не найдены в кэше, они извлекаются из базы данных и кэшируются на 24 часа.
+        """
         slug = self.kwargs.get('slug')
         cache_key = f'product_details_{slug}'
         queryset = cache.get(cache_key)
@@ -115,7 +122,11 @@ class ProductDetailsView(DetailView):
 
         return queryset
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> Dict:
+        """
+        Метод для получения контекстных данных, передаваемых в шаблон.
+        Включает изображения товара, связанные товары от продавца, свойства товара, отзывы и количество отзывов.
+        """
         context_data = super().get_context_data(**kwargs)
 
         context_data['images'] = self.object.images.all()
@@ -126,7 +137,11 @@ class ProductDetailsView(DetailView):
 
         return context_data
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs) -> HttpResponse:
+        """
+        Метод обработки GET-запроса.
+        Если пользователь аутентифицирован, создается запись о просмотре товара в истории просмотров.
+        """
         self.object = self.get_object()
 
         if request.user.is_authenticated:
