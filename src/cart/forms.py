@@ -32,6 +32,6 @@ class CreateOrderForm(forms.ModelForm):
     def clean_phone(self):
         phone = self.cleaned_data.get("phone")
         z = phonenumbers.parse(phone, "SG")
-        if not phonenumbers.is_valid_number(z):
+        if not phonenumbers.is_possible_number(z):
             raise forms.ValidationError("Number not in successful format")
         return z.national_number
