@@ -1,6 +1,6 @@
 # Интернет-магазин MEGANO
 ***
-![45.153.69.124_ru_ (1).png](..%2F..%2F..%2F%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8%2F45.153.69.124_ru_%20%281%29.png)
+![main_page_preview.png](src/static/assets/img/main_page_preview.png)
 ## Структура проекта
 ### Приложения
 - account - личный кабинет, пользователи и продавцы
