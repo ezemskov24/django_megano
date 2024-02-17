@@ -85,7 +85,7 @@
       "password": "pbkdf2_sha256$600000$kYnahJwJk68zMCM94T7rOz$/LsvCWtExIwqnGdgI2SDe5gGSbrhjIkomHxAy7+3K5Y=",
       "last_login": "2024-02-13T18:50:06.209Z",
       "is_superuser": false,
-      "username": "context_manager",
+      "username": "content_manager",
       "first_name": "",
       "last_name": "",
       "is_staff": true,

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-14 15:10+0000\n"
+"POT-Creation-Date: 2024-02-17 15:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -145,13 +145,17 @@ msgstr ""
 msgid "шт."
 msgstr ""
 
+#: templates/cart/create_order.jinja2:208
+msgid "Доставка"
+msgstr ""
+
 #: templates/cart/create_order.jinja2:217
 #: templates/cart/order-details.jinja2:125
 msgid "Оплатить"
 msgstr ""
 
 #: templates/cart/order-details.jinja2:4 templates/cart/order-details.jinja2:22
-#: templates/cart/order-list.jinja2:23
+#: templates/cart/order-list.jinja2:23 templates/registration/account.jinja2:43
 #: templates/registration/historyorder.jinja2:27
 msgid "Заказ"
 msgstr ""
@@ -324,7 +328,8 @@ msgstr ""
 msgid "Открыть"
 msgstr ""
 
-#: templates/index.jinja2:63 templates/registration/historyorder.jinja2:29
+#: templates/index.jinja2:63 templates/registration/account.jinja2:45
+#: templates/registration/historyorder.jinja2:29
 msgid "от"
 msgstr ""
 
@@ -369,6 +374,7 @@ msgid "Добавить в корзину"
 msgstr ""
 
 #: templates/products/compare/compare.jinja2:82
+#: templates/products/compare/compare.jinja2:87
 msgid "Недостаточно товаров для сравнения"
 msgstr ""
 
@@ -404,6 +410,10 @@ msgstr ""
 
 #: templates/products/product-details.jinja2:93
 msgid "Товар успешно добавлен в корзину!"
+msgstr ""
+
+#: templates/products/product-details.jinja2:102
+msgid "Тэги"
 msgstr ""
 
 #: templates/products/product-details.jinja2:112
