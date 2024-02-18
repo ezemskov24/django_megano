@@ -34,19 +34,18 @@ def get_paid(order):
 
 
 def change_seller_product_count(cart):
-    for product_seller, count, product in map(
+    for product_seller, count in map(
             lambda prod: (
                     prod['seller'],
                     prod['count'],
-                    prod['product'],
             ),
             cart.values()):
         seller = SellerProduct.objects.get(pk=product_seller)
         seller.count -= count
         seller.save()
 
-        product.count_sells += count
-        product.save()
+        seller.product.count_sells += count
+        seller.product.save()
 
 
 def get_payment_status(order):
