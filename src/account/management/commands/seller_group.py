@@ -5,6 +5,10 @@ from ...models import Seller
 
 
 class Command(BaseCommand):
+    """
+    Команда для создания группы Sellers.
+    При срабатывании команды, продавцы добавляются в нее.
+    """
     PERMISSIONS = [
         "add_sellerproduct",
         "change_sellerproduct",

@@ -118,9 +118,6 @@ class ProductAdmin(TranslationAdmin):
     def avg_disc_price(self, obj: models.Product) -> int:
         return obj.discounted_average_price
 
-    # def delete_queryset(self, request: HttpRequest, queryset: QuerySet):
-    #     queryset.update(archived=True)
-
 
 @admin.register(models.SellerProduct)
 class SellerProductAdminModel(admin.ModelAdmin):
@@ -129,15 +126,14 @@ class SellerProductAdminModel(admin.ModelAdmin):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.groups.filter(name='Content-managers').exists():
             return queryset
         else:
             return queryset.filter(seller__profile=request.user)
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
-        if not request.user.is_superuser:
+        if not (request.user.is_superuser or request.user.groups.filter(name='Content-managers').exists()):
             form.base_fields['seller'].widget = forms.HiddenInput()
             form.base_fields['seller'].initial = request.user.seller_set.first()
         return form
