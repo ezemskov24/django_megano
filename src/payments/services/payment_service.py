@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from django.urls import reverse
 
 from yookassa import Configuration, Payment
@@ -33,11 +34,19 @@ def get_paid(order):
 
 
 def change_seller_product_count(cart):
-    for product_seller, count in map(lambda product: (product['seller'], product['count']),
-                                     cart.values()):
+    for product_seller, count, product in map(
+            lambda prod: (
+                    prod['seller'],
+                    prod['count'],
+                    prod['product'],
+            ),
+            cart.values()):
         seller = SellerProduct.objects.get(pk=product_seller)
         seller.count -= count
         seller.save()
+
+        product.count_sells += count
+        product.save()
 
 
 def get_payment_status(order):

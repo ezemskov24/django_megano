@@ -145,22 +145,22 @@ WSGI_APPLICATION = "megano.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
 # DATABASES = {
 #     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "HOST": os.environ.get("DB_HOST"),
-#         "NAME": os.environ.get("DB_NAME"),
-#         "USER": os.environ.get("DB_USER"),
-#         "PASSWORD": os.environ.get("DB_PASS"),
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": os.environ.get("DB_HOST"),
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASS"),
+    }
+}
 
 
 # Password validation
@@ -268,7 +268,8 @@ DEFAULT_FROM_EMAIL = 'admin@megano.com'
 # Настройки для работы по https
 CSRF_TRUSTED_ORIGINS = [
     'https://' + host
-    for host in os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",")
+    for host in ALLOWED_HOSTS
+    # for host in os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",")
 ]
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
