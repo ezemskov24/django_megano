@@ -50,6 +50,7 @@
                     </div>
                 </div>
                 <div class="Section-columnSection">
+                    {% if tags %}
                         <header class="Section-header">
                             <strong class="Section-title">{% trans %}Популярные тэги{% endtrans %}
                             </strong>
@@ -61,7 +62,8 @@
                                 {% endfor %}
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
+                </div>
             </div>
             <div class="Section-content">
                 <div class="Sort">
@@ -70,58 +72,58 @@
                         <div class="Sort-variants">
                             <a class="Sort-sortBy {% if curr_sort and curr_sort == sort.POP_ASC.value %}
 Sort-sortBy_inc
-                                                  {% elif curr_sort and curr_sort == sort.POP_DEC.value %}
+{% elif curr_sort and curr_sort == sort.POP_DEC.value %}
 Sort-sortBy_dec
-                                                  {% endif %}"
+{% endif %}"
                                href="?sort={% if curr_sort and curr_sort == sort.POP_ASC.value %}
 {{ sort.POP_DEC.value }}
-                                           {% elif curr_sort and curr_sort == sort.POP_DEC.value %}
+{% elif curr_sort and curr_sort == sort.POP_DEC.value %}
 {{ sort.NONE.value }}
-                                           {% else %}
+{% else %}
 {{ sort.POP_ASC.value }}
                                            {% endif %}">
                                 {% trans %}Популярности{% endtrans %}
                             </a>
                             <a class="Sort-sortBy {% if curr_sort and curr_sort == sort.PRI_ASC.value %}
 Sort-sortBy_inc
-                                                  {% elif curr_sort and curr_sort == sort.PRI_DEC.value %}
+{% elif curr_sort and curr_sort == sort.PRI_DEC.value %}
 Sort-sortBy_dec
-                                                  {% endif %}"
+{% endif %}"
                                href="?sort={% if curr_sort and curr_sort == sort.PRI_DEC.value %}
 {{ sort.PRI_ASC.value }}
-                                           {% elif curr_sort and curr_sort == sort.PRI_ASC.value %}
+{% elif curr_sort and curr_sort == sort.PRI_ASC.value %}
 {{ sort.NONE.value }}
-                                           {% else %}
+{% else %}
 {{ sort.PRI_DEC.value }}
                                            {% endif %}">
                                 {% trans %}Цене{% endtrans %}
                             </a>
                             <a class="Sort-sortBy {% if curr_sort and curr_sort == sort.REV_ASC.value %}
 Sort-sortBy_inc
-                                                  {% elif curr_sort and curr_sort == sort.REV_DEC.value %}
+{% elif curr_sort and curr_sort == sort.REV_DEC.value %}
 Sort-sortBy_dec
-                                                  {% endif %}"
+{% endif %}"
                                href="?sort={% if curr_sort and curr_sort == sort.REV_ASC.value %}
 {{ sort.REV_DEC.value }}
-                                           {% elif curr_sort and curr_sort == sort.REV_DEC.value %}
+{% elif curr_sort and curr_sort == sort.REV_DEC.value %}
 {{ sort.NONE.value }}
-                                           {% else %}
+{% else %}
 {{ sort.REV_ASC.value }}
                                            {% endif %}">
                                 {% trans %}Отзывам{% endtrans %}
                             </a>
                             <a class="Sort-sortBy {% if curr_sort and curr_sort == sort.CRE_ASC.value %}
 Sort-sortBy_inc
-                                                  {% elif curr_sort and curr_sort == sort.CRE_DEC.value %}
+{% elif curr_sort and curr_sort == sort.CRE_DEC.value %}
 Sort-sortBy_dec
-                                                  {% endif %}"
+{% endif %}"
                                href="?sort={% if curr_sort and curr_sort == sort.CRE_ASC.value %}
 {{ sort.CRE_DEC.value }}
-                                           {% elif curr_sort and curr_sort == sort.CRE_DEC.value %}
+{% elif curr_sort and curr_sort == sort.CRE_DEC.value %}
 {{ sort.NONE.value }}
-                                           {% else %}
+{% else %}
 {{ sort.CRE_ASC.value }}
-                                           {% endif %}">
+{% endif %}">
                                 {% trans %}Новизне{% endtrans %}
                             </a>
                         </div>

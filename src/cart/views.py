@@ -252,7 +252,7 @@ class CartApiViewSet(ModelViewSet):
                     {
                         'price': self.get_object().product_seller.price
                     },
-                 'count': request.data['count']
+                 'count': request.data['count'] - 1
                  }
             )
 

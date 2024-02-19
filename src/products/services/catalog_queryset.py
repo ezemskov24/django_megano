@@ -110,8 +110,9 @@ class CatalogQuerySetProcessor:
         """ Получение выбранного типа сортировки из запроса. """
         sort = request.GET.get('sort')
         if sort:
+            sort = sort.strip()
             if ((sort == SortEnum.NONE.value or
-                 sort not in SortEnum._value2member_map_.values()) and
+                 sort not in SortEnum._value2member_map_.keys()) and
                     request.session.get('sort')):
                 del request.session['sort']
             else:
