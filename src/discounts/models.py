@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
 
 from products.models import Category, Product
 
@@ -76,6 +77,10 @@ class ProductDiscount(Discount):
         related_name='product_discounts',
     )
 
+    class Meta:
+        verbose_name = _('Product discount')
+        verbose_name_plural = _('Product discounts')
+
 
 class CategoryDiscount(Discount):
     categories = models.ManyToManyField(
@@ -83,11 +88,19 @@ class CategoryDiscount(Discount):
         related_name='category_discounts',
     )
 
+    class Meta:
+        verbose_name = _('Category discount')
+        verbose_name_plural = _('Category discounts')
+
 
 class BulkDiscount(Discount):
     product_amount = models.PositiveIntegerField()
     total_sum = models.DecimalField(max_digits=10, decimal_places=2)
     only_unique = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = _('Bulk discount')
+        verbose_name_plural = _('Bulk discounts')
 
     def get_absolute_url(self):
         return reverse('products:catalog')
@@ -106,6 +119,10 @@ class ComboSet(models.Model):
         blank=True,
     )
 
+    class Meta:
+        verbose_name = _('Combo set')
+        verbose_name_plural = _('Combo sets')
+
     def __str__(self):
         return self.name if self.name else f'Combo set #{self.pk}'
 
@@ -121,3 +138,7 @@ class ComboDiscount(Discount):
         on_delete=models.CASCADE,
         related_name='discounts_2',
     )
+
+    class Meta:
+        verbose_name = _('Combo discount')
+        verbose_name_plural = _('Combo discounts')

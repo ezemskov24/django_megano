@@ -122,7 +122,7 @@ class ProductDetailsView(DetailView):
 
         return queryset
 
-    def get_context_data(self, **kwargs) -> Dict:
+    def get_context_data(self, **kwargs) -> Dict[str, Any]:
         """
         Метод для получения контекстных данных, передаваемых в шаблон.
         Включает изображения товара, связанные товары от продавца, свойства товара, отзывы и количество отзывов.
@@ -157,7 +157,7 @@ class ProductDetailsView(DetailView):
 
         return self.render_to_response(context_data)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs) -> HttpResponseRedirect:
         form = ReviewForm(request.POST)
 
         if form.is_valid():
@@ -307,7 +307,7 @@ class ProductImportFormView(PermissionRequiredMixin, FormView):
         return context
 
 
-def reset_banners_cache(request):
+def reset_banners_cache(request) -> HttpResponse:
     """
     AJAX функция для сброса кэша при смене языка
     """
