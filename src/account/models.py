@@ -6,6 +6,18 @@ from products.models import Product, SellerProduct
 
 
 class Profile(AbstractUser):
+    """
+    Модель для описания пользователей.
+
+    registered_at - дата регистрации
+    agreement_accept - пользовательское соглашение
+    phone - телефон
+    avatar - фото пользователя
+    address - адрес проживаиния (доставки)
+    cart - корзина пользователя
+    archived - архивирование страницы продавца для мягкого удаления
+    email - адрес электронной почты (используется для входа)
+    """
     registered_at = models.DateTimeField(auto_now_add=True)
     agreement_accept = models.BooleanField(default=False)
     phone = models.CharField(max_length=14, unique=True, blank=True, null=True)
