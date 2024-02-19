@@ -1,4 +1,4 @@
-from django.db.models import Sum
+import os
 from django.urls import reverse
 
 from yookassa import Configuration, Payment
@@ -7,11 +7,10 @@ import uuid
 from cart.services.cart_actions import clear_cart
 
 from products.models import SellerProduct
-
 from cart.models import Order
 
-Configuration.account_id = '306183'
-Configuration.secret_key = 'test_6EQxV_1iuGm1G3oircj-EAeRk4PZSRW3t1yTT6QU2ko'
+Configuration.account_id = os.getenv("SHOP_ID", "")
+Configuration.secret_key = os.getenv("SECRET_KEY", "")
 
 
 def get_paid(order):

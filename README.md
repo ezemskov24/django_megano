@@ -51,6 +51,33 @@ load_test_data=True
 | manager@megano.com       | qwaszx11  | Администратор |
 | walter@megano.com        | qwaszx11  | Покупатель    |
 ***
+### Для работы сервиса оплаты необходимо:
+- Войти/зарегестрироваться на сервисе "ЮКасса" по ссылке
+```
+https://yookassa.ru/yooid/signin/step/login?origin=Checkout&returnUrl=https%3A%2F%2Fyookassa.ru%2Fmy%2Fprofile
+```
+- Создать свой интернет магазин, сдедуя инструкциям ЮКассы
+- Перейти по ссылке
+```
+https://yookassa.ru/my/shop-settings
+```
+- Из поля "shopId" скопировать id своего магазана
+- Перейти по ссылке
+```
+https://yookassa.ru/my/merchant/integration/api-keys
+```
+- Из поля "Секретный ключ" скопировать секретный ключ своего магазина
+- Перейти по ссылке
+```
+https://yookassa.ru/my/merchant/integration/http-notifications
+```
+- Если выключены какие-либо уведомления - включить
+- В поле "URL для уведомлений" ввести, где "example.com" пример доменного имени. 
+```
+https://example.com/payment/notification_url/
+```
+- В файл .env добавить скопированные "shopId" и "Секретный ключ" в соответсвующие поля
+***
 Перед запуском проекта необходимо собрать контейнер командой:
 ```
 docker compose build
