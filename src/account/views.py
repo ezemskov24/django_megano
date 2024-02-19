@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login
@@ -127,7 +129,7 @@ class UserBrowsingHistoryView(LoginRequiredMixin, TemplateView):
     template_name = 'registration/browsing-history.jinja2'
     login_url = 'account:login'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         history = BrowsingHistory.objects.filter(profile=self.request.user).order_by('-timestamp')[:20]
 

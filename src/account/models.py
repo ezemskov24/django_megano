@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from products.models import Product, SellerProduct
 
@@ -55,6 +56,10 @@ class Seller(models.Model):
     )
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     archived = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = _('Seller')
+        verbose_name_plural = _('Sellers')
 
     def __str__(self) -> str:
         return f"{self.name}"
