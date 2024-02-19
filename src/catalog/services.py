@@ -1,8 +1,7 @@
 from django.utils.translation import ngettext
 
 from account.models import Profile
-from .forms import ReviewForm
-from .models import Review
+from catalog.models import Review
 from products.models import Product
 
 

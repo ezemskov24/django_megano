@@ -214,15 +214,12 @@ class ProductsCompareView(ListView):
                     diff_properties[product_property['property_name']].append(product_property['property_value'])
                 else:
                     diff_properties[product_property['property_name']] = [product_property['property_value']]
-        for key, value in diff_properties.items():
-            print(len(set(map(lambda elem: elem.lower(), value))) == 1, len(context['properties']) > 1)
         context['not_dif_category'] = [
             key for key, value in diff_properties.items()
             if len(set(map(lambda elem: elem.lower(), value))) == 1
             and
             len(context['properties']) > 1
         ]
-        print(context['not_dif_category'])
 
         for product in context['properties']:
             product['dif_properties'] = [

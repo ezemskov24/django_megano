@@ -1,13 +1,13 @@
 import os
-from django.urls import reverse
-
 from yookassa import Configuration, Payment
 import uuid
 
-from cart.services.cart_actions import clear_cart
+from django.urls import reverse
 
-from products.models import SellerProduct
+from cart.services.cart_actions import clear_cart
 from cart.models import Order
+from products.models import SellerProduct
+
 
 Configuration.account_id = os.getenv("SHOP_ID", "")
 Configuration.secret_key = os.getenv("SECRET_KEY", "")

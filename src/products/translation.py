@@ -1,6 +1,6 @@
 from modeltranslation.translator import register, TranslationOptions
 
-from .models import Product, Category, Property, Value
+from products.models import Product, Category, Property, Value
 
 
 @register(Product)

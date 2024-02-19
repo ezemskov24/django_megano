@@ -1,10 +1,10 @@
 import re
 
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm, SetPasswordForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.password_validation import validate_password
 
-from .models import Profile
+from account.models import Profile
 
 
 class UserRegistrationForm(UserCreationForm):

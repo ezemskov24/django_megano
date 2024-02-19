@@ -5,8 +5,8 @@ from django.http import HttpRequest
 from django.urls import path
 from modeltranslation.admin import TranslationAdmin
 
-from . import admin_filters, models
-from .views import ProductImportFormView
+from products import admin_filters, models
+from products.views import ProductImportFormView
 
 
 @admin.action(description="Archive selected products")

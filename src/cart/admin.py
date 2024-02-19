@@ -2,10 +2,8 @@ from django.contrib import admin
 
 from cart.models import Order, Cart
 
-from . import models
 
-
-@admin.register(models.Cart)
+@admin.register(Cart)
 class PropertyValueAdmin(admin.ModelAdmin):
 
     list_display = [
