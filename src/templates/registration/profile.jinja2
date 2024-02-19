@@ -118,24 +118,7 @@
         </div>
     </div>
 
-<script>
-    let coverPreview = document.getElementById('coverPreview');
-    let cover = document.getElementById('cover');
-
-    coverPreview.addEventListener('click',_=>cover.click());
-
-    cover.addEventListener("change",_=>{
-        let file = cover.files[0];
-        console.log(file.mozFullPath);
-        let reader = new FileReader();
-        reader.onload = function (){
-            coverPreview.src = reader.result; }
-        file.name;
-    });
-</script>
-
 <script src="{{ static('admin/js/vendor/jquery/jquery.min.js') }}"></script>
-{#<script src="{{ static('assets/js/form_validation.js') }}"></script>#}
 <script src="{{ static('assets/js/inputmask.min.js') }}"></script>
 <script src="{{ static('assets/js/mask.js') }}"></script>
 {% endblock %}
