@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-19 22:31+0000\n"
+"POT-Creation-Date: 2024-02-20 12:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,43 +64,43 @@ msgid_plural "reviews"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discounts/models.py:81
+#: discounts/models.py:84
 msgid "Product discount"
 msgstr ""
 
-#: discounts/models.py:82
+#: discounts/models.py:85
 msgid "Product discounts"
 msgstr ""
 
-#: discounts/models.py:92
+#: discounts/models.py:96
 msgid "Category discount"
 msgstr ""
 
-#: discounts/models.py:93
+#: discounts/models.py:97
 msgid "Category discounts"
 msgstr ""
 
-#: discounts/models.py:102
+#: discounts/models.py:107
 msgid "Bulk discount"
 msgstr ""
 
-#: discounts/models.py:103
+#: discounts/models.py:108
 msgid "Bulk discounts"
 msgstr ""
 
-#: discounts/models.py:123
+#: discounts/models.py:129
 msgid "Combo set"
 msgstr ""
 
-#: discounts/models.py:124
+#: discounts/models.py:130
 msgid "Combo sets"
 msgstr ""
 
-#: discounts/models.py:143
+#: discounts/models.py:150
 msgid "Combo discount"
 msgstr ""
 
-#: discounts/models.py:144
+#: discounts/models.py:151
 msgid "Combo discounts"
 msgstr ""
 
@@ -352,19 +352,19 @@ msgstr "Not available"
 msgid "Не найдено продуктов для отображения."
 msgstr "No products found to display."
 
-#: templates/catalog/review.jinja2:41
+#: templates/catalog/review.jinja2:42
 msgid "Показать еще"
 msgstr "Show more"
 
-#: templates/catalog/review.jinja2:47
+#: templates/catalog/review.jinja2:49
 msgid "Добавить отзыв"
 msgstr "Add a review"
 
-#: templates/catalog/review.jinja2:54
+#: templates/catalog/review.jinja2:56
 msgid "Отзыв"
 msgstr "Review"
 
-#: templates/catalog/review.jinja2:58
+#: templates/catalog/review.jinja2:60
 msgid "Отправить отзыв"
 msgstr "Post a review"
 
