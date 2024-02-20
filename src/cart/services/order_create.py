@@ -23,10 +23,10 @@ def get_total_price(carts: Dict) -> Tuple[int, int]:
     for cart in carts.values():
         total_price += cart['price'] * cart['count']
     sellers = [cart['seller'] for cart in carts.values()]
-    if all(seller == sellers[0] for seller in sellers) or total_price >= min_price:
-        return total_price, 0
-    total_price += delivery_price
-    return total_price, delivery_price
+    if not (all(seller == sellers[0] for seller in sellers) and total_price >= min_price):
+        total_price += delivery_price
+        return total_price, delivery_price
+    return total_price, 0
 
 
 def get_fio(first_name: str, last_name: str, username: str) -> str:
