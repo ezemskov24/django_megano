@@ -273,6 +273,7 @@ def get_compare_list_amt_view(request):
 
 
 class ProductImportFormView(PermissionRequiredMixin, FormView):
+    """ View страницы импорта товаров. """
     template_name = 'admin/product_import_form.html'
     form_class = ProductsImportForm
     success_url = '..'
