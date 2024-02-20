@@ -219,6 +219,8 @@ class ProductsCompareView(ListView):
             if len(set(map(lambda elem: elem.lower(), value))) == 1
             and
             len(context['properties']) > 1
+            and
+            len(list(map(lambda elem: elem.lower(), value))) != 1
         ]
 
         for product in context['properties']:
