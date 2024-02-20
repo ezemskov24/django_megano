@@ -42,7 +42,8 @@ class FormValidationMixin:
             username=username,
             password=password,
         )
-        merge_cart_products(user, self.request.session.get('cart'))
+        if self.request.session.get('cart'):
+            merge_cart_products(user, self.request.session.get('cart'))
         login(request=self.request, user=user)
         messages.success(self.request, "Данные успешно обновлены.")
         return response
@@ -78,6 +79,7 @@ class UserLoginView(LoginView):
         user = authenticate(request, email=request.POST.get('username'), password=request.POST.get('password'))
         if user is not None:
             merge_cart_products(user, request.session.get('cart'))
+            request.session['cart'] = []
             login(request, user)
             return redirect('account:profile')
         return render(request, 'registration/login.jinja2', context={'errors': 'Неверный логин или пароль'})
