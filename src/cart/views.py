@@ -70,7 +70,7 @@ class CreateOrderView(LoginRequiredMixin, View):
 
         return render(request, 'cart/create_order.jinja2', context=context)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
 
         form = CreateOrderForm(request.POST)
         if form.is_valid():
