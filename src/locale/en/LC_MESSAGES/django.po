@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-20 12:05+0000\n"
+"POT-Creation-Date: 2024-02-20 13:31+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -404,8 +404,8 @@ msgid "Личный кабинет"
 msgstr "Personal Area"
 
 #: templates/common/header_parts/header_control_panel.jinja2:42
-#: templates/registration/e-mail.jinja2:40
 #: templates/registration/login.jinja2:4 templates/registration/login.jinja2:14
+#: templates/registration/password_reset_form.jinja2:30
 #: templates/registration/registr.jinja2:37
 msgid "Вход"
 msgstr "Entrance"
@@ -588,22 +588,6 @@ msgstr "Products viewed:"
 msgid "История просмотров пуста"
 msgstr "Browsing history is empty"
 
-#: templates/registration/e-mail.jinja2:24
-msgid "Восстановление пароля (1/2)"
-msgstr "Password recovery (1/2)"
-
-#: templates/registration/e-mail.jinja2:25
-msgid ""
-"Для восстановления пароля введите адрес электронной почты, на которую "
-"зарегистрирована учетная запись"
-msgstr ""
-"To recover your password, enter the email address you registered your "
-"account with"
-
-#: templates/registration/e-mail.jinja2:37
-msgid "Получить проверочный код"
-msgstr "Get verification code"
-
 #: templates/registration/login.jinja2:26
 msgid "Войти"
 msgstr "Login"
@@ -616,23 +600,43 @@ msgstr "Forgot password?"
 msgid "Неверное имя пользователя либо пароль."
 msgstr "Invalid username or password."
 
-#: templates/registration/password.jinja2:20
+#: templates/registration/password_reset_confirm.jinja2:14
 msgid "Восстановление пароля (2/2)"
 msgstr "Password recovery (2/2)"
 
-#: templates/registration/password.jinja2:21
+#: templates/registration/password_reset_confirm.jinja2:15
 msgid "Придумайте новый пароль для учетной записи"
 msgstr "Create a new password for your account"
 
-#: templates/registration/password.jinja2:26
+#: templates/registration/password_reset_confirm.jinja2:23
 #: templates/registration/profile.jinja2:89
 #: templates/registration/registr.jinja2:30
 msgid "Пароль"
 msgstr "Password"
 
-#: templates/registration/password.jinja2:29
+#: templates/registration/password_reset_confirm.jinja2:28
+msgid "Подтверждене пароля"
+msgstr "Password confirmation"
+
+#: templates/registration/password_reset_confirm.jinja2:31
 msgid "Сохранить пароль"
 msgstr "Save password"
+
+#: templates/registration/password_reset_form.jinja2:14
+msgid "Восстановление пароля (1/2)"
+msgstr "Password recovery (1/2)"
+
+#: templates/registration/password_reset_form.jinja2:15
+msgid ""
+"Для восстановления пароля введите адрес электронной почты, на которую "
+"зарегистрирована учетная запись"
+msgstr ""
+"To recover your password, enter the email address you registered your "
+"account with"
+
+#: templates/registration/password_reset_form.jinja2:25
+msgid "Получить ссылку на почту код"
+msgstr "Get verification code"
 
 #: templates/registration/profile.jinja2:26
 msgid "Аватар"
