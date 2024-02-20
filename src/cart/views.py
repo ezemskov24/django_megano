@@ -76,7 +76,7 @@ class CreateOrderView(LoginRequiredMixin, View):
         if form.is_valid():
             form.save()
             Cart.objects.filter(profile=request.user.id).delete()
-            if form.payment_type == ["Online from a random someone else's account"]:
+            if form.cleaned_data['payment_type'] == "Online from a random someone else's account":
                 # TODO: Вставить обработку запроса по случайному счету
                 return HttpResponse("обработка запроса")
             paid_url = get_paid(Order.objects.filter(profile=request.user.pk).last())
