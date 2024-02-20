@@ -22,12 +22,11 @@ def get_total_price(carts: Dict) -> Tuple[int, int]:
     delivery_price = SiteSettings.objects.first().delivery_cost
     for cart in carts.values():
         total_price += cart['price'] * cart['count']
-
     sellers = [cart['seller'] for cart in carts.values()]
-    if not ((len(sellers) > 1 and (all(seller == sellers[0] for seller in sellers))) and total_price >= min_price):
-        total_price += delivery_price
-        return total_price, delivery_price
-    return total_price, 0
+    if all(seller == sellers[0] for seller in sellers) or total_price >= min_price:
+        return total_price, 0
+    total_price += delivery_price
+    return total_price, delivery_price
 
 
 def get_fio(first_name: str, last_name: str, username: str) -> str:
