@@ -89,11 +89,6 @@ class UserLogoutView(LogoutView):
     next_page = reverse_lazy('account:login')
 
 
-class UserEmailView(LoginRequiredMixin, TemplateView):
-    login_url = 'account:login'
-    template_name = 'registration/e-mail.jinja2'
-
-
 class SellerDetailView(DetailView):
     template_name = 'users/seller_details.jinja2'
     model = Seller
