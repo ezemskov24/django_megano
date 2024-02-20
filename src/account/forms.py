@@ -26,8 +26,7 @@ class UserRegistrationForm(UserCreationForm):
 
     def clean_full_name(self):
         full_name = self.cleaned_data.get('full_name')
-        full_name = full_name.split()
-        if Profile.objects.filter(username=full_name[0]).exists():
+        if Profile.objects.filter(username=full_name.split()[0]).exists():
             raise ValidationError(f"User with username {full_name[0]} already exists.")
         return full_name
 
