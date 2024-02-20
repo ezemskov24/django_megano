@@ -44,6 +44,7 @@ class FormValidationMixin:
         )
         if self.request.session.get('cart'):
             merge_cart_products(user, self.request.session.get('cart'))
+        self.request.session['cart'] = []
         login(request=self.request, user=user)
         messages.success(self.request, "Данные успешно обновлены.")
         return response
