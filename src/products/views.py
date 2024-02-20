@@ -175,7 +175,8 @@ class ProductDetailsView(DetailView):
 class ProductsCompareView(ListView):
     template_name = 'products/compare/compare.jinja2'
 
-    def get_queryset(self):
+    def get_queryset(self) -> list[Product]:
+        '''Фомирует кверисет для страницы сравнения'''
         return [
             product[0] for product in [
                 Product.objects.filter(slug=slug).select_related('category').prefetch_related("images")
@@ -183,7 +184,8 @@ class ProductsCompareView(ListView):
             ]
         ]
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs) -> dict[Any]:
+        '''Фомирует контекст для страницы сравнения'''
         context = super().get_context_data()
 
         if not context['object_list']:
@@ -245,30 +247,32 @@ class ProductsCompareView(ListView):
         return context
 
 
-def delete_all_compare_products_view(request):
-    '''функция ajax запроса для доступа к сервису сравнения'''
+def delete_all_compare_products_view(request: HttpRequest) -> HttpResponse:
+    '''функция ajax запроса для удаления всех товаров из сравнения'''
     if request.method == 'DELETE':
         delete_all_compare_products(request)
         return HttpResponse()
     return HttpResponse('Нет доступа')
 
 
-def delete_product_to_compare_list_view(request, slug):
-    '''функция ajax запроса для доступа к сервису сравнения'''
+def delete_product_to_compare_list_view(request: HttpRequest, slug: str) -> HttpResponse:
+    '''функция ajax запроса для удаления одного товара из сравнения'''
     if request.method == 'DELETE':
         delete_product_to_compare_list(request, slug)
         return HttpResponse()
     return HttpResponse('Нет доступа')
 
 
-def add_product_to_compare_list_view(request, slug):
+def add_product_to_compare_list_view(request: HttpRequest, slug: str) -> HttpResponse:
+    '''функция ajax запроса для добавления одного товара в сравнение'''
     if request.method == 'POST':
         add_product_to_compare_list(request, slug)
         return HttpResponse()
     return HttpResponse('Нет доступа')
 
 
-def get_compare_list_amt_view(request):
+def get_compare_list_amt_view(request: HttpRequest) -> HttpResponse:
+    '''функция ajax запроса для получения количества товаров в сравнении'''
     if request.method == 'GET':
         return HttpResponse(get_compare_list_amt(request))
     return HttpResponse('Нет доступа')
