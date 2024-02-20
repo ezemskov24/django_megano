@@ -276,9 +276,9 @@ class ProductImporter:
         sell_prod['seller'] = Seller.objects.filter(
             pk=sell_prod['seller'],
         ).select_related('profile').first()
-        seller_owner = sell_prod['seller']
+        seller_owner = sell_prod['seller'].profile
         if self.__user_id and not (seller_owner.pk == self.__user_id or
-                                   seller_owner.is_admin or
+                                   seller_owner.is_superuser or
                                    seller_owner.is_staff):
             raise PermissionDenied('Can\'t add products for someone else\'s seller')
         if sell_prod.get('new'):
@@ -289,7 +289,7 @@ class ProductImporter:
                 pk=sell_prod['product'],
             ).first()
 
-        if isinstance(sell_prod.get('new'), int):
+        if isinstance(sell_prod.get('new'), bool):
             del sell_prod['new']
 
     def __calculate_successful_imports(self) -> None:
