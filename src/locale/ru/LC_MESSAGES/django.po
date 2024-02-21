@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-20 13:31+0000\n"
+"POT-Creation-Date: 2024-02-21 18:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,6 +26,18 @@ msgstr "Продавец"
 #: account/models.py:74
 msgid "Sellers"
 msgstr "Продавцы"
+
+#: account/views.py:50
+msgid "Данные успешно обновлены."
+msgstr ""
+
+#: account/views.py:62
+msgid "Ошибка обновления данных."
+msgstr ""
+
+#: account/views.py:87
+msgid "Неверный логин или пароль"
+msgstr ""
 
 #: adminsettings/admin.py:26
 msgid "Кэш успешно сброшен."

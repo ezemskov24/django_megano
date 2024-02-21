@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, LoginView
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import (
     CreateView,
     DetailView,
@@ -46,7 +47,7 @@ class FormValidationMixin:
             merge_cart_products(user, self.request.session.get('cart'))
         self.request.session['cart'] = []
         login(request=self.request, user=user)
-        messages.success(self.request, "Данные успешно обновлены.")
+        messages.success(self.request, _("Данные успешно обновлены."))
         return response
 
 
@@ -58,7 +59,7 @@ class ProfileUpdateView(FormValidationMixin, LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('account:profile')
 
     def form_invalid(self, form):
-        messages.error(self.request, "Ошибка обновления данных.")
+        messages.error(self.request, _("Ошибка обновления данных."))
         return super().form_invalid(form)
 
     def get_object(self, queryset=None):
@@ -83,7 +84,7 @@ class UserLoginView(LoginView):
             request.session['cart'] = []
             login(request, user)
             return redirect('account:profile')
-        return render(request, 'registration/login.jinja2', context={'errors': 'Неверный логин или пароль'})
+        return render(request, 'registration/login.jinja2', context={'errors': _('Неверный логин или пароль')})
 
 
 class UserLogoutView(LogoutView):
